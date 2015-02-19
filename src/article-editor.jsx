@@ -7,6 +7,8 @@ var Editor = require("./editor.jsx");
 var EnabledFeatures = require("./enabled-features.jsx");
 var JsonEditor = require("./json-editor.jsx");
 var Renderer = require("./renderer.jsx");
+var Util = require("./util.js");
+var SearchAndReplaceDialog = require("./search-and-replace-dialog.jsx");
 
 var rendererProps = React.PropTypes.shape({
     content: React.PropTypes.string,
@@ -65,6 +67,13 @@ var ArticleEditor = React.createClass({
     },
 
     render: function() {
+        var searchString = this.props.searchString;
+        var occurrences = 0;
+
+        this._sections().forEach((section) => {
+            var content = section.content || "";
+            occurrences += Util.countEditorOccurrences(content, searchString);
+        });
 
         return <div className="framework-perseus perseus-article">
             <div>
@@ -100,6 +109,15 @@ var ArticleEditor = React.createClass({
                         onChange={this._handleJsonChange} />
                 </div>
             }
+
+            <SearchAndReplaceDialog
+                ref="searchAndReplace"
+                json={this.props.json}
+                searchString={this.props.searchString}
+                searchIndex={this.props.searchIndex}
+                onChange={this.props.onChange}
+                searchResultCount={occurrences}
+            />
         </div>;
     },
 
@@ -124,71 +142,83 @@ var ArticleEditor = React.createClass({
         );
 
         var sections = this._sections();
+        var searchIndex = this.props.searchIndex;
+        var searchString = this.props.searchString;
+
+        var adjustedSearchIndices = _.map(sections, (section) => {
+            var adjustedIndex = searchIndex;
+            var content = section.content || "";
+            searchIndex -= Util.countEditorOccurrences(content, searchString);
+            return adjustedIndex;
+        });
+
+        var rows = sections.map((section, i) => {
+            var titleDiv = <div className="pod-title">
+                Section {i+1}
+                <div style={{
+                    display: "inline-block",
+                    float: "right"
+                }}>
+                    {(i + 1 < sections.length) &&
+                        <SectionControlButton
+                            icon="icon-circle-arrow-down"
+                            onClick={() => {
+                                this._handleMoveSectionLater(i);
+                            }}
+                    />}
+                    {(i > 0) &&
+                        <SectionControlButton
+                            icon="icon-circle-arrow-up"
+                            onClick={() => {
+                                this._handleMoveSectionEarlier(i);
+                            }}
+                    />}
+                    <SectionControlButton
+                        icon="icon-trash"
+                        onClick={() => {
+                            var msg = "Are you sure you " +
+                                "want to remove section " +
+                                (i + 1) + "?";
+                            if (confirm(msg)) {
+                                this._handleRemoveSection(i);
+                            }
+                        }} />
+                    <SectionControlButton
+                        icon="icon-plus"
+                        onClick={() => {
+                            this._handleAddSectionAfter(i);
+                        }} />
+                </div>
+            </div>;
+
+            return <div className="perseus-editor-row" key={i}>
+                <div className="perseus-editor-left-cell">
+                    {titleDiv}
+                    <Editor
+                        {...section}
+                        ref={"editor" + i}
+                        placeholder="Type your section text here..."
+                        imageUploader={this.props.imageUploader}
+                        onChange={
+                            _.partial(this._handleEditorChange, i)
+                        }
+                        apiOptions={apiOptions}
+                        enabledFeatures={this.props.enabledFeatures}
+                        searchString={searchString}
+                        searchIndex={adjustedSearchIndices[i]} />
+                </div>
+                <div className="perseus-editor-right-cell">
+                    <Renderer
+                        {...section}
+                        ref={"renderer" + i}
+                        apiOptions={apiOptions}
+                        enabledFeatures={this.props.enabledFeatures} />
+                </div>
+            </div>;
+        });
 
         return <div className="perseus-editor-table">
-            {sections.map((section, i) => {
-                return [
-                    <div className="perseus-editor-row">
-                        <div className="perseus-editor-left-cell">
-                            <div className="pod-title">
-                                Section {i+1}
-                                <div style={{
-                                    display: "inline-block",
-                                    float: "right"
-                                }}>
-                                    {(i + 1 < sections.length) &&
-                                        <SectionControlButton
-                                            icon="icon-circle-arrow-down"
-                                            onClick={() => {
-                                                this._handleMoveSectionLater(i);
-                                            }} />
-                                    }
-                                    {(i > 0) &&
-                                        <SectionControlButton
-                                            icon="icon-circle-arrow-up"
-                                            onClick={() => {
-                                                this._handleMoveSectionEarlier(i);
-                                            }} />
-                                    }
-                                    <SectionControlButton
-                                        icon="icon-trash"
-                                        onClick={() => {
-                                            var msg = "Are you sure you " +
-                                                "want to remove section " +
-                                                (i + 1) + "?";
-                                            if (confirm(msg)) {
-                                                this._handleRemoveSection(i);
-                                            }
-                                        }} />
-                                    <SectionControlButton
-                                        icon="icon-plus"
-                                        onClick={() => {
-                                            this._handleAddSectionAfter(i);
-                                        }} />
-                                </div>
-                            </div>
-                            <Editor
-                                {...section}
-                                ref={"editor" + i}
-                                placeholder="Type your section text here..."
-                                imageUploader={this.props.imageUploader}
-                                onChange={
-                                    _.partial(this._handleEditorChange, i)
-                                }
-                                apiOptions={apiOptions}
-                                enabledFeatures={this.props.enabledFeatures} />
-                        </div>
-
-                        <div className="perseus-editor-right-cell">
-                            <Renderer
-                                {...section}
-                                ref={"renderer" + i}
-                                apiOptions={apiOptions}
-                                enabledFeatures={this.props.enabledFeatures} />
-                        </div>
-                    </div>
-                ];
-            })}
+            {rows}
         </div>;
     },
 
@@ -232,6 +262,10 @@ var ArticleEditor = React.createClass({
         var sections = _.clone(this._sections());
         sections[i] = _.extend({}, sections[i], newProps);
         this.props.onChange({json: sections});
+    },
+
+    _handleSearchChange: function(newProps) {
+
     },
 
     _handleMoveSectionEarlier: function(i) {

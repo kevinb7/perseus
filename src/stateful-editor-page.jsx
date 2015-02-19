@@ -28,8 +28,11 @@ var StatefulEditorPage = React.createClass({
 
     getInitialState: function() {
         return _({}).extend(_.omit(this.props, 'componentClass'), {
+            ref: "editor",
             onChange: this.handleChange,
-            ref: "editor"
+            searchAndReplace: false,
+            searchString: "",
+            searchIndex: 0
         });
     },
 
@@ -58,7 +61,7 @@ var StatefulEditorPage = React.createClass({
 
     scorePreview: function() {
         return this.refs.editor.scorePreview();
-    }
+    },
 });
 
 module.exports = StatefulEditorPage;

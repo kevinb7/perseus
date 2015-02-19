@@ -43,6 +43,8 @@ var ItemEditor = React.createClass({
                         onChange={this.handleEditorChange}
                         apiOptions={this.props.apiOptions}
                         showWordCount={true}
+                        searchString={this.props.searchString}
+                        searchIndex={this.props.searchIndex}
                         {...this.props.question} />
                 </div>
 

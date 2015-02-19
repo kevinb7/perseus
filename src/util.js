@@ -15,6 +15,8 @@ var Util = {
 
     rWidgetParts: /^\[\[\u2603 (([a-z-]+) ([0-9]+))\]\]$/,
     rWidgetRule:  /^\[\[\u2603 (([a-z-]+) ([0-9]+))\]\]/,
+    rWidgets: /\[\[\u2603 (([a-z-]+) ([0-9]+))\]\]/g,
+    rWidgetSplit: /(\[\[\u2603 [a-z-]+ [0-9]+\]\])/g,
     rTypeFromWidgetId: /^([a-z-]+) ([0-9]+)$/,
     snowman: "\u2603",
 
@@ -23,6 +25,54 @@ var Util = {
         earned: 0,
         total: 0,
         message: null
+    },
+
+    // Source: Regular Expressions [MDN]
+    // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
+    escapeRegExp: function(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    },
+
+    /**
+     * Returns the indices of each occurrence of searchString within
+     * contentString ignoring occurrence within widget references.
+     */
+    getEditorIndicesOf: function(contentString, searchString) {
+        if (searchString === "") {
+            return [];
+        }
+
+        var indices = [];
+        var searchStringLength = searchString.length;
+        var pieces = Util.split(contentString, Util.rWidgetSplit);
+        var pieceOffet = 0;
+
+        for (var i = 0; i < pieces.length; i++) {
+            var type = i % 2;
+            if (type === 0) {
+                // normal text
+                var startIndex = 0;
+                while (true) {
+                    var index = pieces[i].indexOf(searchString, startIndex);
+                    if (index > -1) {
+                        indices.push(pieceOffet + index);
+                        startIndex = index + searchStringLength;
+                    } else {
+                        break;
+                    }
+                }
+                pieceOffet += pieces[i].length;
+            } else {
+                // widget reference
+                pieceOffet += pieces[i].length;
+            }
+        }
+
+        return indices;
+    },
+
+    countEditorOccurrences: function(contentString, searchString) {
+        return Util.getEditorIndicesOf(contentString, searchString).length;
     },
 
     seededRNG: function(seed) {

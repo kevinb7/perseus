@@ -8,6 +8,7 @@ var PerseusMarkdown = require("./perseus-markdown.jsx");
 var PropCheckBox = require("./components/prop-check-box.jsx");
 var Util = require("./util.js");
 var Widgets = require("./widgets.js");
+var classNames = require("classnames");
 
 var WIDGET_PROP_BLACKLIST = require("./mixins/widget-prop-blacklist.jsx");
 
@@ -235,7 +236,7 @@ var imageUrlsFromContent = function(content) {
 var Editor = React.createClass({
     propTypes: {
         imageUploader: React.PropTypes.func,
-        apiOptions: ApiOptions.propTypes,
+        apiOptions: ApiOptions.propTypes
     },
 
     getDefaultProps: function() {
@@ -249,6 +250,12 @@ var Editor = React.createClass({
             immutableWidgets: false,
             showWordCount: false,
             apiOptions: ApiOptions.defaults,
+        };
+    },
+
+    getInitialState: function() {
+        return {
+            searchRegex: ""
         };
     },
 
@@ -329,6 +336,7 @@ var Editor = React.createClass({
         var templatesDropDown;
         var widgetsAndTemplates;
         var wordCountDisplay;
+        var classes;
 
         if (this.props.showWordCount) {
             var numChars = PerseusMarkdown.characterCount(this.props.content);
@@ -346,16 +354,51 @@ var Editor = React.createClass({
             widgets = {};
             underlayPieces = [];
 
+            var searchResultIndex = 0;
+            var searchIndex = this.props.searchIndex;
+            var searchString = this.props.searchString || "";
+            var searchRegex = this.state.searchRegex;
+
             for (var i = 0; i < pieces.length; i++) {
                 var type = i % 2;
                 if (type === 0) {
                     // Normal text
-                    underlayPieces.push(pieces[i]);
+                    if (searchString) {
+                        var smallerPieces = Util.split(pieces[i], searchRegex);
+                        for (var j = 0; j < smallerPieces.length; j++) {
+                            var smallerPiece = smallerPieces[j];
+                            if (smallerPiece === searchString) {
+                                var currentResult =
+                                    searchResultIndex === searchIndex;
+                                classes = classNames({
+                                    "search-result": !currentResult,
+                                    "current-search-result": currentResult
+                                });
+
+                                var ref = currentResult ?
+                                    "current-search-result" : "";
+
+                                // Search result
+                                underlayPieces.push(
+                                    <b key={[i,j].join(":")}
+                                        className={classes}
+                                        ref={ref}
+                                        >{smallerPiece}</b>
+                                );
+                                searchResultIndex++;
+                            } else {
+                                // Normal text
+                                underlayPieces.push(smallerPiece);
+                            }
+                        }
+                    } else {
+                        underlayPieces.push(pieces[i]);
+                    }
                 } else {
                     // Widget reference
                     var match = Util.rWidgetParts.exec(pieces[i]);
                     var id = match[1];
-                    var type = match[2];
+                    type = match[2];
 
                     var selected = false;
                     // TODO(alpert):
@@ -369,8 +412,10 @@ var Editor = React.createClass({
                     var duplicate = id in widgets;
 
                     widgets[id] = this.getWidgetEditor(id, type);
-                    var classes = (duplicate || !widgets[id] ? "error " : "") +
-                            (selected ? "selected " : "");
+                    classes = classNames({
+                        "error": duplicate || !widgets[id],
+                        "selected": selected
+                    });
                     var key = duplicate ? i : id;
                     underlayPieces.push(
                             <b className={classes} key={key}>{pieces[i]}</b>);
@@ -467,6 +512,17 @@ var Editor = React.createClass({
         this._sizeImages(this.props);
     },
 
+    componentWillUpdate: function(nextProps) {
+        if (this.props.searchString !== nextProps.searchString) {
+            var searchString = nextProps.searchString;
+            var searchRegex =
+                // the parentheses here are needed so that split includes the
+                // search string in the matches
+                new RegExp(`(${Util.escapeRegExp(searchString)})`, "g");
+            this.setState({ searchRegex });
+        }
+    },
+
     componentDidUpdate: function(prevProps) {
         // TODO(alpert): Maybe fix React so this isn't necessary
         var textarea = this.refs.textarea.getDOMNode();
@@ -477,6 +533,16 @@ var Editor = React.createClass({
         if (this.props.content !== prevProps.content) {
             this._sizeImages(this.props);
         }
+
+        // shift the view so the current search result is visible
+        $(this.refs["current-search-result"]).each((index, component) => {
+            var elem = component.getDOMNode();
+            var bounds = elem.getBoundingClientRect();
+            if (bounds.top < 10 || bounds.bottom > $(window).height() - 10) {
+                var scrollY = bounds.top + window.scrollY - 100;
+                window.scrollTo(window.scrollX, scrollY);
+            }
+        });
     },
 
     handleDrop: function(e) {
@@ -692,7 +758,7 @@ var Editor = React.createClass({
         PerseusMarkdown.traverseContent(parsed, (node) => {
             if (node.type === "image" && !node.alt) {
                 var shortUrl = node.target.length < 9 ? node.target :
-                        node.target.slice(0, 3) + "..." + node.target.slice(-3);
+                    node.target.slice(0, 3) + "..." + node.target.slice(-3);
 
                 noAltImages.push(
                     "Image '" + node.target +

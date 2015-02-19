@@ -23,7 +23,7 @@ var noWidgets = {
         "minor": 1
     },
     "hints": []
-}
+};
 
 var oneAccessibleWidget = {
     "question": {

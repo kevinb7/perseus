@@ -7,6 +7,8 @@ var ItemEditor = require("./item-editor.jsx");
 var ItemRenderer = require("./item-renderer.jsx");
 var JsonEditor = require("./json-editor.jsx");
 var ApiOptions = require("./perseus-api.jsx").Options;
+var Util = require("./util.js");
+var SearchAndReplaceDialog = require("./search-and-replace-dialog.jsx");
 
 var EditorPage = React.createClass({
     propTypes: {
@@ -47,6 +49,17 @@ var EditorPage = React.createClass({
     },
 
     render: function() {
+        var searchString = this.props.searchString;
+        var questionOccurrences = Util.countEditorOccurrences(
+            this.props.question.content, searchString);
+
+        var hintOccurrences = 0;
+        this.props.hints.forEach(hint => {
+            hintOccurrences +=
+                Util.countEditorOccurrences(hint.content, searchString);
+        });
+
+        var hintSearchIndex = this.props.searchIndex - questionOccurrences;
 
         return <div id="perseus" className="framework-perseus">
             {this.props.developerMode &&
@@ -80,7 +93,9 @@ var EditorPage = React.createClass({
                     wasAnswered={this.state.wasAnswered}
                     gradeMessage={this.state.gradeMessage}
                     onCheckAnswer={this.handleCheckAnswer}
-                    apiOptions={this._apiOptions()} />
+                    apiOptions={this._apiOptions()}
+                    searchString={searchString}
+                    searchIndex={this.props.searchIndex} />
             }
 
             {(!this.props.developerMode || !this.props.jsonMode) &&
@@ -88,8 +103,20 @@ var EditorPage = React.createClass({
                     ref="hintsEditor"
                     hints={this.props.hints}
                     imageUploader={this.props.imageUploader}
-                    onChange={this.handleChange} />
+                    onChange={this.handleChange}
+                    searchString={searchString}
+                    searchIndex={hintSearchIndex} />
             }
+
+            <SearchAndReplaceDialog
+                ref="searchAndReplace"
+                question={this.props.question}
+                hints={this.props.hints}
+                searchString={this.props.searchString}
+                searchIndex={this.props.searchIndex}
+                onChange={this.props.onChange}
+                searchResultCount={questionOccurrences + hintOccurrences}
+            />
         </div>;
 
     },

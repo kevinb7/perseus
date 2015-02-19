@@ -13,7 +13,6 @@ var Util = require("../util.js");
 var InfoTip = require("react-components/info-tip.jsx");
 
 var shuffle = require("../util.js").shuffle;
-var seededRNG = require("../util.js").seededRNG;
 var captureScratchpadTouchStart =
         require("../util.js").captureScratchpadTouchStart;
 
@@ -539,10 +538,9 @@ var RadioEditor = React.createClass({
                                       onePerLine={this.props.onePerLine}
                                       onChange={this.props.onChange} />
                         <InfoTip>
-                            <p>
-                                Use one answer per line unless your question has
-                                images that might cause the answers to go off the
-                                page.
+                            <p>Use one answer per line unless your question has
+                                images that might cause the answers to go off
+                                the page.
                             </p>
                         </InfoTip>
                     </div>
@@ -604,11 +602,12 @@ var RadioEditor = React.createClass({
                     {' '}Add a choice{' '}
                 </a>
 
-                {!this.props.hasNoneOfTheAbove && <a href="#" className="simple-button"
+                {!this.props.hasNoneOfTheAbove &&
+                    <a href="#" className="simple-button"
                         onClick={this.addChoice.bind(this, true)}>
-                    <span className="icon-plus" />
-                    {' '}None of the above{' '}
-                </a>}
+                        <span className="icon-plus" />
+                        {' '}None of the above{' '}
+                    </a>}
             </div>
 
         </div>;
@@ -644,7 +643,8 @@ var RadioEditor = React.createClass({
         var choices = _.map(this.props.choices, (choice, i) => {
             return _.extend({}, choice, {
                 correct: checked[i],
-                content: choice.isNoneOfTheAbove && !checked[i] ? '' : choice.content
+                content: choice.isNoneOfTheAbove && !checked[i] ? ''
+                    : choice.content
             });
         });
         this.props.onChange({choices: choices});
@@ -679,7 +679,8 @@ var RadioEditor = React.createClass({
 
         this.props.onChange({
             choices: choices,
-            hasNoneOfTheAbove: this.props.hasNoneOfTheAbove && !deleted.isNoneOfTheAbove
+            hasNoneOfTheAbove:
+                this.props.hasNoneOfTheAbove && !deleted.isNoneOfTheAbove
         });
     },
 
@@ -696,7 +697,8 @@ var RadioEditor = React.createClass({
             choices: choices,
             hasNoneOfTheAbove: noneOfTheAbove || this.props.hasNoneOfTheAbove
         }, () => {
-            this.refs[`choice-editor${addIndex}`].refs['content-editor'].focus();
+            this.refs[`choice-editor${addIndex}`]
+                .refs['content-editor'].focus();
         });
     },
 
@@ -705,7 +707,7 @@ var RadioEditor = React.createClass({
     },
 
     focus: function() {
-        this.refs['choice-editor0'].refs['content-editor'].focus()
+        this.refs['choice-editor0'].refs['content-editor'].focus();
         return true;
     },
 
@@ -718,8 +720,8 @@ var RadioEditor = React.createClass({
 
     serialize: function() {
         return _.pick(this.props, "choices", "randomize",
-            "multipleSelect", "displayCount", "hasNoneOfTheAbove", "onePerLine",
-            "deselectEnabled");
+            "multipleSelect", "displayCount", "hasNoneOfTheAbove",
+            "onePerLine", "deselectEnabled");
     }
 });
 
@@ -745,7 +747,7 @@ var choiceTransform = (editorProps, problemNum) => {
 
         // Place the "None of the above" options last
         if (noneOfTheAbove) {
-            array.push(noneOfTheAbove)
+            array.push(noneOfTheAbove);
         }
 
         return array;
