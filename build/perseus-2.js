@@ -1,6 +1,6 @@
 /*! Perseus | http://github.com/Khan/perseus */
-// commit 5bdd13bd123f1c26e2451b8344c14cc4564d0df7
-// branch search_and_replace
+// commit a62d214b91d0a7031e4aeaf071e1ef111f60c822
+// branch gh-pages
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -763,7 +763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 
 	        // Require here to prevent recursive imports
-	        var SvgImage = __webpack_require__(60);
+	        var SvgImage = __webpack_require__(61);
 	        img.src = SvgImage.getRealImageUrl(url);
 	    },
 
@@ -812,7 +812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Renderer = __webpack_require__(11);
@@ -1248,7 +1248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var ApiOptions = __webpack_require__(13).Options;
@@ -1560,7 +1560,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 
 	var ApiOptions = __webpack_require__(13).Options;
 	var Renderer = __webpack_require__(11);
@@ -1609,13 +1609,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var ApiOptions = __webpack_require__(13).Options;
 	var DragTarget = __webpack_require__(66);
 	var EnabledFeatures = __webpack_require__(50);
-	var PropCheckBox = __webpack_require__(61);
+	var PropCheckBox = __webpack_require__(62);
 	var Util = __webpack_require__(3);
 	var Widgets = __webpack_require__(15);
 
@@ -2389,7 +2389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var CombinedHintsEditor = __webpack_require__(53);
@@ -2647,7 +2647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var AnswerAreaRenderer = __webpack_require__(4);
@@ -3031,11 +3031,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
-	var HintRenderer = __webpack_require__(58);
-	var SvgImage = __webpack_require__(60);
+	var HintRenderer = __webpack_require__(56);
+	var SvgImage = __webpack_require__(61);
 
 	var HintsRenderer = React.createClass({displayName: 'HintsRenderer',
 	    render: function() {
@@ -3137,12 +3137,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var PerseusMarkdown = __webpack_require__(52);
 	var QuestionParagraph = __webpack_require__(48);
-	var SvgImage = __webpack_require__(60);
+	var SvgImage = __webpack_require__(61);
 	var TeX = __webpack_require__(67);
 	var WidgetContainer = __webpack_require__(49);
 	var Widgets = __webpack_require__(15);
@@ -4168,7 +4168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var EditorPage = __webpack_require__(8);
@@ -4269,7 +4269,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * semantic meaning across the same perseus api major version.
 	 */
 
-	var StubTagEditor = __webpack_require__(62);
+	var StubTagEditor = __webpack_require__(63);
 
 	module.exports = {
 	    Options: {
@@ -4329,8 +4329,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Responsible for combining the text diffs from text-diff and the widget
 	// diffs from widget-differ.
 
-	var TextDiff = __webpack_require__(56);
-	var WidgetDiff = __webpack_require__(57);
+	var TextDiff = __webpack_require__(57);
+	var WidgetDiff = __webpack_require__(58);
 
 	// Deeply look up a property in an object,
 	// -> getPath(obj, ["a", "b", "c"]) === obj["a"]["b"]["c"]
@@ -4600,7 +4600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var Changeable = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
@@ -4608,7 +4608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 	var InfoTip = __webpack_require__(71);
-	var PropCheckBox = __webpack_require__(61);
+	var PropCheckBox = __webpack_require__(62);
 	var Renderer = __webpack_require__(11);
 	var TextListEditor = __webpack_require__(72);
 	var Util = __webpack_require__(3);
@@ -4818,7 +4818,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var InfoTip = __webpack_require__(71);
 	var FancySelect = __webpack_require__(73);
 	var FancyOption = FancySelect.Option;
@@ -5094,7 +5094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * TODO(jack): Add more comments
 	 */
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var Changeable = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 	var _ = __webpack_require__(59);
@@ -5283,7 +5283,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * TODO(jack): Add more comments
 	 */
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Util = __webpack_require__(3);
@@ -5291,7 +5291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
 
-	var Graphie = __webpack_require__(78);
+	var Graphie = __webpack_require__(74);
 	var MovablePoint = Graphie.MovablePoint;
 
 	var knumber = __webpack_require__(105).number;
@@ -5477,7 +5477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var InfoTip = __webpack_require__(71);
 	var SortableArea     = __webpack_require__(79);
 	var Tooltip = __webpack_require__(80);
@@ -5491,7 +5491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 
 	var EnabledFeatures = __webpack_require__(50);
-	var PropCheckBox = __webpack_require__(61);
+	var PropCheckBox = __webpack_require__(62);
 
 	var InputWithExamples = __webpack_require__(81);
 	var MathInput = __webpack_require__(82);
@@ -6628,16 +6628,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _ = __webpack_require__(59);
 
-	var ButtonGroup      = __webpack_require__(74);
-	var GraphSettings    = __webpack_require__(75);
+	var ButtonGroup      = __webpack_require__(75);
+	var GraphSettings    = __webpack_require__(76);
 	var InfoTip          = __webpack_require__(71);
-	var Interactive2     = __webpack_require__(76);
-	var MultiButtonGroup = __webpack_require__(77);
-	var SvgImage         = __webpack_require__(60);
+	var Interactive2     = __webpack_require__(77);
+	var MultiButtonGroup = __webpack_require__(78);
+	var SvgImage         = __webpack_require__(61);
 	var Util             = __webpack_require__(3);
 
 	/* Graphie and relevant components. */
-	var Graphie      = __webpack_require__(78);
+	var Graphie      = __webpack_require__(74);
 	var MovablePoint = Graphie.MovablePoint;
 	var Plot         = Graphie.Plot;
 	var MovableLine  = Graphie.MovableLine;
@@ -7938,7 +7938,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *  but could also be used for embedding viz's hosted elsewhere.
 	 */
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var BlurInput    = __webpack_require__(84);
@@ -8221,9 +8221,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
 
-	var Graphie      = __webpack_require__(78);
-	var RangeInput   = __webpack_require__(85);
-	var SvgImage     = __webpack_require__(60);
+	var Graphie      = __webpack_require__(74);
+	var RangeInput   = __webpack_require__(86);
+	var SvgImage     = __webpack_require__(61);
 
 	var defaultBoxSize = 400;
 	var defaultRange = [0, 10];
@@ -8597,13 +8597,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React             = __webpack_require__(63);
+	var React             = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var BlurInput         = __webpack_require__(84);
 	var InfoTip           = __webpack_require__(71);
 	var InputWithExamples = __webpack_require__(81);
-	var ParseTex          = __webpack_require__(86).parseTex;
+	var ParseTex          = __webpack_require__(85).parseTex;
 
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 	var ApiOptions = __webpack_require__(13).Options;
@@ -9034,13 +9034,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Changeable   = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 
-	var ArrowPicker = __webpack_require__(98);
-	var ColorPicker = __webpack_require__(99);
-	var ConstraintEditor = __webpack_require__(100);
-	var DashPicker = __webpack_require__(101);
-	var ElementContainer = __webpack_require__(102);
-	var Graphie = __webpack_require__(78);
-	var GraphSettings = __webpack_require__(75);
+	var ArrowPicker = __webpack_require__(95);
+	var ColorPicker = __webpack_require__(96);
+	var ConstraintEditor = __webpack_require__(97);
+	var DashPicker = __webpack_require__(98);
+	var ElementContainer = __webpack_require__(99);
+	var Graphie = __webpack_require__(74);
+	var GraphSettings = __webpack_require__(76);
 	var MathInput = __webpack_require__(82);
 	var NumberInput = __webpack_require__(87);
 	var TeX = __webpack_require__(67);
@@ -10437,13 +10437,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Graph         = __webpack_require__(89);
-	var GraphSettings = __webpack_require__(75);
+	var GraphSettings = __webpack_require__(76);
 	var InfoTip       = __webpack_require__(71);
-	var Interactive2  = __webpack_require__(76);
+	var Interactive2  = __webpack_require__(77);
 	var NumberInput   = __webpack_require__(87);
 	var Util          = __webpack_require__(3);
 
@@ -12959,13 +12959,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var Changeable = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
 
 	var NumberInput = __webpack_require__(87);
-	var PropCheckBox = __webpack_require__(61);
+	var PropCheckBox = __webpack_require__(62);
 	var InfoTip = __webpack_require__(71);
 
 	var MAX_SIZE = 8;
@@ -13424,7 +13424,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable = __webpack_require__(68);
@@ -13432,7 +13432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Editor = __webpack_require__(7);
 	var NumberInput = __webpack_require__(87);
-	var RangeInput = __webpack_require__(85);
+	var RangeInput = __webpack_require__(86);
 	var Renderer = __webpack_require__(11);
 	var TextInput = __webpack_require__(88);
 	var MathOutput = __webpack_require__(90);
@@ -13967,11 +13967,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var InfoTip        = __webpack_require__(71);
-	var PropCheckBox   = __webpack_require__(61);
+	var PropCheckBox   = __webpack_require__(62);
 	var Renderer       = __webpack_require__(11);
 	var Sortable       = __webpack_require__(92);
 	var TextListEditor = __webpack_require__(72);
@@ -14218,7 +14218,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React        = __webpack_require__(63);
+	var React        = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
@@ -14226,8 +14226,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var InfoTip       = __webpack_require__(71);
 	var NumberInput   = __webpack_require__(87);
-	var PropCheckBox  = __webpack_require__(61);
-	var RangeInput    = __webpack_require__(85);
+	var PropCheckBox  = __webpack_require__(62);
+	var RangeInput    = __webpack_require__(86);
 
 	var defaultImage = {
 	    url: null,
@@ -14584,23 +14584,23 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 
-	var ButtonGroup  = __webpack_require__(74);
+	var ButtonGroup  = __webpack_require__(75);
 	var InfoTip      = __webpack_require__(71);
-	var Interactive2 = __webpack_require__(76);
+	var Interactive2 = __webpack_require__(77);
 	var NumberInput  = __webpack_require__(87);
-	var PropCheckBox = __webpack_require__(61);
-	var RangeInput   = __webpack_require__(85);
+	var PropCheckBox = __webpack_require__(62);
+	var RangeInput   = __webpack_require__(86);
 	var MathOutput   = __webpack_require__(90);
 
 	var ApiOptions = __webpack_require__(13).Options;
 
-	var Graphie = __webpack_require__(78);
+	var Graphie = __webpack_require__(74);
 	var MovablePoint = Graphie.MovablePoint;
 	var Line = Graphie.Line;
 	var Label = Graphie.Label;
@@ -15525,19 +15525,19 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React         = __webpack_require__(63);
+	var React         = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable    = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 
 	var InfoTip = __webpack_require__(71);
-	var PropCheckBox = __webpack_require__(61);
+	var PropCheckBox = __webpack_require__(62);
 	var NumberInput = __webpack_require__(87);
-	var ButtonGroup = __webpack_require__(74);
-	var MultiButtonGroup = __webpack_require__(77);
+	var ButtonGroup = __webpack_require__(75);
+	var MultiButtonGroup = __webpack_require__(78);
 	var InputWithExamples = __webpack_require__(81);
-	var ParseTex = __webpack_require__(86).parseTex;
+	var ParseTex = __webpack_require__(85).parseTex;
 
 	var ApiClassNames   = __webpack_require__(13).ClassNames;
 	var ApiOptions      = __webpack_require__(13).Options;
@@ -16161,7 +16161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var InfoTip = __webpack_require__(71);
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Renderer = __webpack_require__(11);
@@ -16844,7 +16844,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
@@ -16854,8 +16854,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Editor = __webpack_require__(7);
 	var Renderer = __webpack_require__(11);
 	var InfoTip = __webpack_require__(71);
-	var PropCheckBox  = __webpack_require__(61);
-	var PassageMarkdown = __webpack_require__(103);
+	var PropCheckBox  = __webpack_require__(62);
+	var PassageMarkdown = __webpack_require__(100);
 
 	var Passage = React.createClass({displayName: 'Passage',
 	    mixins: [WidgetJsonifyDeprecated, Changeable],
@@ -17174,7 +17174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
@@ -17328,7 +17328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
@@ -17422,15 +17422,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var InfoTip = __webpack_require__(71);
 	var BlurInput = __webpack_require__(84);
 	var _ = __webpack_require__(59);
 
 	var NumberInput = __webpack_require__(87);
 	var TextListEditor = __webpack_require__(72);
-	var RangeInput = __webpack_require__(85);
-	var SvgImage = __webpack_require__(60);
+	var RangeInput = __webpack_require__(86);
+	var SvgImage = __webpack_require__(61);
 
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 
@@ -18434,14 +18434,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable = __webpack_require__(68);
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 
 	var Editor = __webpack_require__(7);
-	var PropCheckBox = __webpack_require__(61);
+	var PropCheckBox = __webpack_require__(62);
 	var Renderer = __webpack_require__(11);
 	var PassageRef = __webpack_require__(36);
 	var Util = __webpack_require__(3);
@@ -19383,7 +19383,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var ApiOptions = __webpack_require__(13).Options;
 	var assert = __webpack_require__(91).assert;
 
-	var Graphie = __webpack_require__(78);
+	var Graphie = __webpack_require__(74);
 	var $__0=
 	    
 	    
@@ -20181,7 +20181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable = __webpack_require__(68);
@@ -20340,11 +20340,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React          = __webpack_require__(63);
+	var React          = __webpack_require__(60);
 	var InfoTip        = __webpack_require__(71);
 	var _ = __webpack_require__(59);
 
-	var PropCheckBox   = __webpack_require__(61);
+	var PropCheckBox   = __webpack_require__(62);
 	var Sortable       = __webpack_require__(92);
 	var TextListEditor = __webpack_require__(72);
 
@@ -20498,7 +20498,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Editor = __webpack_require__(7);
@@ -20954,15 +20954,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Graph         = __webpack_require__(89);
-	var GraphSettings = __webpack_require__(75);
+	var GraphSettings = __webpack_require__(76);
 	var InfoTip       = __webpack_require__(71);
 	var NumberInput   = __webpack_require__(87);
 	var MathOutput    = __webpack_require__(90);
-	var PropCheckBox  = __webpack_require__(61);
+	var PropCheckBox  = __webpack_require__(62);
 	var TeX           = __webpack_require__(67);
 
 	var ApiOptions = __webpack_require__(13).Options;
@@ -24251,7 +24251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 
 	var QuestionParagraph = React.createClass({displayName: 'QuestionParagraph',
 	    render: function() {
@@ -24271,7 +24271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var cx = React.addons.classSet;
 
 	var WidgetContainer = React.createClass({displayName: 'WidgetContainer',
@@ -24344,7 +24344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 
 	module.exports = {
 	    propTypes: React.PropTypes.shape({
@@ -24775,11 +24775,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * hint editor boxes, and hint previews
 	 */
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Editor = __webpack_require__(7);
-	var HintRenderer = __webpack_require__(58);
+	var HintRenderer = __webpack_require__(56);
 	var InfoTip = __webpack_require__(71);
 	var Util = __webpack_require__(3);
 
@@ -25024,10 +25024,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
-	var AnswerAreaEditor = __webpack_require__(95);
+	var AnswerAreaEditor = __webpack_require__(94);
 	var Editor = __webpack_require__(7);
 	var ApiOptions = __webpack_require__(13).Options;
 	var ITEM_DATA_VERSION = __webpack_require__(47).itemDataVersion;
@@ -25173,7 +25173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/** @jsx React.DOM */
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var Util = __webpack_require__(3);
 
 	var SearchAndReplaceDialog = React.createClass({displayName: 'SearchAndReplaceDialog',
@@ -25378,9 +25378,48 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var React = __webpack_require__(60);
+	var Renderer = __webpack_require__(11);
+
+	/* Renders just a hint preview */
+	var HintRenderer = React.createClass({displayName: 'HintRenderer',
+	    render: function() {
+	        var shouldBold = this.props.bold;
+	        var hint = this.props.hint;
+	        var classNames;
+	        if (shouldBold) {
+	            classNames = "perseus-hint-renderer last-hint";
+	        } else {
+	            classNames = "perseus-hint-renderer";
+	        }
+	        return React.createElement("div", {className: classNames}, 
+	            React.createElement(Renderer, {
+	                ref: "renderer", 
+	                widgets: this.props.hint.widgets, 
+	                content: this.props.hint.content || "", 
+	                images: this.props.hint.images})
+	        );
+	    },
+
+	    getSerializedState: function() {
+	        return this.refs.renderer.getSerializedState();
+	    },
+
+	    restoreSerializedState: function(state, callback) {
+	        this.refs.renderer.restoreSerializedState(state, callback);
+	    },
+	});
+
+	module.exports = HintRenderer;
+
+
+/***/ },
+/* 57 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var diff = __webpack_require__(104);
-	var splitDiff = __webpack_require__(96);
-	var stringArrayDiff = __webpack_require__(97);
+	var splitDiff = __webpack_require__(101);
+	var stringArrayDiff = __webpack_require__(102);
 
 	var cx = React.addons.classSet;
 
@@ -25537,11 +25576,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 57 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var cx = React.addons.classSet;
-	var performDiff = __webpack_require__(94);
+	var performDiff = __webpack_require__(103);
 
 	var indentationFromDepth = function(depth) {
 	    return (depth - 1) * 20;
@@ -25735,45 +25774,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 58 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(63);
-	var Renderer = __webpack_require__(11);
-
-	/* Renders just a hint preview */
-	var HintRenderer = React.createClass({displayName: 'HintRenderer',
-	    render: function() {
-	        var shouldBold = this.props.bold;
-	        var hint = this.props.hint;
-	        var classNames;
-	        if (shouldBold) {
-	            classNames = "perseus-hint-renderer last-hint";
-	        } else {
-	            classNames = "perseus-hint-renderer";
-	        }
-	        return React.createElement("div", {className: classNames}, 
-	            React.createElement(Renderer, {
-	                ref: "renderer", 
-	                widgets: this.props.hint.widgets, 
-	                content: this.props.hint.content || "", 
-	                images: this.props.hint.images})
-	        );
-	    },
-
-	    getSerializedState: function() {
-	        return this.refs.renderer.getSerializedState();
-	    },
-
-	    restoreSerializedState: function(state, callback) {
-	        this.refs.renderer.restoreSerializedState(state, callback);
-	    },
-	});
-
-	module.exports = HintRenderer;
-
-
-/***/ },
 /* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -25805,9 +25805,37 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/* This note applies to rcss, react, and underscore.
+	 *
+	 * We're faking a node module for this package by just exporting the global.
+	 * There are a few complications which led us to this solution as a temporary
+	 * fix.
+	 *
+	 * - Browserify can slow down a lot when you include the other packages (and
+	 *   their dependency graphs). We were also battling general browserify
+	 *   slowness at this time - browserify 3.4.0 is "good" but later versions
+	 *   (3.53 if I remember correctly) are terribly slow (on the order of 20x
+	 *   slower).
+	 *
+	 * - I'm not clear on the details of packaging this so we don't duplicate
+	 *   dependencies anywhere. For instance when packaging perseus for webapp we
+	 *   need to be careful not to include packages like underscore from our
+	 *   dependencies or from the packages we depend on. (note: this is a very good
+	 *   opportunity to either explain how existing tools solve the problem or
+	 *   create a new tool to solve it)
+	 *
+	 * - Joel (and Jack)
+	 */
+	module.exports = window.React;
+
+
+/***/ },
+/* 61 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var _ = __webpack_require__(59);
 
-	var Graphie = __webpack_require__(78);
+	var Graphie = __webpack_require__(74);
 	var Util = __webpack_require__(3);
 
 	// The global cache of label data. Its format is:
@@ -26103,10 +26131,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 61 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	/* A checkbox that syncs its value to props using the
@@ -26168,7 +26196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 62 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26216,34 +26244,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	module.exports = StubTagEditor;
-
-
-/***/ },
-/* 63 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* This note applies to rcss, react, and underscore.
-	 *
-	 * We're faking a node module for this package by just exporting the global.
-	 * There are a few complications which led us to this solution as a temporary
-	 * fix.
-	 *
-	 * - Browserify can slow down a lot when you include the other packages (and
-	 *   their dependency graphs). We were also battling general browserify
-	 *   slowness at this time - browserify 3.4.0 is "good" but later versions
-	 *   (3.53 if I remember correctly) are terribly slow (on the order of 20x
-	 *   slower).
-	 *
-	 * - I'm not clear on the details of packaging this so we don't duplicate
-	 *   dependencies anywhere. For instance when packaging perseus for webapp we
-	 *   need to be careful not to include packages like underscore from our
-	 *   dependencies or from the packages we depend on. (note: this is a very good
-	 *   opportunity to either explain how existing tools solve the problem or
-	 *   create a new tool to solve it)
-	 *
-	 * - Joel (and Jack)
-	 */
-	module.exports = window.React;
 
 
 /***/ },
@@ -26349,7 +26349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	/* This component makes its children a drag target. Example:
@@ -26437,7 +26437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	// TODO(joel) - require MathJax / katex so they don't have to be global
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 
 	var pendingScripts = [];
 	var needsProcess = false;
@@ -26731,7 +26731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var RCSS = __webpack_require__(116);
 	var _ = __webpack_require__(59);
 
@@ -27003,7 +27003,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Here be dragons.
 	 */
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 
 	var DROPDOWN_OFFSET = 76;
 
@@ -27210,10 +27210,310 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var _ = __webpack_require__(59);
+	var GraphieClasses = __webpack_require__(107);
+	var Movables = __webpack_require__(108);
+
+	var GraphieMovable = GraphieClasses.GraphieMovable;
+
+	var deepEq = __webpack_require__(3).deepEq;
+	var nestedMap = __webpack_require__(3).nestedMap;
+	var assert = __webpack_require__(91).assert;
+
+	var createGraphie = KhanUtil.createGraphie;
+
+	var Graphie = React.createClass({displayName: 'Graphie',
+	    propTypes: {
+	        box: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
+	        range: React.PropTypes.arrayOf(
+	            React.PropTypes.arrayOf(React.PropTypes.number)
+	        ),
+	        options: React.PropTypes.object,
+	        setup: React.PropTypes.func.isRequired,
+	        onClick: React.PropTypes.func,
+	        onMouseDown: React.PropTypes.func,
+	        onMouseUp: React.PropTypes.func,
+	        onMouseMove: React.PropTypes.func
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            range: [[-10, 10], [-10, 10]],
+	            options: {}
+	        };
+	    },
+
+	    render: function() {
+	        return React.createElement("div", {className: "graphie-container"}, 
+	            React.createElement("div", {className: "graphie", ref: "graphieDiv"})
+	        );
+	    },
+
+	    componentDidMount: function() {
+	        this._setupGraphie();
+	        this._updateMovables();
+	    },
+
+	    shouldComponentUpdate: function(nextProps) {
+	        return !deepEq(this.props, nextProps);
+	    },
+
+	    componentDidUpdate: function(prevProps) {
+	        // If someone changes the setup function passed in, we should
+	        // technically setup graphie again. But that's definitely an
+	        // anti-pattern, since it is most-likely caused by passing in an
+	        // anonymous function rather than a "real" change, and re-rendering
+	        // in that case would cause us to constantly re-setup graphie, which
+	        // would have horrible performance implications. In order to avoid
+	        // those, we just warn here.
+	        if (this.props.setup !== prevProps.setup &&
+	                window.console && window.console.warn) {
+	            window.console.warn("<Graphie> was given a new setup function. " +
+	                    "This is a bad idea; please refactor your code to give " +
+	                    "the same setup function reference to <Graphie> on " +
+	                    "every render.");
+	        }
+	        if (!deepEq(this.props.options, prevProps.options) ||
+	                !deepEq(this.props.box, prevProps.box) ||
+	                !deepEq(this.props.range, prevProps.range)) {
+	            this._setupGraphie();
+	        }
+	        this._updateMovables();
+	    },
+
+	    /**
+	     * Allow parents of the <Graphie> component to grab a reference to the
+	     * underlying graphie object using
+	     * `this.refs.graphieComponent.getGraphie()`
+	     *
+	     * This shouldn't be necessary for 90% of cases, but the power is there.
+	     * Use it for good and not evil.
+	     */
+	    getGraphie: function() {
+	        return this._graphie;
+	    },
+
+	    // bounds-checked range
+	    _range: function() {
+	        return _.map(this.props.range, function(dimRange)  {
+	            if (dimRange[0] >= dimRange[1]) {
+	                return [-10, 10];
+	            } else {
+	                return dimRange;
+	            }
+	        });
+	    },
+
+	    _box: function() {
+	        return _.map(this.props.box, function(pixelDim)  {
+	            // 340 = default size in the editor. exact value
+	            // is arbitrary; this is just a safety check.
+	            return pixelDim > 0 ? pixelDim : 340;
+	        });
+	    },
+
+	    _scale: function() {
+	        var box = this._box();
+	        var range = this._range();
+	        return _.map(box, function(pixelDim, i)  {
+	            var unitDim = range[i][1] - range[i][0];
+	            return pixelDim / unitDim;
+	        });
+	    },
+
+	    _setupGraphie: function() {
+	        this._removeMovables();
+
+	        var graphieDiv = this.refs.graphieDiv.getDOMNode();
+	        $(graphieDiv).empty();
+	        var graphie = this._graphie = createGraphie(graphieDiv);
+
+	        // This has to be called before addMouseLayer. You can re-init
+	        // with graphInit later if you prefer
+	        graphie.init({
+	            range: this._range(),
+	            scale: this._scale()
+	        });
+	        graphie.addMouseLayer({
+	            onClick: this.props.onClick,
+	            onMouseDown: this.props.onMouseDown,
+	            onMouseUp: this.props.onMouseUp,
+	            onMouseMove: this.props.onMouseMove
+	        });
+
+	        graphie.snap = this.props.options.snapStep || [1, 1];
+
+	        this.props.setup(graphie, _.extend({
+	            range: this._range(),
+	            scale: this._scale()
+	        }, this.props.options));
+	    },
+
+	    _removeMovables: function() {
+	        // _.invoke works even when this._movables is undefined
+	        _.invoke(this._movables, "remove");
+	        this._movables = {};
+	    },
+
+	    _renderMovables: function(children, options) {
+	        // Each leaf of `children` is a movable descriptor created by a call to
+	        // some `GraphieMovable`, such as `MovablePoint`.
+	        //
+	        // This function takes these descriptors and renders them into
+	        // on-screen movables, or updates on-screen movables for
+	        // descriptors when possible.
+	        //
+	        // If there is no movable with that key already, this descriptor is
+	        // stored in this._movables and promoted to an on-screen movable by
+	        // calling `child.add(graphie)`.
+	        //
+	        // If a movable of the same type with the same key exists already,
+	        // we take `child.props` and give them to the already-existing
+	        // on-screen movable, and call `movable.modify()`
+
+	        var graphie = options.graphie;
+	        var oldMovables = options.oldMovables;
+	        var newMovables = options.newMovables; /* output parameter */
+
+	        var renderChildren = function(elem)  {
+	            _.each(elem.movableProps, function(prop)  {
+	                // Render the children, and save the results of that
+	                // render to the appropriate props
+	                elem.props[prop] = this._renderMovables(
+	                    elem.props[prop],
+	                    options
+	                );
+	            }.bind(this));
+	        }.bind(this);
+
+	        // Add/modify movables
+
+	        // We want to keep track of whether we have added a new svg element,
+	        // because if we have, then we need to call .toFront() on any svg
+	        // elements occurring afterwards. If this happens, we set
+	        // `areMovablesOutOfOrder` to true:
+	        var areMovablesOutOfOrder = false;
+	        return nestedMap(children, function(childDescriptor)  {
+	            if (!childDescriptor) {
+	                // Still increment the key to avoid cascading key changes
+	                // on hiding/unhiding children, i.e. by using
+	                // {someBoolean && <MovablePoint />}
+	                options.nextKey++;
+	                // preserve the null/undefined in the resulting array
+	                return childDescriptor;
+	            }
+
+	            // Instantiate the descriptor to turn it into a real Movable
+	            var child = new childDescriptor.type(childDescriptor);
+	            assert(child instanceof GraphieMovable,
+	                "All children of a Graphie component must be Graphie " +
+	                "movables");
+
+	            // Give each child a key
+	            var keyProp = childDescriptor.key;
+	            var key = (keyProp == null) ?
+	                    ("_no_id_" + options.nextKey) :
+	                    keyProp;
+	            options.nextKey++;
+	            var ref = childDescriptor.ref;
+
+	            // We render our children first. This allows us to replace any
+	            // `movableProps` on our child with the on-screen movables
+	            // corresponding with those descriptors.
+	            renderChildren(child);
+
+	            var prevMovable = oldMovables[key];
+	            if (!prevMovable) {
+	                // We're creating a new child
+	                child.add(graphie);
+	                areMovablesOutOfOrder = true;
+
+	                newMovables[key] = child;
+
+	            } else if (child.constructor === prevMovable.constructor) {
+	                // We're updating an old child
+	                prevMovable.props = child.props;
+	                var modifyResult = prevMovable.modify(graphie);
+	                if (modifyResult === "reordered") {
+	                    areMovablesOutOfOrder = true;
+	                }
+
+	                newMovables[key] = prevMovable;
+
+	            } else {
+	                // We're destroying an old child and replacing it
+	                // with a new child of a different type
+
+	                // This generally is a bad idea, so warn about it if this
+	                // is being caused by implicit keys
+	                if (keyProp == null) {
+	                    if (typeof console !== "undefined" && console.warn) {
+	                        console.warn("Replacing a <Graphie> child with a " +
+	                                "child of a different type. Please add keys " +
+	                                "to your <Graphie> children");
+	                    }
+	                }
+
+	                prevMovable.remove();
+	                child.add(graphie);
+	                areMovablesOutOfOrder = true;
+
+	                newMovables[key] = child;
+	            }
+
+	            if (areMovablesOutOfOrder) {
+	                newMovables[key].toFront();
+	            }
+
+	            if (ref) {
+	                this.movables[ref] = newMovables[key];
+	            }
+
+	            return newMovables[key];
+	        }.bind(this));
+	    },
+
+	    // Sort of like react diffing, but for movables
+	    _updateMovables: function() {
+	        var graphie = this._graphie;
+
+	        var oldMovables = this._movables;
+	        var newMovables = {};
+	        this._movables = newMovables;
+	        this.movables = {};
+
+	        this._renderMovables(this.props.children, {
+	            nextKey: 1,
+	            graphie: graphie,
+	            oldMovables: oldMovables,
+	            newMovables: newMovables
+	        });
+
+	        // Remove any movables that no longer exist in the child array
+	        _.each(oldMovables, function(oldMovable, key)  {
+	            if (!newMovables[key]) {
+	                oldMovable.remove();
+	            }
+	        });
+	    }
+	});
+
+	// Attach Graphie.createClass and Graphie.createSimpleClass
+	_.extend(Graphie, GraphieClasses);
+	// Attach the Movable react components for easy reference
+	_.extend(Graphie, Movables);
+
+	module.exports = Graphie;
+
+
+/***/ },
+/* 75 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(60);
 	var RCSS = __webpack_require__(116);
 	var _ = __webpack_require__(59);
-	var styles = __webpack_require__(111);
+	var styles = __webpack_require__(109);
 
 	var buttonStyle = styles.button.buttonStyle;
 	var selectedStyle = styles.button.selectedStyle;
@@ -27305,19 +27605,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 75 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Changeable  = __webpack_require__(68);
 
-	var ButtonGroup = __webpack_require__(74);
+	var ButtonGroup = __webpack_require__(75);
 	var InfoTip = __webpack_require__(71);
 	var NumberInput = __webpack_require__(87);
-	var PropCheckBox = __webpack_require__(61);
-	var RangeInput = __webpack_require__(85);
+	var PropCheckBox = __webpack_require__(62);
+	var RangeInput = __webpack_require__(86);
 	var TeX = __webpack_require__(67);
 	var Util = __webpack_require__(3);
 
@@ -27797,13 +28097,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Movable = __webpack_require__(107);
-	var MovablePoint = __webpack_require__(108);
-	var MovableLine = __webpack_require__(109);
-	var MovablePolygon = __webpack_require__(110);
+	var Movable = __webpack_require__(110);
+	var MovablePoint = __webpack_require__(111);
+	var MovableLine = __webpack_require__(112);
+	var MovablePolygon = __webpack_require__(113);
 
 	var Interactive2 = {
 	    MovablePoint: MovablePoint,
@@ -27827,13 +28127,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 77 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var RCSS = __webpack_require__(116);
 	var _ = __webpack_require__(59);
-	var styles = __webpack_require__(111);
+	var styles = __webpack_require__(109);
 
 	var buttonStyle = styles.button.buttonStyle;
 	var selectedStyle = styles.button.selectedStyle;
@@ -27926,310 +28226,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 78 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var _ = __webpack_require__(59);
-	var GraphieClasses = __webpack_require__(112);
-	var Movables = __webpack_require__(113);
-
-	var GraphieMovable = GraphieClasses.GraphieMovable;
-
-	var deepEq = __webpack_require__(3).deepEq;
-	var nestedMap = __webpack_require__(3).nestedMap;
-	var assert = __webpack_require__(91).assert;
-
-	var createGraphie = KhanUtil.createGraphie;
-
-	var Graphie = React.createClass({displayName: 'Graphie',
-	    propTypes: {
-	        box: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
-	        range: React.PropTypes.arrayOf(
-	            React.PropTypes.arrayOf(React.PropTypes.number)
-	        ),
-	        options: React.PropTypes.object,
-	        setup: React.PropTypes.func.isRequired,
-	        onClick: React.PropTypes.func,
-	        onMouseDown: React.PropTypes.func,
-	        onMouseUp: React.PropTypes.func,
-	        onMouseMove: React.PropTypes.func
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            range: [[-10, 10], [-10, 10]],
-	            options: {}
-	        };
-	    },
-
-	    render: function() {
-	        return React.createElement("div", {className: "graphie-container"}, 
-	            React.createElement("div", {className: "graphie", ref: "graphieDiv"})
-	        );
-	    },
-
-	    componentDidMount: function() {
-	        this._setupGraphie();
-	        this._updateMovables();
-	    },
-
-	    shouldComponentUpdate: function(nextProps) {
-	        return !deepEq(this.props, nextProps);
-	    },
-
-	    componentDidUpdate: function(prevProps) {
-	        // If someone changes the setup function passed in, we should
-	        // technically setup graphie again. But that's definitely an
-	        // anti-pattern, since it is most-likely caused by passing in an
-	        // anonymous function rather than a "real" change, and re-rendering
-	        // in that case would cause us to constantly re-setup graphie, which
-	        // would have horrible performance implications. In order to avoid
-	        // those, we just warn here.
-	        if (this.props.setup !== prevProps.setup &&
-	                window.console && window.console.warn) {
-	            window.console.warn("<Graphie> was given a new setup function. " +
-	                    "This is a bad idea; please refactor your code to give " +
-	                    "the same setup function reference to <Graphie> on " +
-	                    "every render.");
-	        }
-	        if (!deepEq(this.props.options, prevProps.options) ||
-	                !deepEq(this.props.box, prevProps.box) ||
-	                !deepEq(this.props.range, prevProps.range)) {
-	            this._setupGraphie();
-	        }
-	        this._updateMovables();
-	    },
-
-	    /**
-	     * Allow parents of the <Graphie> component to grab a reference to the
-	     * underlying graphie object using
-	     * `this.refs.graphieComponent.getGraphie()`
-	     *
-	     * This shouldn't be necessary for 90% of cases, but the power is there.
-	     * Use it for good and not evil.
-	     */
-	    getGraphie: function() {
-	        return this._graphie;
-	    },
-
-	    // bounds-checked range
-	    _range: function() {
-	        return _.map(this.props.range, function(dimRange)  {
-	            if (dimRange[0] >= dimRange[1]) {
-	                return [-10, 10];
-	            } else {
-	                return dimRange;
-	            }
-	        });
-	    },
-
-	    _box: function() {
-	        return _.map(this.props.box, function(pixelDim)  {
-	            // 340 = default size in the editor. exact value
-	            // is arbitrary; this is just a safety check.
-	            return pixelDim > 0 ? pixelDim : 340;
-	        });
-	    },
-
-	    _scale: function() {
-	        var box = this._box();
-	        var range = this._range();
-	        return _.map(box, function(pixelDim, i)  {
-	            var unitDim = range[i][1] - range[i][0];
-	            return pixelDim / unitDim;
-	        });
-	    },
-
-	    _setupGraphie: function() {
-	        this._removeMovables();
-
-	        var graphieDiv = this.refs.graphieDiv.getDOMNode();
-	        $(graphieDiv).empty();
-	        var graphie = this._graphie = createGraphie(graphieDiv);
-
-	        // This has to be called before addMouseLayer. You can re-init
-	        // with graphInit later if you prefer
-	        graphie.init({
-	            range: this._range(),
-	            scale: this._scale()
-	        });
-	        graphie.addMouseLayer({
-	            onClick: this.props.onClick,
-	            onMouseDown: this.props.onMouseDown,
-	            onMouseUp: this.props.onMouseUp,
-	            onMouseMove: this.props.onMouseMove
-	        });
-
-	        graphie.snap = this.props.options.snapStep || [1, 1];
-
-	        this.props.setup(graphie, _.extend({
-	            range: this._range(),
-	            scale: this._scale()
-	        }, this.props.options));
-	    },
-
-	    _removeMovables: function() {
-	        // _.invoke works even when this._movables is undefined
-	        _.invoke(this._movables, "remove");
-	        this._movables = {};
-	    },
-
-	    _renderMovables: function(children, options) {
-	        // Each leaf of `children` is a movable descriptor created by a call to
-	        // some `GraphieMovable`, such as `MovablePoint`.
-	        //
-	        // This function takes these descriptors and renders them into
-	        // on-screen movables, or updates on-screen movables for
-	        // descriptors when possible.
-	        //
-	        // If there is no movable with that key already, this descriptor is
-	        // stored in this._movables and promoted to an on-screen movable by
-	        // calling `child.add(graphie)`.
-	        //
-	        // If a movable of the same type with the same key exists already,
-	        // we take `child.props` and give them to the already-existing
-	        // on-screen movable, and call `movable.modify()`
-
-	        var graphie = options.graphie;
-	        var oldMovables = options.oldMovables;
-	        var newMovables = options.newMovables; /* output parameter */
-
-	        var renderChildren = function(elem)  {
-	            _.each(elem.movableProps, function(prop)  {
-	                // Render the children, and save the results of that
-	                // render to the appropriate props
-	                elem.props[prop] = this._renderMovables(
-	                    elem.props[prop],
-	                    options
-	                );
-	            }.bind(this));
-	        }.bind(this);
-
-	        // Add/modify movables
-
-	        // We want to keep track of whether we have added a new svg element,
-	        // because if we have, then we need to call .toFront() on any svg
-	        // elements occurring afterwards. If this happens, we set
-	        // `areMovablesOutOfOrder` to true:
-	        var areMovablesOutOfOrder = false;
-	        return nestedMap(children, function(childDescriptor)  {
-	            if (!childDescriptor) {
-	                // Still increment the key to avoid cascading key changes
-	                // on hiding/unhiding children, i.e. by using
-	                // {someBoolean && <MovablePoint />}
-	                options.nextKey++;
-	                // preserve the null/undefined in the resulting array
-	                return childDescriptor;
-	            }
-
-	            // Instantiate the descriptor to turn it into a real Movable
-	            var child = new childDescriptor.type(childDescriptor);
-	            assert(child instanceof GraphieMovable,
-	                "All children of a Graphie component must be Graphie " +
-	                "movables");
-
-	            // Give each child a key
-	            var keyProp = childDescriptor.key;
-	            var key = (keyProp == null) ?
-	                    ("_no_id_" + options.nextKey) :
-	                    keyProp;
-	            options.nextKey++;
-	            var ref = childDescriptor.ref;
-
-	            // We render our children first. This allows us to replace any
-	            // `movableProps` on our child with the on-screen movables
-	            // corresponding with those descriptors.
-	            renderChildren(child);
-
-	            var prevMovable = oldMovables[key];
-	            if (!prevMovable) {
-	                // We're creating a new child
-	                child.add(graphie);
-	                areMovablesOutOfOrder = true;
-
-	                newMovables[key] = child;
-
-	            } else if (child.constructor === prevMovable.constructor) {
-	                // We're updating an old child
-	                prevMovable.props = child.props;
-	                var modifyResult = prevMovable.modify(graphie);
-	                if (modifyResult === "reordered") {
-	                    areMovablesOutOfOrder = true;
-	                }
-
-	                newMovables[key] = prevMovable;
-
-	            } else {
-	                // We're destroying an old child and replacing it
-	                // with a new child of a different type
-
-	                // This generally is a bad idea, so warn about it if this
-	                // is being caused by implicit keys
-	                if (keyProp == null) {
-	                    if (typeof console !== "undefined" && console.warn) {
-	                        console.warn("Replacing a <Graphie> child with a " +
-	                                "child of a different type. Please add keys " +
-	                                "to your <Graphie> children");
-	                    }
-	                }
-
-	                prevMovable.remove();
-	                child.add(graphie);
-	                areMovablesOutOfOrder = true;
-
-	                newMovables[key] = child;
-	            }
-
-	            if (areMovablesOutOfOrder) {
-	                newMovables[key].toFront();
-	            }
-
-	            if (ref) {
-	                this.movables[ref] = newMovables[key];
-	            }
-
-	            return newMovables[key];
-	        }.bind(this));
-	    },
-
-	    // Sort of like react diffing, but for movables
-	    _updateMovables: function() {
-	        var graphie = this._graphie;
-
-	        var oldMovables = this._movables;
-	        var newMovables = {};
-	        this._movables = newMovables;
-	        this.movables = {};
-
-	        this._renderMovables(this.props.children, {
-	            nextKey: 1,
-	            graphie: graphie,
-	            oldMovables: oldMovables,
-	            newMovables: newMovables
-	        });
-
-	        // Remove any movables that no longer exist in the child array
-	        _.each(oldMovables, function(oldMovable, key)  {
-	            if (!newMovables[key]) {
-	                oldMovable.remove();
-	            }
-	        });
-	    }
-	});
-
-	// Attach Graphie.createClass and Graphie.createSimpleClass
-	_.extend(Graphie, GraphieClasses);
-	// Attach the Movable react components for easy reference
-	_.extend(Graphie, Movables);
-
-	module.exports = Graphie;
-
-
-/***/ },
 /* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _     = __webpack_require__(59);
 
 	var PT    = React.PropTypes;
@@ -28404,7 +28404,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	// TODO(joel/jack) fix z-index issues https://s3.amazonaws.com/uploads.hipchat.com/6574/29028/yOApjwmgiMhEZYJ/Screen%20Shot%202014-05-30%20at%203.34.18%20PM.png
@@ -28777,7 +28777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var Tooltip = __webpack_require__(80);
 	var _ = __webpack_require__(59);
 
@@ -28979,7 +28979,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// TODO(alex): Package MathQuill
 	var MathQuill = window.MathQuill;
-	var React     = __webpack_require__(63);
+	var React     = __webpack_require__(60);
 	var _         = __webpack_require__(59);
 	var cx        = React.addons.classSet;
 	var PT = React.PropTypes;
@@ -29238,7 +29238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React     = __webpack_require__(63);
+	var React     = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var TeX       = __webpack_require__(67);
@@ -29381,7 +29381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 
 	/* You know when you want to propagate input to a parent...
 	 * but then that parent does something with the input...
@@ -29427,66 +29427,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 85 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(63);
-	var NumberInput = __webpack_require__(87);
-
-	var truth = function()  {return true;};
-
-	/* A minor abstraction on top of NumberInput for ranges
-	 *
-	 */
-	var RangeInput = React.createClass({displayName: 'RangeInput',
-	    propTypes: {
-	        value: React.PropTypes.array.isRequired,
-	        onChange: React.PropTypes.func.isRequired,
-	        placeholder: React.PropTypes.array,
-	        checkValidity: React.PropTypes.func
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            placeholder: [null, null]
-	        };
-	    },
-
-	    render: function() {
-	        var value = this.props.value;
-	        var checkValidity = this.props.checkValidity || truth;
-
-	        return React.createElement("div", {className: "range-input"}, 
-	            React.createElement(NumberInput, React.__spread({}, 
-	                this.props, 
-	                {value: value[0], 
-	                checkValidity: function(val)  {return checkValidity([val, value[1]]);}, 
-	                onChange: this.onChange.bind(this, 0), 
-	                placeholder: this.props.placeholder[0]})), 
-	            React.createElement(NumberInput, React.__spread({}, 
-	                this.props, 
-	                {value: value[1], 
-	                checkValidity: function(val)  {return checkValidity([value[0], val]);}, 
-	                onChange: this.onChange.bind(this, 1), 
-	                placeholder: this.props.placeholder[1]}))
-	        );
-	    },
-
-	    onChange: function(i, newVal) {
-	        var value = this.props.value;
-	        if (i === 0) {
-	            this.props.onChange([newVal, value[1]]);
-	        } else {
-	            this.props.onChange([value[0], newVal]);
-	        }
-	    }
-
-	});
-
-	module.exports = RangeInput;
-
-
-/***/ },
-/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -29653,10 +29593,70 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 86 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(60);
+	var NumberInput = __webpack_require__(87);
+
+	var truth = function()  {return true;};
+
+	/* A minor abstraction on top of NumberInput for ranges
+	 *
+	 */
+	var RangeInput = React.createClass({displayName: 'RangeInput',
+	    propTypes: {
+	        value: React.PropTypes.array.isRequired,
+	        onChange: React.PropTypes.func.isRequired,
+	        placeholder: React.PropTypes.array,
+	        checkValidity: React.PropTypes.func
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            placeholder: [null, null]
+	        };
+	    },
+
+	    render: function() {
+	        var value = this.props.value;
+	        var checkValidity = this.props.checkValidity || truth;
+
+	        return React.createElement("div", {className: "range-input"}, 
+	            React.createElement(NumberInput, React.__spread({}, 
+	                this.props, 
+	                {value: value[0], 
+	                checkValidity: function(val)  {return checkValidity([val, value[1]]);}, 
+	                onChange: this.onChange.bind(this, 0), 
+	                placeholder: this.props.placeholder[0]})), 
+	            React.createElement(NumberInput, React.__spread({}, 
+	                this.props, 
+	                {value: value[1], 
+	                checkValidity: function(val)  {return checkValidity([value[0], val]);}, 
+	                onChange: this.onChange.bind(this, 1), 
+	                placeholder: this.props.placeholder[1]}))
+	        );
+	    },
+
+	    onChange: function(i, newVal) {
+	        var value = this.props.value;
+	        if (i === 0) {
+	            this.props.onChange([newVal, value[1]]);
+	        } else {
+	            this.props.onChange([value[0], newVal]);
+	        }
+	    }
+
+	});
+
+	module.exports = RangeInput;
+
+
+/***/ },
 /* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var firstNumericalParse = __webpack_require__(3).firstNumericalParse;
@@ -29900,12 +29900,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Util = __webpack_require__(3);
 
-	var SvgImage = __webpack_require__(60);
+	var SvgImage = __webpack_require__(61);
 
 	var defaultBoxSize = 400;
 	var defaultBackgroundImage = {
@@ -30236,11 +30236,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React         = __webpack_require__(63);
+	var React         = __webpack_require__(60);
 	var TeX           = __webpack_require__(67);
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 	var Tooltip       = __webpack_require__(80);
-	var ModifyTex     = __webpack_require__(86).modifyTex;
+	var ModifyTex     = __webpack_require__(85).modifyTex;
 
 	var MathOutput = React.createClass({displayName: 'MathOutput',
 	    propTypes: {
@@ -30493,7 +30493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var _ = __webpack_require__(59);
 
 	var Util     = __webpack_require__(3);
@@ -31482,81 +31482,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var UNCHANGED = "unchanged";
-	var CHANGED = "changed";
-	var ADDED = "added";
-	var REMOVED = "removed";
-
-	// For values which do not have further values nested within them (strings,
-	// numbers, and booleans)
-	var valueEntry = function(before, after, key) {
-	    var status;
-	    if (before === after) {
-	        status = UNCHANGED;
-	    } else if (before === undefined) {
-	        status = ADDED;
-	    } else if (after === undefined) {
-	        status = REMOVED;
-	    } else {
-	        status = CHANGED;
-	    }
-
-	    return {
-	        after: JSON.stringify(after),
-	        before: JSON.stringify(before),
-	        children: [],
-	        key: key,
-	        status: status
-	    };
-	};
-
-	// For values which require a more granular diff (objects and arrays)
-	var objectEntry = function(before, after, key) {
-	    var beforeKeys = (_.isObject(before)) ? _(before).keys() : [];
-	    var afterKeys = (_.isObject(after)) ? _(after).keys() : [];
-	    var keys = _.union(beforeKeys, afterKeys);
-
-	    var children = _.map(keys, function(key) {
-	        return performDiff((before || {})[key], (after || {})[key], key);
-	    });
-
-	    var status;
-	    if (before === undefined) {
-	        status = ADDED;
-	    } else if (after === undefined) {
-	        status = REMOVED;
-	    } else {
-	        var changed = _.any(children, function(child) {
-	            return child.status !== UNCHANGED;
-	        });
-	        status = changed ? CHANGED : UNCHANGED;
-	    }
-
-	    return {
-	        after: "",
-	        before: "",
-	        children: children,
-	        key: key,
-	        status: status
-	    };
-	};
-
-	var performDiff = function(before, after, /* optional */ key) {
-	    if (typeof before === "object" || typeof after === "object") {
-	        return objectEntry(before, after, key);
-	    } else {
-	        return valueEntry(before, after, key);
-	    }
-	};
-
-	module.exports = performDiff;
-
-
-/***/ },
-/* 95 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(63);
+	var React = __webpack_require__(60);
 	var Editor = __webpack_require__(7);
 	var InfoTip = __webpack_require__(71);
 	var Widgets = __webpack_require__(15);
@@ -31697,119 +31623,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 96 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Split a word-wise diff generated by jsdiff into multiple lines, for the
-	// purpose of breaking up the diffs into lines, so that modified lines can be
-	// faintly highlighted
-
-	var splitDiff = function(diffEntries) {
-	    var lines = [];
-	    var currentLine = [];
-	    _.each(diffEntries, function(entry)  {
-	        var values = entry.value.split("\n");
-	        _.each(values, function(value, i)  {
-	            var isNewline = i > 0;
-	            if (isNewline) {
-	                lines.push(currentLine);
-	                currentLine = [];
-	            }
-	            var newEntry = _.extend({}, entry, { value: value });
-	            currentLine.push(newEntry);
-	        });
-	    });
-
-	    if (currentLine.length) {
-	        lines.push(currentLine);
-	    }
-	    return lines;
-	};
-
-
-	module.exports = splitDiff;
-
-
-/***/ },
-/* 97 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var jsdiff = __webpack_require__(104);
-	var _ = __webpack_require__(59);
-
-	var statusFor = function(chunk) {
-	    if (chunk.added) {
-	        return "added";
-	    } else if (chunk.removed) {
-	        return "removed";
-	    } else {
-	        return "unchanged";
-	    }
-	};
-
-	// Turn a chunk (which contains an array of values and a status)
-	// into an array of values, each with the same status
-	var splitUpChunk = function(chunk)  {return _.map(chunk.value, function(value)  {
-	    return {
-	        value: value,
-	        status: statusFor(chunk)
-	    };
-	});};
-
-	// Apply `fn` to every element in `lst` and then concatenate all the results
-	// http://clojuredocs.org/clojure_core/clojure.core/mapcat
-	var mapcat = function(lst, fn) {
-	    return _.flatten(_.map(lst, fn), true /* only flatten one level */);
-	};
-
-	// > ArrayDiff.diff([1,2,3], [2,3,4]);
-	// = [{ "value": [1],
-	//      "removed": true },
-	//    { "value": [2, 3] },
-	//    { "value": [4],
-	//      "added": true }]
-	var ArrayDiff = new jsdiff.Diff();
-	ArrayDiff.tokenize = function(array)  {return _.map(array, function(elem)  {return [elem];});};
-	// The default is `+` for string concatenation, which doesn't work for array
-	// concatenation.
-	ArrayDiff.join = function(a, b)  {return a.concat(b);};
-	// By default jsDiff uses ===
-	ArrayDiff.equals = _.isEqual;
-
-	// Take the output of jsdiff's function (which concatenates adjacent entries)
-	// and make it just one entry per chunk
-	// > flattenChunks([{ "value": [1],
-	//                    "removed": true },
-	//                  { "value": [2, 3] },
-	//                  { "value": [4],
-	//                    "added": true }])
-	// = [{ "value":1, "status":"removed"},
-	//    { "value":2, "status":"unchanged"},
-	//    { "value":3, "status":"unchanged"},
-	//    { "value":4, "status":"added"}]
-	var flattenChunks = function(chunks)  {return mapcat(chunks, splitUpChunk);};
-
-	// Take two arrays and create a diff for them. The result is two arrays of
-	// objects, one for the things that should be included in a 'before', and one
-	// for 'after'
-	var stringArrayDiff = function(a, b) {
-	    var diffResult = ArrayDiff.diff(a, b);
-	    var flattened = flattenChunks(diffResult);
-
-	    return {
-	        before: _.filter(flattened, function(entry)  {return entry.status !== "added";}),
-	        after: _.filter(flattened, function(entry)  {return entry.status !== "removed";})
-	    };
-	};
-
-	module.exports = stringArrayDiff;
-
-
-/***/ },
-/* 98 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var ButtonGroup = __webpack_require__(74);
+	var ButtonGroup = __webpack_require__(75);
 
 	var ArrowPicker = React.createClass({displayName: 'ArrowPicker',
 	    propTypes: {
@@ -31842,10 +31659,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 99 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ButtonGroup = __webpack_require__(74);
+	var ButtonGroup = __webpack_require__(75);
 
 	var ColorPicker = React.createClass({displayName: 'ColorPicker',
 	    COLORS: [KhanUtil.BLACK, KhanUtil.BLUE, KhanUtil.GREEN, KhanUtil.PINK,
@@ -31889,10 +31706,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 100 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ButtonGroup = __webpack_require__(74);
+	var ButtonGroup = __webpack_require__(75);
 	var Changeable = __webpack_require__(68);
 	var MathInput = __webpack_require__(82);
 	var NumberInput = __webpack_require__(87);
@@ -32000,10 +31817,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 101 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ButtonGroup = __webpack_require__(74);
+	var ButtonGroup = __webpack_require__(75);
 
 	var DashPicker = React.createClass({displayName: 'DashPicker',
 	    propTypes: {
@@ -32035,7 +31852,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 102 */
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var ElementContainer = React.createClass({displayName: 'ElementContainer',
@@ -32105,7 +31922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 103 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(59);
@@ -32291,6 +32108,189 @@ return /******/ (function(modules) { // webpackBootstrap
 	    START_REF_PREFIX: START_REF_PREFIX,
 	    END_REF_PREFIX: END_REF_PREFIX
 	};
+
+
+/***/ },
+/* 101 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// Split a word-wise diff generated by jsdiff into multiple lines, for the
+	// purpose of breaking up the diffs into lines, so that modified lines can be
+	// faintly highlighted
+
+	var splitDiff = function(diffEntries) {
+	    var lines = [];
+	    var currentLine = [];
+	    _.each(diffEntries, function(entry)  {
+	        var values = entry.value.split("\n");
+	        _.each(values, function(value, i)  {
+	            var isNewline = i > 0;
+	            if (isNewline) {
+	                lines.push(currentLine);
+	                currentLine = [];
+	            }
+	            var newEntry = _.extend({}, entry, { value: value });
+	            currentLine.push(newEntry);
+	        });
+	    });
+
+	    if (currentLine.length) {
+	        lines.push(currentLine);
+	    }
+	    return lines;
+	};
+
+
+	module.exports = splitDiff;
+
+
+/***/ },
+/* 102 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var jsdiff = __webpack_require__(104);
+	var _ = __webpack_require__(59);
+
+	var statusFor = function(chunk) {
+	    if (chunk.added) {
+	        return "added";
+	    } else if (chunk.removed) {
+	        return "removed";
+	    } else {
+	        return "unchanged";
+	    }
+	};
+
+	// Turn a chunk (which contains an array of values and a status)
+	// into an array of values, each with the same status
+	var splitUpChunk = function(chunk)  {return _.map(chunk.value, function(value)  {
+	    return {
+	        value: value,
+	        status: statusFor(chunk)
+	    };
+	});};
+
+	// Apply `fn` to every element in `lst` and then concatenate all the results
+	// http://clojuredocs.org/clojure_core/clojure.core/mapcat
+	var mapcat = function(lst, fn) {
+	    return _.flatten(_.map(lst, fn), true /* only flatten one level */);
+	};
+
+	// > ArrayDiff.diff([1,2,3], [2,3,4]);
+	// = [{ "value": [1],
+	//      "removed": true },
+	//    { "value": [2, 3] },
+	//    { "value": [4],
+	//      "added": true }]
+	var ArrayDiff = new jsdiff.Diff();
+	ArrayDiff.tokenize = function(array)  {return _.map(array, function(elem)  {return [elem];});};
+	// The default is `+` for string concatenation, which doesn't work for array
+	// concatenation.
+	ArrayDiff.join = function(a, b)  {return a.concat(b);};
+	// By default jsDiff uses ===
+	ArrayDiff.equals = _.isEqual;
+
+	// Take the output of jsdiff's function (which concatenates adjacent entries)
+	// and make it just one entry per chunk
+	// > flattenChunks([{ "value": [1],
+	//                    "removed": true },
+	//                  { "value": [2, 3] },
+	//                  { "value": [4],
+	//                    "added": true }])
+	// = [{ "value":1, "status":"removed"},
+	//    { "value":2, "status":"unchanged"},
+	//    { "value":3, "status":"unchanged"},
+	//    { "value":4, "status":"added"}]
+	var flattenChunks = function(chunks)  {return mapcat(chunks, splitUpChunk);};
+
+	// Take two arrays and create a diff for them. The result is two arrays of
+	// objects, one for the things that should be included in a 'before', and one
+	// for 'after'
+	var stringArrayDiff = function(a, b) {
+	    var diffResult = ArrayDiff.diff(a, b);
+	    var flattened = flattenChunks(diffResult);
+
+	    return {
+	        before: _.filter(flattened, function(entry)  {return entry.status !== "added";}),
+	        after: _.filter(flattened, function(entry)  {return entry.status !== "removed";})
+	    };
+	};
+
+	module.exports = stringArrayDiff;
+
+
+/***/ },
+/* 103 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var UNCHANGED = "unchanged";
+	var CHANGED = "changed";
+	var ADDED = "added";
+	var REMOVED = "removed";
+
+	// For values which do not have further values nested within them (strings,
+	// numbers, and booleans)
+	var valueEntry = function(before, after, key) {
+	    var status;
+	    if (before === after) {
+	        status = UNCHANGED;
+	    } else if (before === undefined) {
+	        status = ADDED;
+	    } else if (after === undefined) {
+	        status = REMOVED;
+	    } else {
+	        status = CHANGED;
+	    }
+
+	    return {
+	        after: JSON.stringify(after),
+	        before: JSON.stringify(before),
+	        children: [],
+	        key: key,
+	        status: status
+	    };
+	};
+
+	// For values which require a more granular diff (objects and arrays)
+	var objectEntry = function(before, after, key) {
+	    var beforeKeys = (_.isObject(before)) ? _(before).keys() : [];
+	    var afterKeys = (_.isObject(after)) ? _(after).keys() : [];
+	    var keys = _.union(beforeKeys, afterKeys);
+
+	    var children = _.map(keys, function(key) {
+	        return performDiff((before || {})[key], (after || {})[key], key);
+	    });
+
+	    var status;
+	    if (before === undefined) {
+	        status = ADDED;
+	    } else if (after === undefined) {
+	        status = REMOVED;
+	    } else {
+	        var changed = _.any(children, function(child) {
+	            return child.status !== UNCHANGED;
+	        });
+	        status = changed ? CHANGED : UNCHANGED;
+	    }
+
+	    return {
+	        after: "",
+	        before: "",
+	        children: children,
+	        key: key,
+	        status: status
+	    };
+	};
+
+	var performDiff = function(before, after, /* optional */ key) {
+	    if (typeof before === "object" || typeof after === "object") {
+	        return objectEntry(before, after, key);
+	    } else {
+	        return valueEntry(before, after, key);
+	    }
+	};
+
+	module.exports = performDiff;
 
 
 /***/ },
@@ -32859,6 +32859,476 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var Util = __webpack_require__(3);
+	var nestedMap = Util.nestedMap;
+	var deepEq = Util.deepEq;
+	var _ = __webpack_require__(59);
+
+	/**
+	 * A base class for all Graphie Movables
+	 *
+	 * Used for checking that all Graphie children are, in fact,
+	 * GraphieMovables
+	 */
+	function GraphieMovable(descriptor) {
+	    _.extend(this, descriptor);
+	}
+
+	var abstractMethod = function() {
+	    throw new Error("Abstract method! Must be implemented by Graphie Movable" +
+	            this.constructor.displayName);
+	};
+
+	_.extend(GraphieMovable.prototype, {
+	    movableProps: [],
+	    add: abstractMethod,
+	    modify: abstractMethod,
+	    remove: abstractMethod,
+	    toFront: function() { /* no op */ }
+	});
+
+
+	/**
+	 * returns cloned props modified with `children: childrenArray`
+	 */
+	var rewriteProps = function(props, childrenArray) {
+	    // Clone the props and add `children:`
+	    // childrenArray is always an array here because this is only called
+	    // from createClass, which initializes childrenArray as _.rest(arguments)
+	    return _.extend({}, props, {
+	        children: _.filter(_.flatten(childrenArray), _.identity)
+	    });
+	};
+
+
+	/**
+	 * Create a custom GraphieMovable class
+	 */
+	var createClass = function(spec) {
+	    var GraphieClass = function(descriptor) {
+	        this.props = rewriteProps(descriptor.props, descriptor.props.children);
+	        return this;
+	    };
+
+	    spec.displayName = spec.displayName || _.uniqueId("GraphieClass");
+
+	    // Add the displayName to the constructor for compatibility with
+	    // React's myDescriptor.constructor.displayName
+	    GraphieClass.displayName = spec.displayName;
+
+	    GraphieClass.prototype = new GraphieMovable(spec);
+	    GraphieClass.prototype.constructor = GraphieClass;
+
+	    var factory = function(config) {
+	        // TODO(alpert): Remove after 0.12 -- adapted from 
+	        // https://github.com/facebook/react/blob/af485d9/src/core/ReactDescriptor.js#L136-L188
+	        var props = {};
+	        var key = null;
+	        var ref = null;
+	        var propName;
+	        if (config != null) {
+	            key = config.key === undefined ? null : '' + config.key;
+	            ref = config.ref === undefined ? null : config.ref;
+	            for (propName in config) {
+	                if (config.hasOwnProperty(propName) &&
+	                        propName !== "key" &&
+	                        propName !== "ref") {
+	                    props[propName] = config[propName];
+	                }
+	            }
+	        }
+	        props.children = _.rest(arguments);
+	        return {
+	            type: GraphieClass,
+	            key: key,
+	            ref: ref,
+	            props: props,
+	        };
+	    };
+
+	    // TODO(alpert): This is present to trick React.createElement into
+	    // believing that graphie movable classes are valid React types. In React
+	    // 0.13 (probably) createElement will probably just assume that its
+	    // argument is a proper type and we'll be able to get rid of this.
+	    factory.isReactLegacyFactory = true;
+	    factory.type = GraphieClass;
+
+	    return factory;
+	};
+
+
+	/**
+	 * Create a GraphieMovable class from a function that describes
+	 * how to add said class to a graphie, and returns an array of
+	 * `.remove()`able elements to be used when a remove() or
+	 * modify() is called.
+	 *
+	 * This convenience method creates an inefficient class, although
+	 * it does check for a difference in this.props and prevProps before
+	 * removing and re-adding itself.
+	 *
+	 * The primary benefit of this is being able to very easily create
+	 * a wrapper for old graphie code to make it interface with <Graphie>
+	 *
+	 * Commonly used elements should use the fully-fledged createClass
+	 * and implement an efficient modify() operation.
+	 */
+	var createSimpleClass = function(addFunction) {
+	    return createClass({
+	        displayName: addFunction.name || _.uniqueId("GraphieSimpleClass"),
+	        movableProps: ["children"],
+
+	        add: function(graphie) {
+	            this._elements = addFunction(graphie, this.props);
+	            this._prevProps = this.props;
+	        },
+
+	        modify: function(graphie) {
+	            if (!deepEq(this.props, this._prevProps)) {
+	                this.remove();
+	                this.add(graphie);
+	                this._prevProps = this.props;
+	                return "reordered";
+	            }
+	        },
+
+	        remove: function() {
+	            nestedMap(this._elements, function(elem)  {
+	                if (elem) {
+	                    elem.remove();
+	                }
+	            });
+	            this._elements = null;
+	            this._prevProps = null;
+	        },
+
+	        toFront: function() {
+	            nestedMap(this._elements, function(elem)  {
+	                if (_.isFunction(elem.toFront)) {
+	                    elem.toFront();
+	                }
+	            });
+	        }
+	    });
+	};
+
+
+	module.exports = {
+	    GraphieMovable: GraphieMovable,
+	    createClass: createClass,
+	    createSimpleClass: createSimpleClass
+	};
+
+
+/***/ },
+/* 108 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _ = __webpack_require__(59);
+	var GraphieClasses = __webpack_require__(107);
+	var Interactive2 = __webpack_require__(77);
+	var InteractiveUtil = __webpack_require__(91);
+
+	var assert = InteractiveUtil.assert;
+
+	var MovablePoint = GraphieClasses.createClass({
+	    displayName: "MovablePoint",
+
+	    movableProps: ["children"],
+
+	    add: function(graphie) {
+	        this.point = Interactive2.addMovablePoint(graphie, this.props);
+	    },
+
+	    modify: function() {
+	        this.point.modify(this.props);
+	    },
+
+	    remove: function() {
+	        this.point.remove();
+	    },
+
+	    toFront: function() {
+	        this.point.toFront();
+	    },
+
+	    grab: function(coord) {
+	        this.point.grab(coord);
+	    }
+	});
+
+	// Include helper methods, such as MovablePoint.constrain.snap()
+	_.extend(MovablePoint, Interactive2.MovablePoint);
+
+	var MovableLine = GraphieClasses.createClass({
+	    displayName: "MovableLine",
+
+	    movableProps: ["children"],
+
+	    add: function(graphie) {
+	        // Add MovablePoint children
+	        var points = _.pluck(this.props.children, "point");
+	        var props = _.extend({}, this.props, {
+	            points: points
+	        });
+	        this.line = Interactive2.addMovableLine(graphie, props);
+	    },
+
+	    modify: function() {
+	        // Add MovablePoint children
+	        var points = _.pluck(this.props.children, "point");
+	        var props = _.extend({}, this.props, {
+	            points: points
+	        });
+	        this.line.modify(props);
+	    },
+
+	    remove: function() {
+	        this.line.remove();
+	    },
+
+	    toFront: function() {
+	        this.line.toFront();
+	    }
+	});
+
+	// Include helper methods, such as MovableLine.constrain.snap()
+	_.extend(MovableLine, Interactive2.MovableLine);
+
+	var Label = GraphieClasses.createSimpleClass(function(graphie, props)  {
+	    var coord = props.coord;
+	    if (props.unscaled) {
+	        coord = graphie.unscalePoint(coord);
+	    }
+
+	    return graphie.label(
+	        coord,
+	        props.text,
+	        props.direction,
+	        props.tex,
+	        props.style
+	    );
+	});
+
+	var Line = GraphieClasses.createClass({
+	    displayName: "Line",
+
+	    movableProps: ["children"],
+
+	    add: function(graphie) {
+	        var props = this.props;
+	        this.graphie = graphie;
+	        this.line = this.graphie.line(props.start, props.end, props.style);
+	    },
+
+	    modify: function() {
+	        var props = this.props;
+	        var path = this.graphie.svgPath([props.start, props.end]);
+	        this.line.attr(_.extend({}, props.style, { path: path }));
+	    },
+
+	    remove: function() {
+	        this.line.remove();
+	    },
+
+	    toFront: function() {
+	        this.line.toFront();
+	    }
+	});
+
+	var Parabola = GraphieClasses.createClass({
+	    displayName: "Parabola",
+
+	    movableProps: ["children"],
+
+	    add: function(graphie) {
+	        var props = this.props;
+	        this.graphie = graphie;
+	        this.parabola = this.graphie.parabola(props.a, props.b, props.c,
+	            props.style);
+	    },
+
+	    modify: function() {
+	        var props = this.props;
+	        var path = this.graphie.svgParabolaPath(props.a, props.b, props.c);
+	        this.parabola.attr(_.extend({}, props.style, { path: path }));
+	    },
+
+	    remove: function() {
+	        this.parabola.remove();
+	    },
+
+	    toFront: function() {
+	        this.parabola.toFront();
+	    }
+	});
+
+	var Sinusoid = GraphieClasses.createClass({
+	    displayName: "Sinusoid",
+
+	    movableProps: ["children"],
+
+	    add: function(graphie) {
+	        var props = this.props;
+	        this.graphie = graphie;
+	        this.sinusoid = this.graphie.sinusoid(props.a, props.b, props.c,
+	            props.d, props.style);
+	    },
+
+	    modify: function() {
+	        var props = this.props;
+	        var path = this.graphie.svgSinusoidPath(props.a, props.b, props.c,
+	            props.d);
+	        this.sinusoid.attr(_.extend({}, props.style, { path: path }));
+	    },
+
+	    remove: function() {
+	        this.sinusoid.remove();
+	    },
+
+	    toFront: function() {
+	        this.sinusoid.toFront();
+	    }
+	});
+
+	var Plot = GraphieClasses.createSimpleClass(function(graphie, props)  {
+	    return graphie.plot(props.fn, props.range, props.style);
+	});
+
+	var PlotParametric = GraphieClasses.createSimpleClass(function(graphie, props)  {
+	    return graphie.plotParametric(props.fn, props.range, props.style);
+	});
+
+	var Point = GraphieClasses.createSimpleClass(function(graphie, props)  {
+	    return graphie.ellipse(props.coord, graphie.unscaleVector([4, 4]), {
+	        fill: props.color || KhanUtil.BLACK,
+	        stroke: props.color || KhanUtil.BLACK,
+	    });
+	});
+
+	var Path = GraphieClasses.createClass({
+	    displayName: "Path",
+
+	    movableProps: ["children"],
+
+	    add: function(graphie) {
+	        var props = this.props;
+	        this.graphie = graphie;
+	        this.path = this.graphie.path(props.coords, props.style);
+	    },
+
+	    modify: function() {
+	        var props = this.props;
+	        var path = this.graphie.svgPath(props.coords);
+	        this.path.attr({ path: path });
+	    },
+
+	    remove: function() {
+	        this.path.remove();
+	    },
+
+	    toFront: function() {
+	        this.path.toFront();
+	    }
+	});
+
+	var Arc = GraphieClasses.createSimpleClass(function(graphie, props)  {
+	    var center = props.center;
+	    var radius = props.radius;
+	    if (props.unscaled) {
+	        center = graphie.unscalePoint(center);
+	        radius = graphie.unscaleVector(radius);
+	    }
+
+	    return graphie.arc(
+	        center,
+	        radius,
+	        props.startAngle,
+	        props.endAngle,
+	        props.sector,
+	        props.style
+	    );
+	});
+
+	var Circle = GraphieClasses.createSimpleClass(function(graphie, props)  {
+	    return graphie.circle(
+	        props.center,
+	        props.radius,
+	        props.style
+	    );
+	});
+
+	var Rect = GraphieClasses.createSimpleClass(function(graphie, props)  {
+	    return graphie.rect(
+	        props.x, props.y, props.width, props.height, props.style);
+	});
+
+	module.exports = {
+	    Arc: Arc,
+	    Circle: Circle,
+	    Label: Label,
+	    Line: Line,
+	    MovableLine: MovableLine,
+	    MovablePoint: MovablePoint,
+	    Parabola: Parabola,
+	    Path: Path,
+	    Plot: Plot,
+	    PlotParametric: PlotParametric,
+	    Point: Point,
+	    Sinusoid: Sinusoid,
+	    Rect: Rect
+	};
+
+
+/***/ },
+/* 109 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var button = {
+	    buttonStyle: {
+	        backgroundColor: 'white',
+	        border: '1px solid #ccc',
+	        borderLeft: '0',
+	        cursor: 'pointer',
+	        margin: '0',
+	        padding: '5px 10px',
+	        position: 'relative', // for hover
+
+	        ':first-child': {
+	            borderLeft: '1px solid #ccc',
+	            borderTopLeftRadius: '3px',
+	            borderBottomLeftRadius: '3px'
+	        },
+
+	        ':last-child': {
+	            borderRight: '1px solid #ccc',
+	            borderTopRightRadius: '3px',
+	            borderBottomRightRadius: '3px'
+	        },
+
+	        ':hover': {
+	            backgroundColor: '#ccc'
+	        },
+
+	        ':focus': {
+	            zIndex: '2'
+	        }
+	    },
+
+	    selectedStyle: {
+	        backgroundColor: '#ddd'
+	    }
+	};
+
+	module.exports = {
+	    button: button
+	};
+
+
+/***/ },
+/* 110 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/**
 	 * Movable
 	 *
@@ -33137,7 +33607,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 108 */
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -33483,7 +33953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 109 */
+/* 112 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -33765,7 +34235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 110 */
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -34092,476 +34562,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 111 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var button = {
-	    buttonStyle: {
-	        backgroundColor: 'white',
-	        border: '1px solid #ccc',
-	        borderLeft: '0',
-	        cursor: 'pointer',
-	        margin: '0',
-	        padding: '5px 10px',
-	        position: 'relative', // for hover
-
-	        ':first-child': {
-	            borderLeft: '1px solid #ccc',
-	            borderTopLeftRadius: '3px',
-	            borderBottomLeftRadius: '3px'
-	        },
-
-	        ':last-child': {
-	            borderRight: '1px solid #ccc',
-	            borderTopRightRadius: '3px',
-	            borderBottomRightRadius: '3px'
-	        },
-
-	        ':hover': {
-	            backgroundColor: '#ccc'
-	        },
-
-	        ':focus': {
-	            zIndex: '2'
-	        }
-	    },
-
-	    selectedStyle: {
-	        backgroundColor: '#ddd'
-	    }
-	};
-
-	module.exports = {
-	    button: button
-	};
-
-
-/***/ },
-/* 112 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Util = __webpack_require__(3);
-	var nestedMap = Util.nestedMap;
-	var deepEq = Util.deepEq;
-	var _ = __webpack_require__(59);
-
-	/**
-	 * A base class for all Graphie Movables
-	 *
-	 * Used for checking that all Graphie children are, in fact,
-	 * GraphieMovables
-	 */
-	function GraphieMovable(descriptor) {
-	    _.extend(this, descriptor);
-	}
-
-	var abstractMethod = function() {
-	    throw new Error("Abstract method! Must be implemented by Graphie Movable" +
-	            this.constructor.displayName);
-	};
-
-	_.extend(GraphieMovable.prototype, {
-	    movableProps: [],
-	    add: abstractMethod,
-	    modify: abstractMethod,
-	    remove: abstractMethod,
-	    toFront: function() { /* no op */ }
-	});
-
-
-	/**
-	 * returns cloned props modified with `children: childrenArray`
-	 */
-	var rewriteProps = function(props, childrenArray) {
-	    // Clone the props and add `children:`
-	    // childrenArray is always an array here because this is only called
-	    // from createClass, which initializes childrenArray as _.rest(arguments)
-	    return _.extend({}, props, {
-	        children: _.filter(_.flatten(childrenArray), _.identity)
-	    });
-	};
-
-
-	/**
-	 * Create a custom GraphieMovable class
-	 */
-	var createClass = function(spec) {
-	    var GraphieClass = function(descriptor) {
-	        this.props = rewriteProps(descriptor.props, descriptor.props.children);
-	        return this;
-	    };
-
-	    spec.displayName = spec.displayName || _.uniqueId("GraphieClass");
-
-	    // Add the displayName to the constructor for compatibility with
-	    // React's myDescriptor.constructor.displayName
-	    GraphieClass.displayName = spec.displayName;
-
-	    GraphieClass.prototype = new GraphieMovable(spec);
-	    GraphieClass.prototype.constructor = GraphieClass;
-
-	    var factory = function(config) {
-	        // TODO(alpert): Remove after 0.12 -- adapted from 
-	        // https://github.com/facebook/react/blob/af485d9/src/core/ReactDescriptor.js#L136-L188
-	        var props = {};
-	        var key = null;
-	        var ref = null;
-	        var propName;
-	        if (config != null) {
-	            key = config.key === undefined ? null : '' + config.key;
-	            ref = config.ref === undefined ? null : config.ref;
-	            for (propName in config) {
-	                if (config.hasOwnProperty(propName) &&
-	                        propName !== "key" &&
-	                        propName !== "ref") {
-	                    props[propName] = config[propName];
-	                }
-	            }
-	        }
-	        props.children = _.rest(arguments);
-	        return {
-	            type: GraphieClass,
-	            key: key,
-	            ref: ref,
-	            props: props,
-	        };
-	    };
-
-	    // TODO(alpert): This is present to trick React.createElement into
-	    // believing that graphie movable classes are valid React types. In React
-	    // 0.13 (probably) createElement will probably just assume that its
-	    // argument is a proper type and we'll be able to get rid of this.
-	    factory.isReactLegacyFactory = true;
-	    factory.type = GraphieClass;
-
-	    return factory;
-	};
-
-
-	/**
-	 * Create a GraphieMovable class from a function that describes
-	 * how to add said class to a graphie, and returns an array of
-	 * `.remove()`able elements to be used when a remove() or
-	 * modify() is called.
-	 *
-	 * This convenience method creates an inefficient class, although
-	 * it does check for a difference in this.props and prevProps before
-	 * removing and re-adding itself.
-	 *
-	 * The primary benefit of this is being able to very easily create
-	 * a wrapper for old graphie code to make it interface with <Graphie>
-	 *
-	 * Commonly used elements should use the fully-fledged createClass
-	 * and implement an efficient modify() operation.
-	 */
-	var createSimpleClass = function(addFunction) {
-	    return createClass({
-	        displayName: addFunction.name || _.uniqueId("GraphieSimpleClass"),
-	        movableProps: ["children"],
-
-	        add: function(graphie) {
-	            this._elements = addFunction(graphie, this.props);
-	            this._prevProps = this.props;
-	        },
-
-	        modify: function(graphie) {
-	            if (!deepEq(this.props, this._prevProps)) {
-	                this.remove();
-	                this.add(graphie);
-	                this._prevProps = this.props;
-	                return "reordered";
-	            }
-	        },
-
-	        remove: function() {
-	            nestedMap(this._elements, function(elem)  {
-	                if (elem) {
-	                    elem.remove();
-	                }
-	            });
-	            this._elements = null;
-	            this._prevProps = null;
-	        },
-
-	        toFront: function() {
-	            nestedMap(this._elements, function(elem)  {
-	                if (_.isFunction(elem.toFront)) {
-	                    elem.toFront();
-	                }
-	            });
-	        }
-	    });
-	};
-
-
-	module.exports = {
-	    GraphieMovable: GraphieMovable,
-	    createClass: createClass,
-	    createSimpleClass: createSimpleClass
-	};
-
-
-/***/ },
-/* 113 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var _ = __webpack_require__(59);
-	var GraphieClasses = __webpack_require__(112);
-	var Interactive2 = __webpack_require__(76);
-	var InteractiveUtil = __webpack_require__(91);
-
-	var assert = InteractiveUtil.assert;
-
-	var MovablePoint = GraphieClasses.createClass({
-	    displayName: "MovablePoint",
-
-	    movableProps: ["children"],
-
-	    add: function(graphie) {
-	        this.point = Interactive2.addMovablePoint(graphie, this.props);
-	    },
-
-	    modify: function() {
-	        this.point.modify(this.props);
-	    },
-
-	    remove: function() {
-	        this.point.remove();
-	    },
-
-	    toFront: function() {
-	        this.point.toFront();
-	    },
-
-	    grab: function(coord) {
-	        this.point.grab(coord);
-	    }
-	});
-
-	// Include helper methods, such as MovablePoint.constrain.snap()
-	_.extend(MovablePoint, Interactive2.MovablePoint);
-
-	var MovableLine = GraphieClasses.createClass({
-	    displayName: "MovableLine",
-
-	    movableProps: ["children"],
-
-	    add: function(graphie) {
-	        // Add MovablePoint children
-	        var points = _.pluck(this.props.children, "point");
-	        var props = _.extend({}, this.props, {
-	            points: points
-	        });
-	        this.line = Interactive2.addMovableLine(graphie, props);
-	    },
-
-	    modify: function() {
-	        // Add MovablePoint children
-	        var points = _.pluck(this.props.children, "point");
-	        var props = _.extend({}, this.props, {
-	            points: points
-	        });
-	        this.line.modify(props);
-	    },
-
-	    remove: function() {
-	        this.line.remove();
-	    },
-
-	    toFront: function() {
-	        this.line.toFront();
-	    }
-	});
-
-	// Include helper methods, such as MovableLine.constrain.snap()
-	_.extend(MovableLine, Interactive2.MovableLine);
-
-	var Label = GraphieClasses.createSimpleClass(function(graphie, props)  {
-	    var coord = props.coord;
-	    if (props.unscaled) {
-	        coord = graphie.unscalePoint(coord);
-	    }
-
-	    return graphie.label(
-	        coord,
-	        props.text,
-	        props.direction,
-	        props.tex,
-	        props.style
-	    );
-	});
-
-	var Line = GraphieClasses.createClass({
-	    displayName: "Line",
-
-	    movableProps: ["children"],
-
-	    add: function(graphie) {
-	        var props = this.props;
-	        this.graphie = graphie;
-	        this.line = this.graphie.line(props.start, props.end, props.style);
-	    },
-
-	    modify: function() {
-	        var props = this.props;
-	        var path = this.graphie.svgPath([props.start, props.end]);
-	        this.line.attr(_.extend({}, props.style, { path: path }));
-	    },
-
-	    remove: function() {
-	        this.line.remove();
-	    },
-
-	    toFront: function() {
-	        this.line.toFront();
-	    }
-	});
-
-	var Parabola = GraphieClasses.createClass({
-	    displayName: "Parabola",
-
-	    movableProps: ["children"],
-
-	    add: function(graphie) {
-	        var props = this.props;
-	        this.graphie = graphie;
-	        this.parabola = this.graphie.parabola(props.a, props.b, props.c,
-	            props.style);
-	    },
-
-	    modify: function() {
-	        var props = this.props;
-	        var path = this.graphie.svgParabolaPath(props.a, props.b, props.c);
-	        this.parabola.attr(_.extend({}, props.style, { path: path }));
-	    },
-
-	    remove: function() {
-	        this.parabola.remove();
-	    },
-
-	    toFront: function() {
-	        this.parabola.toFront();
-	    }
-	});
-
-	var Sinusoid = GraphieClasses.createClass({
-	    displayName: "Sinusoid",
-
-	    movableProps: ["children"],
-
-	    add: function(graphie) {
-	        var props = this.props;
-	        this.graphie = graphie;
-	        this.sinusoid = this.graphie.sinusoid(props.a, props.b, props.c,
-	            props.d, props.style);
-	    },
-
-	    modify: function() {
-	        var props = this.props;
-	        var path = this.graphie.svgSinusoidPath(props.a, props.b, props.c,
-	            props.d);
-	        this.sinusoid.attr(_.extend({}, props.style, { path: path }));
-	    },
-
-	    remove: function() {
-	        this.sinusoid.remove();
-	    },
-
-	    toFront: function() {
-	        this.sinusoid.toFront();
-	    }
-	});
-
-	var Plot = GraphieClasses.createSimpleClass(function(graphie, props)  {
-	    return graphie.plot(props.fn, props.range, props.style);
-	});
-
-	var PlotParametric = GraphieClasses.createSimpleClass(function(graphie, props)  {
-	    return graphie.plotParametric(props.fn, props.range, props.style);
-	});
-
-	var Point = GraphieClasses.createSimpleClass(function(graphie, props)  {
-	    return graphie.ellipse(props.coord, graphie.unscaleVector([4, 4]), {
-	        fill: props.color || KhanUtil.BLACK,
-	        stroke: props.color || KhanUtil.BLACK,
-	    });
-	});
-
-	var Path = GraphieClasses.createClass({
-	    displayName: "Path",
-
-	    movableProps: ["children"],
-
-	    add: function(graphie) {
-	        var props = this.props;
-	        this.graphie = graphie;
-	        this.path = this.graphie.path(props.coords, props.style);
-	    },
-
-	    modify: function() {
-	        var props = this.props;
-	        var path = this.graphie.svgPath(props.coords);
-	        this.path.attr({ path: path });
-	    },
-
-	    remove: function() {
-	        this.path.remove();
-	    },
-
-	    toFront: function() {
-	        this.path.toFront();
-	    }
-	});
-
-	var Arc = GraphieClasses.createSimpleClass(function(graphie, props)  {
-	    var center = props.center;
-	    var radius = props.radius;
-	    if (props.unscaled) {
-	        center = graphie.unscalePoint(center);
-	        radius = graphie.unscaleVector(radius);
-	    }
-
-	    return graphie.arc(
-	        center,
-	        radius,
-	        props.startAngle,
-	        props.endAngle,
-	        props.sector,
-	        props.style
-	    );
-	});
-
-	var Circle = GraphieClasses.createSimpleClass(function(graphie, props)  {
-	    return graphie.circle(
-	        props.center,
-	        props.radius,
-	        props.style
-	    );
-	});
-
-	var Rect = GraphieClasses.createSimpleClass(function(graphie, props)  {
-	    return graphie.rect(
-	        props.x, props.y, props.width, props.height, props.style);
-	});
-
-	module.exports = {
-	    Arc: Arc,
-	    Circle: Circle,
-	    Label: Label,
-	    Line: Line,
-	    MovableLine: MovableLine,
-	    MovablePoint: MovablePoint,
-	    Parabola: Parabola,
-	    Path: Path,
-	    Plot: Plot,
-	    PlotParametric: PlotParametric,
-	    Point: Point,
-	    Sinusoid: Sinusoid,
-	    Rect: Rect
-	};
-
-
-/***/ },
 /* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -34761,7 +34761,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var _ = find("_") || __webpack_require__(59);
-	var React = find("React") || __webpack_require__(63);
+	var React = find("React") || __webpack_require__(60);
 
 	/**
 	 * Creates a parser for a given set of rules, with the precedence
@@ -37265,7 +37265,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 131 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isValidCSSProps = __webpack_require__(138);
+	var isValidCSSProps = __webpack_require__(137);
 
 	function isValidProp(prop) {
 	  return isValidCSSProps(prop);
@@ -37285,7 +37285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 132 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var escape = __webpack_require__(137);
+	var escape = __webpack_require__(138);
 
 	var _uppercasePattern = /([A-Z])/g;
 
@@ -37440,7 +37440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var baseCreateCallback = __webpack_require__(139),
 	    keys = __webpack_require__(140),
-	    objectTypes = __webpack_require__(141);
+	    objectTypes = __webpack_require__(142);
 
 	/**
 	 * Assigns own enumerable properties of source object(s) to the destination
@@ -37506,7 +37506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 136 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var every = __webpack_require__(142);
+	var every = __webpack_require__(141);
 
 	function isValidRatio(ratio) {
 	    var re = /\d+\/\d+/;
@@ -37709,43 +37709,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 137 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var escapeHtmlChar = __webpack_require__(143),
-	    keys = __webpack_require__(144),
-	    reUnescapedHtml = __webpack_require__(145);
-
-	/**
-	 * Converts the characters `&`, `<`, `>`, `"`, and `'` in `string` to their
-	 * corresponding HTML entities.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @param {string} string The string to escape.
-	 * @returns {string} Returns the escaped string.
-	 * @example
-	 *
-	 * _.escape('Fred, Wilma, & Pebbles');
-	 * // => 'Fred, Wilma, &amp; Pebbles'
-	 */
-	function escape(string) {
-	  return string == null ? '' : String(string).replace(reUnescapedHtml, escapeHtmlChar);
-	}
-
-	module.exports = escape;
-
-
-/***/ },
-/* 138 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _validCSSProps = {
@@ -38006,6 +37969,43 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 138 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var escapeHtmlChar = __webpack_require__(143),
+	    keys = __webpack_require__(144),
+	    reUnescapedHtml = __webpack_require__(145);
+
+	/**
+	 * Converts the characters `&`, `<`, `>`, `"`, and `'` in `string` to their
+	 * corresponding HTML entities.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @param {string} string The string to escape.
+	 * @returns {string} Returns the escaped string.
+	 * @example
+	 *
+	 * _.escape('Fred, Wilma, & Pebbles');
+	 * // => 'Fred, Wilma, &amp; Pebbles'
+	 */
+	function escape(string) {
+	  return string == null ? '' : String(string).replace(reUnescapedHtml, escapeHtmlChar);
+	}
+
+	module.exports = escape;
+
+
+/***/ },
 /* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -38017,8 +38017,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var bind = __webpack_require__(146),
-	    identity = __webpack_require__(147),
+	var bind = __webpack_require__(147),
+	    identity = __webpack_require__(146),
 	    setBindData = __webpack_require__(148),
 	    support = __webpack_require__(149);
 
@@ -38103,9 +38103,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(150),
+	var isNative = __webpack_require__(152),
 	    isObject = __webpack_require__(151),
-	    shimKeys = __webpack_require__(152);
+	    shimKeys = __webpack_require__(153);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -38145,33 +38145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-
-	/** Used to determine if values are of the language type Object */
-	var objectTypes = {
-	  'boolean': false,
-	  'function': true,
-	  'object': true,
-	  'number': false,
-	  'string': false,
-	  'undefined': false
-	};
-
-	module.exports = objectTypes;
-
-
-/***/ },
-/* 142 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var createCallback = __webpack_require__(153),
+	var createCallback = __webpack_require__(150),
 	    forOwn = __webpack_require__(154);
 
 	/**
@@ -38240,6 +38214,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 142 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used to determine if values are of the language type Object */
+	var objectTypes = {
+	  'boolean': false,
+	  'function': true,
+	  'object': true,
+	  'number': false,
+	  'string': false,
+	  'undefined': false
+	};
+
+	module.exports = objectTypes;
+
+
+/***/ },
 /* 143 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -38251,7 +38251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var htmlEscapes = __webpack_require__(159);
+	var htmlEscapes = __webpack_require__(155);
 
 	/**
 	 * Used by `escape` to convert characters to HTML entities.
@@ -38280,8 +38280,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 	var isNative = __webpack_require__(156),
-	    isObject = __webpack_require__(157),
-	    shimKeys = __webpack_require__(158);
+	    isObject = __webpack_require__(158),
+	    shimKeys = __webpack_require__(157);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -38321,7 +38321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var htmlEscapes = __webpack_require__(155),
+	var htmlEscapes = __webpack_require__(159),
 	    keys = __webpack_require__(144);
 
 	/** Used to match HTML entities and HTML characters */
@@ -38332,6 +38332,40 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 146 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * This method returns the first argument provided to it.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @param {*} value Any value.
+	 * @returns {*} Returns `value`.
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.identity(object) === object;
+	 * // => true
+	 */
+	function identity(value) {
+	  return value;
+	}
+
+	module.exports = identity;
+
+
+/***/ },
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38377,40 +38411,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 147 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/**
-	 * This method returns the first argument provided to it.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @param {*} value Any value.
-	 * @returns {*} Returns `value`.
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.identity(object) === object;
-	 * // => true
-	 */
-	function identity(value) {
-	  return value;
-	}
-
-	module.exports = identity;
-
-
-/***/ },
 /* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -38422,7 +38422,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(163),
+	var isNative = __webpack_require__(162),
 	    noop = __webpack_require__(164);
 
 	/** Used as the property descriptor for `__bindData__` */
@@ -38471,7 +38471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(162);
+	var isNative = __webpack_require__(163);
 
 	/** Used to detect functions containing a `this` reference */
 	var reThis = /\bthis\b/;
@@ -38508,135 +38508,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 150 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the internal [[Class]] of values */
-	var toString = objectProto.toString;
-
-	/** Used to detect if a method is native */
-	var reNative = RegExp('^' +
-	  String(toString)
-	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
-	);
-
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
-	 */
-	function isNative(value) {
-	  return typeof value == 'function' && reNative.test(value);
-	}
-
-	module.exports = isNative;
-
-
-/***/ },
-/* 151 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(141);
-
-	/**
-	 * Checks if `value` is the language type of Object.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Objects
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(1);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // check if the value is the ECMAScript language type of Object
-	  // http://es5.github.io/#x8
-	  // and avoid a V8 bug
-	  // http://code.google.com/p/v8/issues/detail?id=2291
-	  return !!(value && objectTypes[typeof value]);
-	}
-
-	module.exports = isObject;
-
-
-/***/ },
-/* 152 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(141);
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Native method shortcuts */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-
-	/**
-	 * A fallback implementation of `Object.keys` which produces an array of the
-	 * given object's own enumerable property names.
-	 *
-	 * @private
-	 * @type Function
-	 * @param {Object} object The object to inspect.
-	 * @returns {Array} Returns an array of property names.
-	 */
-	var shimKeys = function(object) {
-	  var index, iterable = object, result = [];
-	  if (!iterable) return result;
-	  if (!(objectTypes[typeof object])) return result;
-	    for (index in iterable) {
-	      if (hasOwnProperty.call(iterable, index)) {
-	        result.push(index);
-	      }
-	    }
-	  return result
-	};
-
-	module.exports = shimKeys;
-
-
-/***/ },
-/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38723,6 +38594,135 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 151 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var objectTypes = __webpack_require__(142);
+
+	/**
+	 * Checks if `value` is the language type of Object.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Objects
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(1);
+	 * // => false
+	 */
+	function isObject(value) {
+	  // check if the value is the ECMAScript language type of Object
+	  // http://es5.github.io/#x8
+	  // and avoid a V8 bug
+	  // http://code.google.com/p/v8/issues/detail?id=2291
+	  return !!(value && objectTypes[typeof value]);
+	}
+
+	module.exports = isObject;
+
+
+/***/ },
+/* 152 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Used to resolve the internal [[Class]] of values */
+	var toString = objectProto.toString;
+
+	/** Used to detect if a method is native */
+	var reNative = RegExp('^' +
+	  String(toString)
+	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
+	);
+
+	/**
+	 * Checks if `value` is a native function.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
+	 */
+	function isNative(value) {
+	  return typeof value == 'function' && reNative.test(value);
+	}
+
+	module.exports = isNative;
+
+
+/***/ },
+/* 153 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var objectTypes = __webpack_require__(142);
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Native method shortcuts */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * A fallback implementation of `Object.keys` which produces an array of the
+	 * given object's own enumerable property names.
+	 *
+	 * @private
+	 * @type Function
+	 * @param {Object} object The object to inspect.
+	 * @returns {Array} Returns an array of property names.
+	 */
+	var shimKeys = function(object) {
+	  var index, iterable = object, result = [];
+	  if (!iterable) return result;
+	  if (!(objectTypes[typeof object])) return result;
+	    for (index in iterable) {
+	      if (hasOwnProperty.call(iterable, index)) {
+	        result.push(index);
+	      }
+	    }
+	  return result
+	};
+
+	module.exports = shimKeys;
+
+
+/***/ },
 /* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -38735,8 +38735,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 	var baseCreateCallback = __webpack_require__(170),
-	    keys = __webpack_require__(171),
-	    objectTypes = __webpack_require__(172);
+	    keys = __webpack_require__(172),
+	    objectTypes = __webpack_require__(171);
 
 	/**
 	 * Iterates over own enumerable properties of an object, executing the callback
@@ -38862,6 +38862,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
+	var objectTypes = __webpack_require__(173);
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Native method shortcuts */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * A fallback implementation of `Object.keys` which produces an array of the
+	 * given object's own enumerable property names.
+	 *
+	 * @private
+	 * @type Function
+	 * @param {Object} object The object to inspect.
+	 * @returns {Array} Returns an array of property names.
+	 */
+	var shimKeys = function(object) {
+	  var index, iterable = object, result = [];
+	  if (!iterable) return result;
+	  if (!(objectTypes[typeof object])) return result;
+	    for (index in iterable) {
+	      if (hasOwnProperty.call(iterable, index)) {
+	        result.push(index);
+	      }
+	    }
+	  return result
+	};
+
+	module.exports = shimKeys;
+
+
+/***/ },
+/* 158 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
 	var objectTypes = __webpack_require__(174);
 
 	/**
@@ -38893,50 +38937,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = isObject;
-
-
-/***/ },
-/* 158 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(173);
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Native method shortcuts */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-
-	/**
-	 * A fallback implementation of `Object.keys` which produces an array of the
-	 * given object's own enumerable property names.
-	 *
-	 * @private
-	 * @type Function
-	 * @param {Object} object The object to inspect.
-	 * @returns {Array} Returns an array of property names.
-	 */
-	var shimKeys = function(object) {
-	  var index, iterable = object, result = [];
-	  if (!iterable) return result;
-	  if (!(objectTypes[typeof object])) return result;
-	    for (index in iterable) {
-	      if (hasOwnProperty.call(iterable, index)) {
-	        result.push(index);
-	      }
-	    }
-	  return result
-	};
-
-	module.exports = shimKeys;
 
 
 /***/ },
@@ -38983,8 +38983,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseBind = __webpack_require__(175),
-	    baseCreateWrapper = __webpack_require__(176),
+	var baseBind = __webpack_require__(176),
+	    baseCreateWrapper = __webpack_require__(175),
 	    isFunction = __webpack_require__(177),
 	    slice = __webpack_require__(161);
 
@@ -39251,10 +39251,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var bind = __webpack_require__(178),
-	    identity = __webpack_require__(179),
-	    setBindData = __webpack_require__(180),
-	    support = __webpack_require__(181);
+	var bind = __webpack_require__(183),
+	    identity = __webpack_require__(184),
+	    setBindData = __webpack_require__(185),
+	    support = __webpack_require__(186);
 
 	/** Used to detected named functions */
 	var reFuncName = /^\s*function[ \n\r\t]+\w/;
@@ -39337,11 +39337,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var forIn = __webpack_require__(182),
-	    getArray = __webpack_require__(183),
-	    isFunction = __webpack_require__(184),
-	    objectTypes = __webpack_require__(185),
-	    releaseArray = __webpack_require__(186);
+	var forIn = __webpack_require__(178),
+	    getArray = __webpack_require__(179),
+	    isFunction = __webpack_require__(180),
+	    objectTypes = __webpack_require__(181),
+	    releaseArray = __webpack_require__(182);
 
 	/** `Object#toString` result shortcuts */
 	var argsClass = '[object Arguments]',
@@ -39552,7 +39552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(189);
+	var objectTypes = __webpack_require__(190);
 
 	/**
 	 * Checks if `value` is the language type of Object.
@@ -39685,10 +39685,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var bind = __webpack_require__(190),
-	    identity = __webpack_require__(191),
-	    setBindData = __webpack_require__(192),
-	    support = __webpack_require__(193);
+	var bind = __webpack_require__(189),
+	    identity = __webpack_require__(193),
+	    setBindData = __webpack_require__(191),
+	    support = __webpack_require__(192);
 
 	/** Used to detected named functions */
 	var reFuncName = /^\s*function[ \n\r\t]+\w/;
@@ -39771,6 +39771,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
+
+	/** Used to determine if values are of the language type Object */
+	var objectTypes = {
+	  'boolean': false,
+	  'function': true,
+	  'object': true,
+	  'number': false,
+	  'string': false,
+	  'undefined': false
+	};
+
+	module.exports = objectTypes;
+
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
 	var isNative = __webpack_require__(194),
 	    isObject = __webpack_require__(195),
 	    shimKeys = __webpack_require__(196);
@@ -39799,32 +39825,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	module.exports = keys;
-
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used to determine if values are of the language type Object */
-	var objectTypes = {
-	  'boolean': false,
-	  'function': true,
-	  'object': true,
-	  'number': false,
-	  'string': false,
-	  'undefined': false
-	};
-
-	module.exports = objectTypes;
 
 
 /***/ },
@@ -39892,75 +39892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 	var baseCreate = __webpack_require__(197),
-	    isObject = __webpack_require__(198),
-	    setBindData = __webpack_require__(148),
-	    slice = __webpack_require__(161);
-
-	/**
-	 * Used for `Array` method references.
-	 *
-	 * Normally `Array.prototype` would suffice, however, using an array literal
-	 * avoids issues in Narwhal.
-	 */
-	var arrayRef = [];
-
-	/** Native method shortcuts */
-	var push = arrayRef.push;
-
-	/**
-	 * The base implementation of `_.bind` that creates the bound function and
-	 * sets its meta data.
-	 *
-	 * @private
-	 * @param {Array} bindData The bind data array.
-	 * @returns {Function} Returns the new bound function.
-	 */
-	function baseBind(bindData) {
-	  var func = bindData[0],
-	      partialArgs = bindData[2],
-	      thisArg = bindData[4];
-
-	  function bound() {
-	    // `Function#bind` spec
-	    // http://es5.github.io/#x15.3.4.5
-	    if (partialArgs) {
-	      // avoid `arguments` object deoptimizations by using `slice` instead
-	      // of `Array.prototype.slice.call` and not assigning `arguments` to a
-	      // variable as a ternary expression
-	      var args = slice(partialArgs);
-	      push.apply(args, arguments);
-	    }
-	    // mimic the constructor's `return` behavior
-	    // http://es5.github.io/#x13.2.2
-	    if (this instanceof bound) {
-	      // ensure `new bound` is an instance of `func`
-	      var thisBinding = baseCreate(func.prototype),
-	          result = func.apply(thisBinding, args || arguments);
-	      return isObject(result) ? result : thisBinding;
-	    }
-	    return func.apply(thisArg, args || arguments);
-	  }
-	  setBindData(bound, bindData);
-	  return bound;
-	}
-
-	module.exports = baseBind;
-
-
-/***/ },
-/* 176 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var baseCreate = __webpack_require__(199),
-	    isObject = __webpack_require__(200),
+	    isObject = __webpack_require__(199),
 	    setBindData = __webpack_require__(148),
 	    slice = __webpack_require__(161);
 
@@ -40032,6 +39964,74 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 176 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var baseCreate = __webpack_require__(198),
+	    isObject = __webpack_require__(200),
+	    setBindData = __webpack_require__(148),
+	    slice = __webpack_require__(161);
+
+	/**
+	 * Used for `Array` method references.
+	 *
+	 * Normally `Array.prototype` would suffice, however, using an array literal
+	 * avoids issues in Narwhal.
+	 */
+	var arrayRef = [];
+
+	/** Native method shortcuts */
+	var push = arrayRef.push;
+
+	/**
+	 * The base implementation of `_.bind` that creates the bound function and
+	 * sets its meta data.
+	 *
+	 * @private
+	 * @param {Array} bindData The bind data array.
+	 * @returns {Function} Returns the new bound function.
+	 */
+	function baseBind(bindData) {
+	  var func = bindData[0],
+	      partialArgs = bindData[2],
+	      thisArg = bindData[4];
+
+	  function bound() {
+	    // `Function#bind` spec
+	    // http://es5.github.io/#x15.3.4.5
+	    if (partialArgs) {
+	      // avoid `arguments` object deoptimizations by using `slice` instead
+	      // of `Array.prototype.slice.call` and not assigning `arguments` to a
+	      // variable as a ternary expression
+	      var args = slice(partialArgs);
+	      push.apply(args, arguments);
+	    }
+	    // mimic the constructor's `return` behavior
+	    // http://es5.github.io/#x13.2.2
+	    if (this instanceof bound) {
+	      // ensure `new bound` is an instance of `func`
+	      var thisBinding = baseCreate(func.prototype),
+	          result = func.apply(thisBinding, args || arguments);
+	      return isObject(result) ? result : thisBinding;
+	    }
+	    return func.apply(thisArg, args || arguments);
+	  }
+	  setBindData(bound, bindData);
+	  return bound;
+	}
+
+	module.exports = baseBind;
+
+
+/***/ },
 /* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -40076,8 +40076,185 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var createWrapper = __webpack_require__(201),
-	    slice = __webpack_require__(202);
+	var baseCreateCallback = __webpack_require__(165),
+	    objectTypes = __webpack_require__(181);
+
+	/**
+	 * Iterates over own and inherited enumerable properties of an object,
+	 * executing the callback for each property. The callback is bound to `thisArg`
+	 * and invoked with three arguments; (value, key, object). Callbacks may exit
+	 * iteration early by explicitly returning `false`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @type Function
+	 * @category Objects
+	 * @param {Object} object The object to iterate over.
+	 * @param {Function} [callback=identity] The function called per iteration.
+	 * @param {*} [thisArg] The `this` binding of `callback`.
+	 * @returns {Object} Returns `object`.
+	 * @example
+	 *
+	 * function Shape() {
+	 *   this.x = 0;
+	 *   this.y = 0;
+	 * }
+	 *
+	 * Shape.prototype.move = function(x, y) {
+	 *   this.x += x;
+	 *   this.y += y;
+	 * };
+	 *
+	 * _.forIn(new Shape, function(value, key) {
+	 *   console.log(key);
+	 * });
+	 * // => logs 'x', 'y', and 'move' (property order is not guaranteed across environments)
+	 */
+	var forIn = function(collection, callback, thisArg) {
+	  var index, iterable = collection, result = iterable;
+	  if (!iterable) return result;
+	  if (!objectTypes[typeof iterable]) return result;
+	  callback = callback && typeof thisArg == 'undefined' ? callback : baseCreateCallback(callback, thisArg, 3);
+	    for (index in iterable) {
+	      if (callback(iterable[index], index, collection) === false) return result;
+	    }
+	  return result
+	};
+
+	module.exports = forIn;
+
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var arrayPool = __webpack_require__(201);
+
+	/**
+	 * Gets an array from the array pool or creates a new one if the pool is empty.
+	 *
+	 * @private
+	 * @returns {Array} The array from the pool.
+	 */
+	function getArray() {
+	  return arrayPool.pop() || [];
+	}
+
+	module.exports = getArray;
+
+
+/***/ },
+/* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * Checks if `value` is a function.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Objects
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a function, else `false`.
+	 * @example
+	 *
+	 * _.isFunction(_);
+	 * // => true
+	 */
+	function isFunction(value) {
+	  return typeof value == 'function';
+	}
+
+	module.exports = isFunction;
+
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used to determine if values are of the language type Object */
+	var objectTypes = {
+	  'boolean': false,
+	  'function': true,
+	  'object': true,
+	  'number': false,
+	  'string': false,
+	  'undefined': false
+	};
+
+	module.exports = objectTypes;
+
+
+/***/ },
+/* 182 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var arrayPool = __webpack_require__(202),
+	    maxPoolSize = __webpack_require__(203);
+
+	/**
+	 * Releases the given array back to the array pool.
+	 *
+	 * @private
+	 * @param {Array} [array] The array to release.
+	 */
+	function releaseArray(array) {
+	  array.length = 0;
+	  if (arrayPool.length < maxPoolSize) {
+	    arrayPool.push(array);
+	  }
+	}
+
+	module.exports = releaseArray;
+
+
+/***/ },
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var createWrapper = __webpack_require__(204),
+	    slice = __webpack_require__(205);
 
 	/**
 	 * Creates a function that, when called, invokes `func` with the `this`
@@ -40111,7 +40288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 179 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -40145,7 +40322,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 180 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -40194,7 +40371,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 181 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -40205,7 +40382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(205);
+	var isNative = __webpack_require__(208);
 
 	/** Used to detect functions containing a `this` reference */
 	var reThis = /\bthis\b/;
@@ -40239,183 +40416,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = support;
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 182 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var baseCreateCallback = __webpack_require__(165),
-	    objectTypes = __webpack_require__(185);
-
-	/**
-	 * Iterates over own and inherited enumerable properties of an object,
-	 * executing the callback for each property. The callback is bound to `thisArg`
-	 * and invoked with three arguments; (value, key, object). Callbacks may exit
-	 * iteration early by explicitly returning `false`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @type Function
-	 * @category Objects
-	 * @param {Object} object The object to iterate over.
-	 * @param {Function} [callback=identity] The function called per iteration.
-	 * @param {*} [thisArg] The `this` binding of `callback`.
-	 * @returns {Object} Returns `object`.
-	 * @example
-	 *
-	 * function Shape() {
-	 *   this.x = 0;
-	 *   this.y = 0;
-	 * }
-	 *
-	 * Shape.prototype.move = function(x, y) {
-	 *   this.x += x;
-	 *   this.y += y;
-	 * };
-	 *
-	 * _.forIn(new Shape, function(value, key) {
-	 *   console.log(key);
-	 * });
-	 * // => logs 'x', 'y', and 'move' (property order is not guaranteed across environments)
-	 */
-	var forIn = function(collection, callback, thisArg) {
-	  var index, iterable = collection, result = iterable;
-	  if (!iterable) return result;
-	  if (!objectTypes[typeof iterable]) return result;
-	  callback = callback && typeof thisArg == 'undefined' ? callback : baseCreateCallback(callback, thisArg, 3);
-	    for (index in iterable) {
-	      if (callback(iterable[index], index, collection) === false) return result;
-	    }
-	  return result
-	};
-
-	module.exports = forIn;
-
-
-/***/ },
-/* 183 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var arrayPool = __webpack_require__(203);
-
-	/**
-	 * Gets an array from the array pool or creates a new one if the pool is empty.
-	 *
-	 * @private
-	 * @returns {Array} The array from the pool.
-	 */
-	function getArray() {
-	  return arrayPool.pop() || [];
-	}
-
-	module.exports = getArray;
-
-
-/***/ },
-/* 184 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/**
-	 * Checks if `value` is a function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Objects
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a function, else `false`.
-	 * @example
-	 *
-	 * _.isFunction(_);
-	 * // => true
-	 */
-	function isFunction(value) {
-	  return typeof value == 'function';
-	}
-
-	module.exports = isFunction;
-
-
-/***/ },
-/* 185 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used to determine if values are of the language type Object */
-	var objectTypes = {
-	  'boolean': false,
-	  'function': true,
-	  'object': true,
-	  'number': false,
-	  'string': false,
-	  'undefined': false
-	};
-
-	module.exports = objectTypes;
-
-
-/***/ },
-/* 186 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var arrayPool = __webpack_require__(208),
-	    maxPoolSize = __webpack_require__(209);
-
-	/**
-	 * Releases the given array back to the array pool.
-	 *
-	 * @private
-	 * @param {Array} [array] The array to release.
-	 */
-	function releaseArray(array) {
-	  array.length = 0;
-	  if (arrayPool.length < maxPoolSize) {
-	    arrayPool.push(array);
-	  }
-	}
-
-	module.exports = releaseArray;
-
 
 /***/ },
 /* 187 */
@@ -40469,7 +40469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(204);
+	var objectTypes = __webpack_require__(210);
 
 	/** Used for native method references */
 	var objectProto = Object.prototype;
@@ -40513,34 +40513,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-
-	/** Used to determine if values are of the language type Object */
-	var objectTypes = {
-	  'boolean': false,
-	  'function': true,
-	  'object': true,
-	  'number': false,
-	  'string': false,
-	  'undefined': false
-	};
-
-	module.exports = objectTypes;
-
-
-/***/ },
-/* 190 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var createWrapper = __webpack_require__(210),
-	    slice = __webpack_require__(211);
+	var createWrapper = __webpack_require__(209),
+	    slice = __webpack_require__(213);
 
 	/**
 	 * Creates a function that, when called, invokes `func` with the `this`
@@ -40574,6 +40548,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 190 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used to determine if values are of the language type Object */
+	var objectTypes = {
+	  'boolean': false,
+	  'function': true,
+	  'object': true,
+	  'number': false,
+	  'string': false,
+	  'undefined': false
+	};
+
+	module.exports = objectTypes;
+
+
+/***/ },
 /* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -40585,42 +40585,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-
-	/**
-	 * This method returns the first argument provided to it.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @param {*} value Any value.
-	 * @returns {*} Returns `value`.
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.identity(object) === object;
-	 * // => true
-	 */
-	function identity(value) {
-	  return value;
-	}
-
-	module.exports = identity;
-
-
-/***/ },
-/* 192 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var isNative = __webpack_require__(212),
-	    noop = __webpack_require__(213);
+	var isNative = __webpack_require__(211),
+	    noop = __webpack_require__(212);
 
 	/** Used as the property descriptor for `__bindData__` */
 	var descriptor = {
@@ -40657,7 +40623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 193 */
+/* 192 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -40702,6 +40668,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = support;
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 193 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * This method returns the first argument provided to it.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @param {*} value Any value.
+	 * @returns {*} Returns `value`.
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.identity(object) === object;
+	 * // => true
+	 */
+	function identity(value) {
+	  return value;
+	}
+
+	module.exports = identity;
+
 
 /***/ },
 /* 194 */
@@ -40755,7 +40755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(172);
+	var objectTypes = __webpack_require__(171);
 
 	/**
 	 * Checks if `value` is the language type of Object.
@@ -40800,7 +40800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(172);
+	var objectTypes = __webpack_require__(171);
 
 	/** Used for native method references */
 	var objectProto = Object.prototype;
@@ -40844,9 +40844,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(215),
-	    isObject = __webpack_require__(198),
-	    noop = __webpack_require__(216);
+	var isNative = __webpack_require__(216),
+	    isObject = __webpack_require__(199),
+	    noop = __webpack_require__(215);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
@@ -40883,51 +40883,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 198 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(141);
-
-	/**
-	 * Checks if `value` is the language type of Object.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Objects
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(1);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // check if the value is the ECMAScript language type of Object
-	  // http://es5.github.io/#x8
-	  // and avoid a V8 bug
-	  // http://code.google.com/p/v8/issues/detail?id=2291
-	  return !!(value && objectTypes[typeof value]);
-	}
-
-	module.exports = isObject;
-
-
-/***/ },
-/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -40976,6 +40931,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
+/* 199 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var objectTypes = __webpack_require__(142);
+
+	/**
+	 * Checks if `value` is the language type of Object.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Objects
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(1);
+	 * // => false
+	 */
+	function isObject(value) {
+	  // check if the value is the ECMAScript language type of Object
+	  // http://es5.github.io/#x8
+	  // and avoid a V8 bug
+	  // http://code.google.com/p/v8/issues/detail?id=2291
+	  return !!(value && objectTypes[typeof value]);
+	}
+
+	module.exports = isObject;
+
+
+/***/ },
 /* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -40987,7 +40987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(141);
+	var objectTypes = __webpack_require__(142);
 
 	/**
 	 * Checks if `value` is the language type of Object.
@@ -41032,10 +41032,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
+
+	/** Used to pool arrays and objects used internally */
+	var arrayPool = [];
+
+	module.exports = arrayPool;
+
+
+/***/ },
+/* 202 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used to pool arrays and objects used internally */
+	var arrayPool = [];
+
+	module.exports = arrayPool;
+
+
+/***/ },
+/* 203 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used as the max size of the `arrayPool` and `objectPool` */
+	var maxPoolSize = 40;
+
+	module.exports = maxPoolSize;
+
+
+/***/ },
+/* 204 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
 	var baseBind = __webpack_require__(219),
 	    baseCreateWrapper = __webpack_require__(220),
 	    isFunction = __webpack_require__(221),
-	    slice = __webpack_require__(202);
+	    slice = __webpack_require__(205);
 
 	/**
 	 * Used for `Array` method references.
@@ -41133,7 +41190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 202 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41174,91 +41231,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = slice;
-
-
-/***/ },
-/* 203 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used to pool arrays and objects used internally */
-	var arrayPool = [];
-
-	module.exports = arrayPool;
-
-
-/***/ },
-/* 204 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used to determine if values are of the language type Object */
-	var objectTypes = {
-	  'boolean': false,
-	  'function': true,
-	  'object': true,
-	  'number': false,
-	  'string': false,
-	  'undefined': false
-	};
-
-	module.exports = objectTypes;
-
-
-/***/ },
-/* 205 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the internal [[Class]] of values */
-	var toString = objectProto.toString;
-
-	/** Used to detect if a method is native */
-	var reNative = RegExp('^' +
-	  String(toString)
-	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
-	);
-
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
-	 */
-	function isNative(value) {
-	  return typeof value == 'function' && reNative.test(value);
-	}
-
-	module.exports = isNative;
 
 
 /***/ },
@@ -41346,10 +41318,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 
-	/** Used to pool arrays and objects used internally */
-	var arrayPool = [];
+	/** Used for native method references */
+	var objectProto = Object.prototype;
 
-	module.exports = arrayPool;
+	/** Used to resolve the internal [[Class]] of values */
+	var toString = objectProto.toString;
+
+	/** Used to detect if a method is native */
+	var reNative = RegExp('^' +
+	  String(toString)
+	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
+	);
+
+	/**
+	 * Checks if `value` is a native function.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
+	 */
+	function isNative(value) {
+	  return typeof value == 'function' && reNative.test(value);
+	}
+
+	module.exports = isNative;
 
 
 /***/ },
@@ -41364,29 +41357,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-
-	/** Used as the max size of the `arrayPool` and `objectPool` */
-	var maxPoolSize = 40;
-
-	module.exports = maxPoolSize;
-
-
-/***/ },
-/* 210 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
 	var baseBind = __webpack_require__(222),
 	    baseCreateWrapper = __webpack_require__(223),
 	    isFunction = __webpack_require__(224),
-	    slice = __webpack_require__(211);
+	    slice = __webpack_require__(213);
 
 	/**
 	 * Used for `Array` method references.
@@ -41484,7 +41458,105 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 210 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used to determine if values are of the language type Object */
+	var objectTypes = {
+	  'boolean': false,
+	  'function': true,
+	  'object': true,
+	  'number': false,
+	  'string': false,
+	  'undefined': false
+	};
+
+	module.exports = objectTypes;
+
+
+/***/ },
 /* 211 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Used to resolve the internal [[Class]] of values */
+	var toString = objectProto.toString;
+
+	/** Used to detect if a method is native */
+	var reNative = RegExp('^' +
+	  String(toString)
+	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
+	);
+
+	/**
+	 * Checks if `value` is a native function.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
+	 */
+	function isNative(value) {
+	  return typeof value == 'function' && reNative.test(value);
+	}
+
+	module.exports = isNative;
+
+
+/***/ },
+/* 212 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * A no-operation function.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.noop(object) === undefined;
+	 * // => true
+	 */
+	function noop() {
+	  // no operation performed
+	}
+
+	module.exports = noop;
+
+
+/***/ },
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41525,78 +41597,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = slice;
-
-
-/***/ },
-/* 212 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the internal [[Class]] of values */
-	var toString = objectProto.toString;
-
-	/** Used to detect if a method is native */
-	var reNative = RegExp('^' +
-	  String(toString)
-	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
-	);
-
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
-	 */
-	function isNative(value) {
-	  return typeof value == 'function' && reNative.test(value);
-	}
-
-	module.exports = isNative;
-
-
-/***/ },
-/* 213 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/**
-	 * A no-operation function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.noop(object) === undefined;
-	 * // => true
-	 */
-	function noop() {
-	  // no operation performed
-	}
-
-	module.exports = noop;
 
 
 /***/ },
@@ -41652,6 +41652,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 
+	/**
+	 * A no-operation function.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.noop(object) === undefined;
+	 * // => true
+	 */
+	function noop() {
+	  // no operation performed
+	}
+
+	module.exports = noop;
+
+
+/***/ },
+/* 216 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
 	/** Used for native method references */
 	var objectProto = Object.prototype;
 
@@ -41677,38 +41709,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = isNative;
-
-
-/***/ },
-/* 216 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/**
-	 * A no-operation function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.noop(object) === undefined;
-	 * // => true
-	 */
-	function noop() {
-	  // no operation performed
-	}
-
-	module.exports = noop;
 
 
 /***/ },
@@ -41797,8 +41797,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var baseCreate = __webpack_require__(225),
 	    isObject = __webpack_require__(167),
-	    setBindData = __webpack_require__(180),
-	    slice = __webpack_require__(202);
+	    setBindData = __webpack_require__(185),
+	    slice = __webpack_require__(205);
 
 	/**
 	 * Used for `Array` method references.
@@ -41863,10 +41863,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreate = __webpack_require__(226),
+	var baseCreate = __webpack_require__(227),
 	    isObject = __webpack_require__(167),
-	    setBindData = __webpack_require__(180),
-	    slice = __webpack_require__(202);
+	    setBindData = __webpack_require__(185),
+	    slice = __webpack_require__(205);
 
 	/**
 	 * Used for `Array` method references.
@@ -41980,10 +41980,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreate = __webpack_require__(227),
+	var baseCreate = __webpack_require__(226),
 	    isObject = __webpack_require__(228),
-	    setBindData = __webpack_require__(192),
-	    slice = __webpack_require__(211);
+	    setBindData = __webpack_require__(191),
+	    slice = __webpack_require__(213);
 
 	/**
 	 * Used for `Array` method references.
@@ -42050,8 +42050,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var baseCreate = __webpack_require__(229),
 	    isObject = __webpack_require__(230),
-	    setBindData = __webpack_require__(192),
-	    slice = __webpack_require__(211);
+	    setBindData = __webpack_require__(191),
+	    slice = __webpack_require__(213);
 
 	/**
 	 * Used for `Array` method references.
@@ -42165,9 +42165,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(235),
+	var isNative = __webpack_require__(233),
 	    isObject = __webpack_require__(167),
-	    noop = __webpack_require__(236);
+	    noop = __webpack_require__(235);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
@@ -42204,55 +42204,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 226 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var isNative = __webpack_require__(233),
-	    isObject = __webpack_require__(167),
-	    noop = __webpack_require__(234);
-
-	/* Native method shortcuts for methods with the same name as other `lodash` methods */
-	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
-
-	/**
-	 * The base implementation of `_.create` without support for assigning
-	 * properties to the created object.
-	 *
-	 * @private
-	 * @param {Object} prototype The object to inherit from.
-	 * @returns {Object} Returns the new object.
-	 */
-	function baseCreate(prototype, properties) {
-	  return isObject(prototype) ? nativeCreate(prototype) : {};
-	}
-	// fallback for browsers without `Object.create`
-	if (!nativeCreate) {
-	  baseCreate = (function() {
-	    function Object() {}
-	    return function(prototype) {
-	      if (isObject(prototype)) {
-	        Object.prototype = prototype;
-	        var result = new Object;
-	        Object.prototype = null;
-	      }
-	      return result || global.Object();
-	    };
-	  }());
-	}
-
-	module.exports = baseCreate;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -42301,6 +42252,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
+/* 227 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var isNative = __webpack_require__(234),
+	    isObject = __webpack_require__(167),
+	    noop = __webpack_require__(236);
+
+	/* Native method shortcuts for methods with the same name as other `lodash` methods */
+	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
+
+	/**
+	 * The base implementation of `_.create` without support for assigning
+	 * properties to the created object.
+	 *
+	 * @private
+	 * @param {Object} prototype The object to inherit from.
+	 * @returns {Object} Returns the new object.
+	 */
+	function baseCreate(prototype, properties) {
+	  return isObject(prototype) ? nativeCreate(prototype) : {};
+	}
+	// fallback for browsers without `Object.create`
+	if (!nativeCreate) {
+	  baseCreate = (function() {
+	    function Object() {}
+	    return function(prototype) {
+	      if (isObject(prototype)) {
+	        Object.prototype = prototype;
+	        var result = new Object;
+	        Object.prototype = null;
+	      }
+	      return result || global.Object();
+	    };
+	  }());
+	}
+
+	module.exports = baseCreate;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
 /* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -42312,7 +42312,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(172);
+	var objectTypes = __webpack_require__(171);
 
 	/**
 	 * Checks if `value` is the language type of Object.
@@ -42406,7 +42406,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(172);
+	var objectTypes = __webpack_require__(171);
 
 	/**
 	 * Checks if `value` is the language type of Object.
@@ -42564,38 +42564,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 
-	/**
-	 * A no-operation function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.noop(object) === undefined;
-	 * // => true
-	 */
-	function noop() {
-	  // no operation performed
-	}
-
-	module.exports = noop;
-
-
-/***/ },
-/* 235 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
 	/** Used for native method references */
 	var objectProto = Object.prototype;
 
@@ -42621,6 +42589,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = isNative;
+
+
+/***/ },
+/* 235 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * A no-operation function.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.noop(object) === undefined;
+	 * // => true
+	 */
+	function noop() {
+	  // no operation performed
+	}
+
+	module.exports = noop;
 
 
 /***/ },
