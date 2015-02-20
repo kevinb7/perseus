@@ -1,13 +1,14 @@
-/** @jsx React.DOM */
-
 /* Collection of classes for rendering the hint editor area,
  * hint editor boxes, and hint previews
  */
 
 var React = require('react');
+var _ = require("underscore");
+
 var Editor = require("./editor.jsx");
 var HintRenderer = require("./hint-renderer.jsx");
-var InfoTip = require("react-components/info-tip");
+var InfoTip = require("react-components/info-tip.jsx");
+var Util = require("./util.js");
 
 /* Renders a hint editor box
  *
@@ -37,39 +38,33 @@ var HintEditor = React.createClass({
                     images={this.props.images}
                     placeholder="Type your hint here..."
                     imageUploader={this.props.imageUploader}
-                    onChange={this.props.onChange} />
+                    onChange={this.props.onChange}
+                    searchString={this.props.searchString}
+                    searchIndex={this.props.searchIndex} />
             <div className="hint-controls-container clearfix">
                 <span className="reorder-hints">
-                    <a href="#"
-                        className={this.props.isLast && "hidden"}
-                        onClick={() => {
-                            this.props.onMove(1);
-                            return false;
-                        }}>
+                    <button type="button"
+                            className={this.props.isLast ? "hidden" : ""}
+                            onClick={_.partial(this.props.onMove, 1)}>
                         <span className="icon-circle-arrow-down" />
-                    </a>
+                    </button>
                     {' '}
-                    <a href="#"
-                        className={this.props.isFirst && "hidden"}
-                        onClick={() => {
-                            this.props.onMove(-1);
-                            return false;
-                        }}>
+                    <button type="button"
+                            className={this.props.isFirst ? "hidden" : ""}
+                            onClick={_.partial(this.props.onMove, -1)}>
                         <span className="icon-circle-arrow-up" />
-                    </a>
+                    </button>
                     {' '}
                     {this.props.isLast &&
                     <InfoTip>
                         <p>The last hint is automatically bolded.</p>
                     </InfoTip>}
                 </span>
-                <a href="#" className="remove-hint simple-button orange"
-                        onClick={() => {
-                            this.props.onRemove();
-                            return false;
-                        }}>
+                <button type="button"
+                        className="remove-hint simple-button orange"
+                        onClick={this.props.onRemove}>
                     <span className="icon-trash" /> Remove this hint{' '}
-                </a>
+                </button>
             </div>
         </div>;
     },
@@ -78,8 +73,12 @@ var HintEditor = React.createClass({
         this.refs.editor.focus();
     },
 
-    toJSON: function(skipValidation) {
-        return this.refs.editor.toJSON(skipValidation);
+    getSaveWarnings: function() {
+        return this.refs.editor.getSaveWarnings();
+    },
+
+    serialize: function(options) {
+        return this.refs.editor.serialize(options);
     }
 });
 
@@ -105,7 +104,9 @@ var CombinedHintEditor = React.createClass({
                 imageUploader={this.props.imageUploader}
                 onChange={this.props.onChange}
                 onRemove={this.props.onRemove}
-                onMove={this.props.onMove} />
+                onMove={this.props.onMove}
+                searchString={this.props.searchString}
+                searchIndex={this.props.searchIndex} />
 
             <div className="perseus-editor-right-cell">
                 <HintRenderer hint={this.props.hint} bold={shouldBold} />
@@ -113,8 +114,12 @@ var CombinedHintEditor = React.createClass({
         </div>;
     },
 
-    toJSON: function(skipValidation) {
-        return this.refs.editor.toJSON(skipValidation);
+    getSaveWarnings: function() {
+        return this.refs.editor.getSaveWarnings();
+    },
+
+    serialize: function(options) {
+        return this.refs.editor.serialize(options);
     },
 
     focus: function() {
@@ -144,7 +149,19 @@ var CombinedHintsEditor = React.createClass({
 
     render: function() {
         var hints = this.props.hints;
+        var searchIndex = this.props.searchIndex;
+        var searchString = this.props.searchString;
+        
         var hintElems = _.map(hints, function(hint, i) {
+            var hintSearchCount = Util.countOccurences(hint.content, searchString);
+            var hintSearchIndex = -1;
+            if (searchIndex >= 0) {
+                if (searchIndex < hintSearchCount) {
+                    hintSearchIndex = searchIndex;
+                }
+                searchIndex -= hintSearchCount;
+            }
+
             return <CombinedHintEditor
                         ref={"hintEditor" + i}
                         key={"hintEditor" + i}
@@ -154,28 +171,37 @@ var CombinedHintsEditor = React.createClass({
                         imageUploader={this.props.imageUploader}
                         onChange={this.handleHintChange.bind(this, i)}
                         onRemove={this.handleHintRemove.bind(this, i)}
-                        onMove={this.handleHintMove.bind(this, i)} />;
+                        onMove={this.handleHintMove.bind(this, i)}
+                        searchString={searchString}
+                        searchIndex={hintSearchIndex} />;
         }, this);
 
-        return <div className="perseus-hints-container perseus-editor-table">
+        return <div className="perseus-hints-editor perseus-editor-table">
             {hintElems}
             <div className="perseus-editor-row">
                 <div className="add-hint-container perseus-editor-left-cell">
-                <a href="#" className="simple-button orange"
+                <button type="button"
+                        className="add-hint simple-button orange"
                         onClick={this.addHint}>
                     <span className="icon-plus" />
-                    {' '}Add a hint{' '}
-                </a>
+                    {' '}Add a hint
+                </button>
                 </div>
                 <div className="perseus-editor-right-cell" />
             </div>
         </div>;
     },
 
-    handleHintChange: function(i, newProps, cb) {
+    handleHintChange: function(i, newProps, cb, silent) {
+        // TODO(joel) - lens
         var hints = _(this.props.hints).clone();
-        hints[i] = _.extend({}, hints[i], newProps);
-        this.props.onChange({hints: hints}, cb);
+        hints[i] = _.extend(
+            {},
+            this.serializeHint(i, {keepDeletedWidgets: true}),
+            newProps
+        );
+
+        this.props.onChange({hints: hints}, cb, silent);
     },
 
     handleHintRemove: function(i) {
@@ -199,15 +225,22 @@ var CombinedHintsEditor = React.createClass({
             var i = hints.length - 1;
             this.refs["hintEditor" + i].focus();
         });
-
-        // TODO(joel) - is this doing anything?
-        return false;
     },
 
-    toJSON: function(skipValidation) {
-        return this.props.hints.map(function(hint, i) {
-            return this.refs["hintEditor" + i].toJSON(skipValidation);
-        }, this);
+    getSaveWarnings: function() {
+        return this.props.hints.map((hint, i) => {
+            return this.refs["hintEditor" + i].getSaveWarnings();
+        });
+    },
+
+    serialize: function(options) {
+        return this.props.hints.map((hint, i) => {
+            return this.serializeHint(i, options);
+        });
+    },
+
+    serializeHint: function(index, options) {
+        return this.refs["hintEditor" + index].serialize(options);
     }
 });
 

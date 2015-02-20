@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 /**
  * This is an iframe widget. It is used for rendering an iframe that
  *  then communicates its state via window.postMessage
@@ -10,55 +8,63 @@
  */
 
 var React = require("react");
+var _ = require("underscore");
 
-var BlurInput    = require("react-components/blur-input");
+var BlurInput    = require("react-components/blur-input.jsx");
 var Changeable = require("../mixins/changeable.jsx");
-var JsonifyProps = require("../mixins/jsonify-props.jsx");
+var EditorJsonify = require("../mixins/editor-jsonify.jsx");
+var WidgetJsonifyDeprecated = require("../mixins/widget-jsonify-deprecated.jsx");
 var updateQueryString = require("../util.js").updateQueryString;
 
 
 /* This renders the iframe and handles validation via window.postMessage */
 var Iframe = React.createClass({
 
-    mixins: [Changeable, JsonifyProps],
+    mixins: [Changeable, WidgetJsonifyDeprecated],
 
     propTypes: {
-        status: React.PropTypes.string,
+        width: React.PropTypes.string,
+        height: React.PropTypes.string,
+        url: React.PropTypes.string,
+        settings: React.PropTypes.array,
+        status: React.PropTypes.oneOf(['incomplete', 'incorrect', 'correct']),
         message: React.PropTypes.string,
     },
 
     getDefaultProps: function() {
         return {
-            // options: incomplete, incorrect, correct
             status: "incomplete",
             // optional message
             message: null
         };
     },
-
-    componentDidMount: function() {
+    handleMessageEvent: function(e) {
         // We receive data from the iframe that contains {passed: true/false}
         //  and use that to set the status
         // It could also contain an optional message
-        $(window).bind("message", (e) => {
-            var data = {};
-            try {
-                data = JSON.parse(e.originalEvent.data);
-            } catch (err) {
-                return;
-            }
+        var data = {};
+        try {
+            data = JSON.parse(e.originalEvent.data);
+        } catch (err) {
+            return;
+        }
 
-            if (_.isUndefined(data.testsPassed)) {
-                return;
-            }
+        if (_.isUndefined(data.testsPassed)) {
+            return;
+        }
 
-            var status = (data.testsPassed ? "correct" : "incorrect");
-            this.change({
-                status: status,
-                message: data.message
-            });
-
+        var status = (data.testsPassed ? "correct" : "incorrect");
+        this.change({
+            status: status,
+            message: data.message
         });
+    },
+    componentDidMount: function() {
+        $(window).on("message", this.handleMessageEvent);
+    },
+
+    componentWillUnmount: function() {
+        $(window).off("message", this.handleMessageEvent);
     },
 
     render: function() {
@@ -69,9 +75,11 @@ var Iframe = React.createClass({
         var url = this.props.url;
 
         // If the URL doesnt start with http, it must be a program ID
-        if (url.length && url.indexOf("http") !== 0) {
-            url = "http://khanacademy.org/cs/program/" + url +
+        if (url && url.length && url.indexOf("http") !== 0) {
+            url = "https://www.khanacademy.org/computer-programming/program/" + url +
                     "/embedded?buttons=no&embed=yes&editor=no&author=no";
+            url = updateQueryString(url, "width", this.props.width);
+            url = updateQueryString(url, "height", this.props.height);
             // Origin is used by output.js in deciding to send messages
             url = updateQueryString(url, "origin", window.location.origin);
         }
@@ -97,7 +105,7 @@ var Iframe = React.createClass({
     },
 
     simpleValidate: function(rubric) {
-        return Iframe.validate(this.toJSON(), rubric);
+        return Iframe.validate(this.getUserInput(), rubric);
     },
 
     statics: {
@@ -142,7 +150,7 @@ _.extend(Iframe, {
  */
 var PairEditor = React.createClass({
 
-    mixins: [Changeable, JsonifyProps],
+    mixins: [Changeable, EditorJsonify],
 
     propTypes: {
         name: React.PropTypes.string,
@@ -158,7 +166,7 @@ var PairEditor = React.createClass({
 
     render: function() {
         return <fieldset>
-                <label>Name: 
+                <label>Name:
                     <BlurInput value={this.props.name}
                            onChange={this.change("name")} />
                 </label>
@@ -175,7 +183,7 @@ var PairEditor = React.createClass({
  */
 var PairsEditor = React.createClass({
 
-    mixins: [Changeable, JsonifyProps],
+    mixins: [Changeable, EditorJsonify],
 
     propTypes: {
         pairs: React.PropTypes.arrayOf(React.PropTypes.shape({
@@ -198,7 +206,7 @@ var PairsEditor = React.createClass({
         // If they're both non empty, add a new one
         var pairs = this.props.pairs.slice();
         pairs[pairIndex] = pair;
-        
+
         var lastPair = pairs[pairs.length-1];
         if (lastPair.name && lastPair.value) {
             pairs.push({name: "", value: ""});
@@ -212,7 +220,7 @@ var PairsEditor = React.createClass({
  */
 var IframeEditor = React.createClass({
 
-    mixins: [Changeable, JsonifyProps],
+    mixins: [Changeable, EditorJsonify],
 
     getDefaultProps: function() {
         return {
@@ -237,12 +245,12 @@ var IframeEditor = React.createClass({
                            onChange={this.handleSettingsChange} />
             </label>
             <br/>
-            <label>Width: 
+            <label>Width:
                 <BlurInput name="width"
                            value={this.props.width}
                            onChange={this.change("width")} />
             </label>
-            <label>Height: 
+            <label>Height:
                 <BlurInput name="height"
                            value={this.props.height}
                            onChange={this.change("height")} />

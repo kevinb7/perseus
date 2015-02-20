@@ -1,17 +1,15 @@
-/** @jsx React.DOM */
-
 var React             = require('react');
-var BlurInput         = require("react-components/blur-input");
-var InfoTip           = require("react-components/info-tip");
-var Renderer          = require("../renderer.jsx");
-var TeX               = require("../tex.jsx");
-var InputWithExamples = require("../components/input-with-examples.jsx");
+var _ = require("underscore");
 
+var BlurInput         = require("react-components/blur-input.jsx");
+var InfoTip           = require("react-components/info-tip.jsx");
+var InputWithExamples = require("../components/input-with-examples.jsx");
+var ParseTex          = require("../tex-wrangler.js").parseTex;
+
+var ApiClassNames = require("../perseus-api.jsx").ClassNames;
 var ApiOptions = require("../perseus-api.jsx").Options;
 var Util = require("../util.js");
 var EnabledFeatures = require("../enabled-features.jsx");
-
-var toNumericString = KhanUtil.toNumericString;
 
 var answerTypes = {
     number: {
@@ -82,6 +80,7 @@ var InputNumber = React.createClass({
     propTypes: {
         currentValue: React.PropTypes.string,
         enabledFeatures: EnabledFeatures.propTypes,
+        reviewModeRubric: React.PropTypes.object,
     },
 
     getDefaultProps: function() {
@@ -96,61 +95,61 @@ var InputNumber = React.createClass({
 
     shouldShowExamples: function() {
         return this.props.enabledFeatures.toolTipFormats &&
-                this.props.answerType !== "number";
+                this.props.answerType !== "number" &&
+                !this.props.apiOptions.staticRender;
     },
 
     render: function() {
-        if (this.props.apiOptions.staticRender) {
-            var style = {
-                borderRadius: "5px",
-                padding: "4px",
-                background: "white",
-                border: "1px solid #a4a4a4"
-            };
-            return <span style={style}>
-                <TeX ref="input" onClick={this._handleFocus}>
-                    {this.props.currentValue}
-                </TeX>
+        // HACK(johnsullivan): Create a function with shared logic between this
+        // and NumericInput.
+        var rubric = this.props.reviewModeRubric;
+        var correct = null;
+        var answerBlurb = null;
+        if (rubric) {
+            var score = this.simpleValidate(rubric);
+            correct = score.type === "points" &&
+                          score.earned === score.total;
+
+            if (!correct) {
+                // TODO(johnsullivan): Make this a little more human-friendly.
+                var answerString = String(rubric.value);
+                if (rubric.inexact && rubric.maxError) {
+                    answerString += " \u00B1 " + rubric.maxError;
+                }
+                answerBlurb = <span className="perseus-possible-answers">
+                    <span className="perseus-possible-answer">
+                        {answerString}
+                    </span>
+                </span>;
+            }
+        }
+
+        var classes = {};
+        classes["perseus-input-size-" + this.props.size] = true;
+        classes[ApiClassNames.CORRECT] =
+            rubric && correct && this.props.currentValue;
+        classes[ApiClassNames.INCORRECT] =
+            rubric && !correct && this.props.currentValue;
+        classes[ApiClassNames.UNANSWERED] = rubric && !this.props.currentValue;
+
+        var input = <InputWithExamples
+            ref="input"
+            value={this.props.currentValue}
+            onChange={this.handleChange}
+            className={React.addons.classSet(classes)}
+            type={this._getInputType()}
+            examples={this.examples()}
+            shouldShowExamples={this.shouldShowExamples()}
+            onFocus={this._handleFocus}
+            onBlur={this._handleBlur} />;
+
+        if (answerBlurb) {
+            return <span className="perseus-input-with-answer-blurb">
+                {input}
+                {answerBlurb}
             </span>;
         } else {
-            return <InputWithExamples
-                    ref="input"
-                    value={this.props.currentValue}
-                    onChange={this.handleChange}
-                    className={"perseus-input-size-" + this.props.size}
-                    examples={this.examples()}
-                    shouldShowExamples={this.shouldShowExamples()}
-                    interceptFocus={this._getInterceptFocus()}
-                    onFocus={this._handleFocus}
-                    onBlur={this._handleBlur} />;
-        }
-    },
-
-    _handleFocus: function() {
-        if (this.props.apiOptions.staticRender) {
-            this.props.onFocus([], this.refs.input.getDOMNode());
-        } else {
-            this.props.onFocus([], this.refs.input.getInputDOMNode());
-        }
-    },
-
-    _handleBlur: function() {
-        this.props.onBlur([], this.refs.input.getInputDOMNode());
-    },
-
-    _getInterceptFocus: function() {
-        return this.props.apiOptions.interceptInputFocus &&
-                this._interceptFocus;
-    },
-
-    _interceptFocus: function() {
-        this.props.onFocus([], this.refs.input.getInputDOMNode());
-        var interceptProp = this.props.apiOptions.interceptInputFocus;
-        if (interceptProp) {
-            return interceptProp(
-                this.props.widgetId,
-                this.refs.input.getInputDOMNode()
-            );
+            return input;
         }
     },
 
@@ -158,12 +157,52 @@ var InputNumber = React.createClass({
         this.props.onChange({ currentValue: newValue });
     },
 
+    _getInputType: function() {
+        if (this.props.apiOptions.staticRender) {
+            return "tex";
+        } else {
+            return "text";
+        }
+    },
+
+    _handleFocus: function() {
+        this.props.onFocus([]);
+    },
+
+    _handleBlur: function() {
+        this.props.onBlur([]);
+    },
+
     focus: function() {
         this.refs.input.focus();
         return true;
     },
 
-    toJSON: function(skipValidation) {
+    focusInputPath: function(inputPath) {
+        this.refs.input.focus();
+    },
+
+    blurInputPath: function(inputPath) {
+        this.refs.input.blur();
+    },
+
+    getInputPaths: function() {
+        // The widget itself is an input, so we return a single empty list to
+        // indicate this.
+        return [[]];
+    },
+
+    getGrammarTypeForPath: function(path) {
+        return "number";
+    },
+
+    setInputValue: function(path, newValue, cb) {
+        this.props.onChange({
+            currentValue: newValue
+        }, cb);
+    },
+
+    getUserInput: function() {
         return {
             currentValue: this.props.currentValue
         };
@@ -172,7 +211,7 @@ var InputNumber = React.createClass({
     simpleValidate: function(rubric, onInputError) {
         onInputError = onInputError || function() { };
         return InputNumber.validate(
-            this.toJSON(),
+            this.getUserInput(),
             rubric,
             onInputError
         );
@@ -207,7 +246,11 @@ _.extend(InputNumber, {
                 forms: answerTypes[rubric.answerType].forms
             });
 
-        var result = val(state.currentValue);
+        // We may have received TeX; try to parse it before grading.
+        // If `currentValue` is not TeX, this should be a no-op.
+        var currentValue = ParseTex(state.currentValue);
+
+        var result = val(currentValue);
 
         // TODO(eater): Seems silly to translate result to this invalid/points
         // thing and immediately translate it back in ItemRenderer.scoreInput()
@@ -233,9 +276,18 @@ _.extend(InputNumber, {
 });
 
 var InputNumberEditor = React.createClass({
+    propTypes: {
+        value: React.PropTypes.number,
+        simplify: React.PropTypes.oneOf(['required', 'optional', 'enforced']),
+        size: React.PropTypes.oneOf(['normal', 'small']),
+        inexact: React.PropTypes.bool,
+        maxError: React.PropTypes.number,
+        answerType: React.PropTypes.string
+    },
+
     getDefaultProps: function() {
         return {
-            value: "0",
+            value: 0,
             simplify: "required",
             size: "normal",
             inexact: false,
@@ -256,7 +308,7 @@ var InputNumberEditor = React.createClass({
 
         return <div>
             <div><label>
-                {' '}Correct answer:{' '}
+                Correct answer:{' '}
                 <BlurInput value={"" + this.props.value}
                            onChange={this.handleAnswerChange}
                            ref="input" />
@@ -264,7 +316,7 @@ var InputNumberEditor = React.createClass({
 
             <div>
                 <label>
-                    {' '}Unsimplified answers{' '}
+                    Unsimplified answers{' '}
                     <select value={this.props.simplify}
                             onChange={e => {
                                 this.props.onChange({simplify:
@@ -295,13 +347,13 @@ var InputNumberEditor = React.createClass({
                     onChange={e => {
                         this.props.onChange({inexact: e.target.checked});
                     }} />
-                {' '}Allow inexact answers{' '}
+                {' '}Allow inexact answers
             </label>
 
             <label>
             <input /* TODO(emily): don't use a hidden checkbox for alignment */
                 type="checkbox" style={{visibility: "hidden"}} />
-            {' '}Max error:{' '}
+            Max error:{' '}
             <input type="text" disabled={!this.props.inexact}
                 defaultValue={this.props.maxError}
                 onBlur={e => {
@@ -313,7 +365,7 @@ var InputNumberEditor = React.createClass({
             </label></div>
 
             <div>
-            {' '}Answer type:{' '}
+            Answer type:{' '}
             <select
                 value={this.props.answerType}
                 onChange={e => {
@@ -330,7 +382,7 @@ var InputNumberEditor = React.createClass({
 
             <div>
                 <label>
-                    {' '}Width{' '}
+                    Width{' '}
                     <select value={this.props.size}
                             onChange={e => {
                                 this.props.onChange({size: e.target.value});
@@ -353,7 +405,7 @@ var InputNumberEditor = React.createClass({
         return true;
     },
 
-    toJSON: function() {
+    serialize: function() {
         return _.pick(this.props,
                 "value", "simplify", "size", "inexact", "maxError",
                 "answerType");
@@ -366,7 +418,8 @@ var propTransform = (editorProps) => {
 
 module.exports = {
     name: "input-number",
-    displayName: "Number text box",
+    displayName: "Number text box (old)",
+    hidden: true,
     widget: InputNumber,
     editor: InputNumberEditor,
     transform: propTransform

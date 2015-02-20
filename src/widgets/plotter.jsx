@@ -1,12 +1,17 @@
-/** @jsx React.DOM */
+var React = require("react");
+var InfoTip = require("react-components/info-tip.jsx");
+var BlurInput = require("react-components/blur-input.jsx");
+var _ = require("underscore");
 
-var React = require('react');
-var InfoTip = require("react-components/info-tip");
 var NumberInput = require("../components/number-input.jsx");
 var TextListEditor = require("../components/text-list-editor.jsx");
 var RangeInput = require("../components/range-input.jsx");
+var SvgImage = require("../components/svg-image.jsx");
+
+var ApiClassNames = require("../perseus-api.jsx").ClassNames;
 
 var deepEq = require("../util.js").deepEq;
+var knumber = require("kmath").number;
 
 var BAR = "bar",
     LINE = "line",
@@ -37,7 +42,7 @@ var widgetPropTypes = {
     labelInterval: React.PropTypes.number
 };
 
-var formatNumber = (num) => "$" + KhanUtil.knumber.round(num, 2) + "$";
+var formatNumber = (num) => "$" + knumber.round(num, 2) + "$";
 
 var Plotter = React.createClass({
     propTypes: widgetPropTypes,
@@ -69,7 +74,8 @@ var Plotter = React.createClass({
 
     render: function() {
         return <div
-            className="perseus-widget-plotter graphie above-scratchpad"
+            className={"perseus-widget-plotter graphie " +
+                ApiClassNames.INTERACTIVE}
             ref="graphieDiv" />;
     },
 
@@ -110,7 +116,6 @@ var Plotter = React.createClass({
         // is outside React, it makes it easier to do this.
         self.graphie = graphie;
         self.graphie.pics = [];
-        self.mousedownPic = false;
 
         var isBar = self.props.type === BAR,
             isLine = self.props.type === LINE,
@@ -202,10 +207,6 @@ var Plotter = React.createClass({
         self.setupCategories(config);
 
         if (isTiledPlot) {
-            self.mousedownPic = false;
-            $(document).on("mouseup.plotterPic", function() {
-                self.mousedownPic = false;
-            });
             self.drawPicHeights(self.state.values, prevState.values);
         }
 
@@ -366,11 +367,6 @@ var Plotter = React.createClass({
                     );
                 }
             }
-
-            // Align top of bar to edge unless at bottom
-            if (height) {
-                config.graph.lines[i].visibleLine.translate(0, 2);
-            }
         };
 
         graphie.style({
@@ -522,16 +518,31 @@ var Plotter = React.createClass({
                     coord[0], coord[1], c.picBoxWidthPx, c.picBoxHeight);
             $(mouseRect[0])
                 .css({fill: "#000", opacity: 0.0, cursor: "pointer"})
-                .on("mousedown", function(e) {
-                    self.mousedownPic = true;
+                .on("vmousedown", function(e) {
+                    e.preventDefault();
                     self.whichPicClicked = i;
                     self.setPicHeight(i, topY);
-                    e.preventDefault();
-                })
-                .on("mouseover", function() {
-                    if (self.mousedownPic) {
-                        self.setPicHeight(self.whichPicClicked, topY);
-                    }
+
+                    $(document).on("vmouseup.plotTile", function(e) {
+                        $(document).unbind(".plotTile");
+                    });
+
+                    $(document).on("vmousemove.plotTile", function(e) {
+                        e.preventDefault();
+
+                        // Reverse-engineer the initial calculation
+                        var yCoord = graphie.getMouseCoord(e)[1];
+                        var adjustedCoord = Math.floor(yCoord - bottomMargin);
+
+                        // Calculate top coord from j value, but don't let them
+                        // go below j = -1, which is equivalent to having '0'
+                        // on the dot plot (due to weird indexing).
+                        var newJ = Math.max(-1,
+                            Math.floor(adjustedCoord / c.scaleY));
+                        var newMidY = (newJ + 0.5) * c.scaleY;
+                        var newTopY = newMidY + 0.5 * c.scaleY;
+                        self.setPicHeight(self.whichPicClicked, newTopY);
+                    });
                 });
 
             if (j < 0) {
@@ -575,12 +586,12 @@ var Plotter = React.createClass({
         });
     },
 
-    toJSON: function(skipValidation) {
+    getUserInput: function() {
         return this.state.values;
     },
 
     simpleValidate: function(rubric) {
-        return Plotter.validate(this.toJSON(), rubric);
+        return Plotter.validate(this.getUserInput(), rubric);
     },
 
     statics: {
@@ -757,12 +768,10 @@ var PlotterEditor = React.createClass({
             {this.props.type === PIC && <div>
                 <label>
                     Picture:{' '}
-                    <input
-                        type="text"
+                    <BlurInput
                         className="pic-url"
-                        defaultValue={this.props.picUrl}
-                        onKeyPress={this.changePicUrl}
-                        onBlur={this.changePicUrl} />
+                        value={this.props.picUrl}
+                        onChange={this.changePicUrl} />
                 <InfoTip>
                     <p>Use the default picture of Earth, or insert the URL for
                     a different picture using the "Add image" function.</p>
@@ -838,11 +847,10 @@ var PlotterEditor = React.createClass({
                     they start the problem). Note: These cannot be the same.
                 </p></InfoTip>
             </div>
-            {this.transferPropsTo(
-                <Plotter
-                    starting={this.props[this.state.editing]}
-                    onChange={this.handlePlotterChange} />
-            )}
+            <Plotter
+                {...this.props}
+                starting={this.props[this.state.editing]}
+                onChange={this.handlePlotterChange} />
         </div>;
     },
 
@@ -896,13 +904,13 @@ var PlotterEditor = React.createClass({
         this.props.onChange({labels: labels});
     },
 
-    changePicUrl: function(e) {
-        // Only continue on blur or "enter"
-        if (e.type === "keypress" && e.keyCode !== 13) {
-            return;
-        }
+    changePicUrl: function(value) {
+        // We don't need the labels and other data in the plotter, so just
+        // extract the raw image and use that.
+        // TODO(emily): Maybe indicate that such a change has happened?
+        var url = SvgImage.getRealImageUrl(value);
 
-        this.props.onChange({picUrl: e.target.value});
+        this.props.onChange({picUrl: url});
     },
 
     changeCategories: function(categories) {
@@ -978,7 +986,7 @@ var PlotterEditor = React.createClass({
         this.refs.categories.getDOMNode().value = categories.join(", ");
     },
 
-    toJSON: function(skipValidation) {
+    serialize: function() {
         var json = _.pick(this.props, "correct", "starting", "type", "labels",
             "categories", "scaleY", "maxY", "snapsPerLine", "labelInterval");
 
