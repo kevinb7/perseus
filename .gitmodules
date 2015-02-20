@@ -6,7 +6,7 @@
 	url = https://github.com/Khan/react-components.git
 [submodule "kmath"]
 	path = kmath
-	url = git@github.com:Khan/kmath.git
+	url = https://github.com/Khan/kmath.git
 [submodule "simple-markdown"]
 	path = simple-markdown
 	url = git@github.com:Khan/simple-markdown.git
