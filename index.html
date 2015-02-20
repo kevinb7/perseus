@@ -7,8 +7,7 @@
 
 <link rel="stylesheet" type="text/css" href="ke/css/khan-site.css" />
 <link rel="stylesheet" type="text/css" href="ke/css/khan-exercise.css" />
-<link rel="stylesheet" type="text/css" href="lib/katex/fonts/fonts.css" />
-<link rel="stylesheet/less" type="text/css" href="lib/katex/katex.less" />
+<link rel="stylesheet" type="text/css" href="lib/katex/katex.css" />
 <link rel="stylesheet" type="text/css" href="lib/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="lib/mathquill/mathquill.css" />
 
@@ -21,7 +20,7 @@
 <body>
 
 <div id="extras">
-    <button id="toJSON">toJSON</button>
+    <button id="serialize">serialize</button>
     <button id="scorePreview">Score</button>
     <button id="permalink">permalink</button>
     <button id="searchAndReplace">Search and Replace</button>
@@ -41,12 +40,10 @@ add hint button ends up touching the bottom of the page). -->
 
 <script src="lib/jquery.js"></script>
 <script src="lib/underscore.js"></script>
-<script src="lib/marked.js"></script>
 <script src="lib/react-with-addons.js"></script>
-<script src="lib/rcss.js"></script>
 <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full&amp;delayStartupUntil=configured"></script>
 <script src="lib/katex/katex.js"></script>
-<script src="lib/mathquill/mathquill.js"></script>
+<script src="lib/mathquill/mathquill-basic.js"></script>
 <script src="lib/kas.js"></script>
 
 <script>
@@ -94,7 +91,7 @@ requirejs.config({
 // Load khan-exercises modules, then perseus
 require(["ke-deps.js"], function() {
     // pre built
-    require(["build/perseus-1.js"], initPerseus);
+    require(["build/perseus-2.js"], initPerseus);
 
     // pre built with source maps
     // require(["build/perseus.debug.js"], initPerseus);
@@ -174,8 +171,8 @@ var enabledFeatures = {
     useMathQuill: true
 };
 
-$('#toJSON').on('click', function() {
-    console.log(JSON.stringify(editor, null, 4));
+$('#serialize').on('click', function() {
+    console.log(JSON.stringify(editor.serialize(), null, 4));
 });
 $('#scorePreview').on('click', function() {
     console.log(editor.scorePreview());
@@ -186,7 +183,7 @@ $('#permalink').on('click', function(e) {
     e.preventDefault();
 });
 $('#searchAndReplace').on('click', function() {
-    editor.searchAndReplace();
+    editor.toggleSearchAndReplace();
 });
 $('#problemNum').text(problemNum);
 $('#enabledFeatures').html(_.map(enabledFeatures, function(enabled, feature) {
@@ -220,8 +217,9 @@ Perseus.init({skipMathJax: false}).then(function() {
         }
     });
 
-    editor = React.renderComponent(
-        Perseus.StatefulEditorPage(editorProps, null),
+    var StatefulEditorPage = React.createFactory(Perseus.StatefulEditorPage);
+    editor = React.render(
+        StatefulEditorPage(editorProps, null),
         document.getElementById("perseus-container")
     );
 
