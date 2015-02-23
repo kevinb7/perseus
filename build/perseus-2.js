@@ -1,6 +1,6 @@
 /*! Perseus | http://github.com/Khan/perseus */
-// commit a62d214b91d0a7031e4aeaf071e1ef111f60c822
-// branch gh-pages
+// commit ba63a8bd63152ad3d666ff99a217f644fb9c5f49
+// branch search_and_replace
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -184,6 +184,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    rWidgetParts: /^\[\[\u2603 (([a-z-]+) ([0-9]+))\]\]$/,
 	    rWidgetRule:  /^\[\[\u2603 (([a-z-]+) ([0-9]+))\]\]/,
+	    rWidgets: /\[\[\u2603 (([a-z-]+) ([0-9]+))\]\]/g,
+	    rWidgetSplit: new RegExp("(\\[\\[\u2603 [a-z-]+ [0-9]+\\]\\])", "g"),
 	    rTypeFromWidgetId: /^([a-z-]+) ([0-9]+)$/,
 	    snowman: "\u2603",
 
@@ -193,19 +195,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	        total: 0,
 	        message: null
 	    },
-	    
-	    countOccurences: function(contentString, searchString) {
-	        var count = 0;
 
-	        var searchRegex = new RegExp(searchString, "g");
-	        var widgetRegex = /^\[\[\u2603 (([a-z-]+) ([0-9]+))\]\]/g;
+	    escapeRegExp: function(string) {
+	        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	    },
 
-	        var matches = contentString.replace(widgetRegex, "").match(searchRegex);
-	        if (matches !== null) {
-	            count += matches.length;
+	    /**
+	     * Returns the indices of each occurrence of searchString within
+	     * contentString ignoring occurrence within widget references.
+	     */
+	    getIndicesOf: function(contentString, searchString) {
+	        if (searchString === "") {
+	            return [];
 	        }
-	        
-	        return count;
+
+	        var indices = [];
+	        var searchStringLength = searchString.length;
+	        var pieces = this.split(contentString, this.rWidgetSplit);
+	        var pieceOffet = 0;
+
+	        for (var i = 0; i < pieces.length; i++) {
+	            var type = i % 2;
+	            if (type === 0) {
+	                // normal text
+	                var startIndex = 0;
+	                while (true) {
+	                    var index = pieces[i].indexOf(searchString, startIndex);
+	                    if (index > -1) {
+	                        indices.push(pieceOffet + index);
+	                        startIndex = index + searchStringLength;
+	                    } else {
+	                        break;
+	                    }
+	                }
+	                pieceOffet += pieces[i].length;
+	            } else {
+	                // widget reference
+	                pieceOffet += pieces[i].length;
+	            }
+	        }
+
+	        return indices;
+	    },
+
+	    countOccurrences: function(contentString, searchString) {
+	        return this.getIndicesOf(contentString, searchString).length;
 	    },
 
 	    seededRNG: function(seed) {
@@ -763,7 +797,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 
 	        // Require here to prevent recursive imports
-	        var SvgImage = __webpack_require__(61);
+	        var SvgImage = __webpack_require__(60);
 	        img.src = SvgImage.getRealImageUrl(url);
 	    },
 
@@ -812,7 +846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Renderer = __webpack_require__(11);
@@ -1248,7 +1282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var ApiOptions = __webpack_require__(13).Options;
@@ -1257,6 +1291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EnabledFeatures = __webpack_require__(50);
 	var JsonEditor = __webpack_require__(51);
 	var Renderer = __webpack_require__(11);
+	var Util = __webpack_require__(3);
 
 	var rendererProps = React.PropTypes.shape({
 	    content: React.PropTypes.string,
@@ -1374,6 +1409,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        );
 
 	        var sections = this._sections();
+	        var searchIndex = this.props.searchIndex;
+	        var searchString = this.props.searchString;
+
+	        var adjustedSearchIndices = _.map(sections, function(section)  {
+	            var adjustedIndex = searchIndex;
+	            var content = section.content || "";
+	            searchIndex -= Util.countOccurrences(content, searchString);
+	            return adjustedIndex;
+	        });
 
 	        return React.createElement("div", {className: "perseus-editor-table"}, 
 	            sections.map(function(section, i)  {
@@ -1426,7 +1470,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    _.partial(this._handleEditorChange, i), 
 	                                
 	                                apiOptions: apiOptions, 
-	                                enabledFeatures: this.props.enabledFeatures}))
+	                                enabledFeatures: this.props.enabledFeatures, 
+	                                searchString: searchString, 
+	                                searchIndex: adjustedSearchIndices[i]}))
 	                        ), 
 
 	                        React.createElement("div", {className: "perseus-editor-right-cell"}, 
@@ -1560,7 +1606,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 
 	var ApiOptions = __webpack_require__(13).Options;
 	var Renderer = __webpack_require__(11);
@@ -1609,19 +1655,20 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var ApiOptions = __webpack_require__(13).Options;
 	var DragTarget = __webpack_require__(66);
 	var EnabledFeatures = __webpack_require__(50);
-	var PropCheckBox = __webpack_require__(62);
+	var PropCheckBox = __webpack_require__(61);
 	var Util = __webpack_require__(3);
 	var Widgets = __webpack_require__(15);
+	var cx = React.addons.classSet;
 
 	var WIDGET_PROP_BLACKLIST = __webpack_require__(64);
 
-	var characterCount = __webpack_require__(52).characterCount;
+	var characterCount = __webpack_require__(54).characterCount;
 
 	// like [[snowman input-number 1]]
 	var widgetPlaceholder = "[[\u2603 {id}]]";
@@ -1847,7 +1894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Editor = React.createClass({displayName: 'Editor',
 	    propTypes: {
 	        imageUploader: React.PropTypes.func,
-	        apiOptions: ApiOptions.propTypes,
+	        apiOptions: ApiOptions.propTypes
 	    },
 
 	    getDefaultProps: function() {
@@ -1940,6 +1987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var templatesDropDown;
 	        var widgetsAndTemplates;
 	        var wordCountDisplay;
+	        var classes;
 
 	        if (this.props.showWordCount) {
 	            var numChars = characterCount(this.props.content);
@@ -1951,43 +1999,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	                commafyInteger(numWords)
 	            );
 	        }
-	        
-	        var searchResultStyle = {
-	            backgroundColor: 'yellow',
-	            fontWeight: 'normal'
-	        };
-	        
-	        var selectedSearchResultStyle = {
-	            backgroundColor: 'orange',
-	            fontWeight: 'normal'
-	        };
-	        
 
 	        if (this.props.widgetEnabled) {
 	            pieces = Util.split(this.props.content, rWidgetSplit);
 	            widgets = {};
 	            underlayPieces = [];
 
+	            var searchResultIndex = 0;
+
 	            for (var i = 0; i < pieces.length; i++) {
 	                var type = i % 2;
 	                if (type === 0) {
 	                    // Normal text
 	                    if (this.props.searchString !== "") {
-	                        //var searchString = this.props.searchString;
-	                        var searchRegex = new RegExp(("(" + this.props.searchString + ")"), "g");
+	                        var searchRegex =
+	                            new RegExp(("(" + this.props.searchString + ")"), "g");
 	                        var smallerPieces = Util.split(pieces[i], searchRegex);
-	                        var searchResultIndex = 0;
 
 	                        for (var j = 0; j < smallerPieces.length; j++) {
 	                            var smallerPiece = smallerPieces[j];
 	                            if (smallerPiece === this.props.searchString) {
-	                                var style = searchResultStyle;
-	                                if (searchResultIndex === this.props.searchIndex) {
-	                                    style = selectedSearchResultStyle;
-	                                }
-	                                underlayPieces.push(React.createElement("b", {style: style}, smallerPiece));
+	                                var currentSearchResult =
+	                                    searchResultIndex === this.props.searchIndex;
+	                                classes = cx({
+	                                    "search-result": !currentSearchResult,
+	                                    "current-search-result": currentSearchResult
+	                                });
+
+	                                // Search result
+	                                underlayPieces.push(
+	                                    React.createElement("b", {className: classes}, smallerPiece));
 	                                searchResultIndex++;
 	                            } else {
+	                                // Normal text
 	                                underlayPieces.push(smallerPiece);
 	                            }
 	                        }
@@ -1998,7 +2042,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // Widget reference
 	                    var match = Util.rWidgetParts.exec(pieces[i]);
 	                    var id = match[1];
-	                    var type = match[2];
+	                    type = match[2];
 
 	                    var selected = false;
 	                    // TODO(alpert):
@@ -2012,8 +2056,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var duplicate = id in widgets;
 
 	                    widgets[id] = this.getWidgetEditor(id, type);
-	                    var classes = (duplicate || !widgets[id] ? "error " : "") +
-	                            (selected ? "selected " : "");
+	                    classes = cx({
+	                        "error": duplicate || !widgets[id],
+	                        "selected": selected
+	                    });
 	                    var key = duplicate ? i : id;
 	                    underlayPieces.push(
 	                            React.createElement("b", {className: classes, key: key}, pieces[i]));
@@ -2119,6 +2165,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.props.content !== prevProps.content) {
 	            this._sizeImages(this.props);
 	        }
+
+	        // shift the view so the current search result is visible
+	        $('.current-search-result').each(function(index, elem)  {
+	            var bounds = elem.getBoundingClientRect();
+	            if (bounds.top < 10 || bounds.bottom > $(window).height() - 10) {
+	                var scrollY = bounds.top + window.scrollY - 100;
+	                window.scrollTo(window.scrollX, scrollY);
+	            }
+	        });
 	    },
 
 	    handleDrop: function(e) {
@@ -2389,16 +2444,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
-	var CombinedHintsEditor = __webpack_require__(53);
+	var CombinedHintsEditor = __webpack_require__(52);
 	var EnabledFeatures = __webpack_require__(50);
-	var ItemEditor = __webpack_require__(54);
+	var ItemEditor = __webpack_require__(53);
 	var ItemRenderer = __webpack_require__(9);
 	var JsonEditor = __webpack_require__(51);
 	var ApiOptions = __webpack_require__(13).Options;
-	var SearchAndReplaceDialog = __webpack_require__(55);
 	var Util = __webpack_require__(3);
 
 	var EditorPage = React.createClass({displayName: 'EditorPage',
@@ -2412,7 +2466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // We don't specify a more specific type here because it's valid
 	        // for a client of Perseus to specify a subset of the API options,
 	        // in which case we default the rest in `this._apiOptions()`
-	        apiOptions: React.PropTypes.object
+	        apiOptions: React.PropTypes.object,
 	    },
 
 	    getDefaultProps: function() {
@@ -2438,41 +2492,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            wasAnswered: false
 	        };
 	    },
-	    
-	    getItemEditorSearchCount: function() {
-	        var count = 0;
-	        
-	        count += Util.countOccurences(this.props.question.content, this.state.searchString);
-	        count += Util.countOccurences(this.props.answerArea.options.content, this.state.searchString);
-
-	        return count;
-	    },
-	    
-	    getCombinedHintsSearchCount: function() {
-	        var count = 0;
-	        
-	        this.props.hints.forEach(function(hint)  {
-	            count += Util.countOccurences(hint.content, this.state.searchString);
-	        }.bind(this));
-
-	        return count;
-	    },
 
 	    render: function() {
-	        
-	        var itemEditorSearchIndex = -1;
-	        var combinedHintsSearchIndex = -1;
-
-	        if (this.state.searchIndex !== -1) {
-	            var itemEditorCount = this.getItemEditorSearchCount();
-	            var combinedHintsCount = this.getCombinedHintsSearchCount();
-
-	            if (this.state.searchIndex < itemEditorCount) {
-	                itemEditorSearchIndex = this.state.searchIndex;
-	            } else if (this.state.searchIndex < itemEditorCount + combinedHintsCount) {
-	                combinedHintsSearchIndex = this.state.searchIndex - itemEditorCount;
-	            }
-	        }
+	        var hintSearchIndex = this.props.searchIndex -
+	            Util.countOccurrences(this.props.question.content, this.props.searchString);
 
 	        return React.createElement("div", {id: "perseus", className: "framework-perseus"}, 
 	            this.props.developerMode &&
@@ -2507,8 +2530,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    gradeMessage: this.state.gradeMessage, 
 	                    onCheckAnswer: this.handleCheckAnswer, 
 	                    apiOptions: this._apiOptions(), 
-	                    searchString: this.state.searchString, 
-	                    searchIndex: itemEditorSearchIndex}), 
+	                    searchString: this.props.searchString, 
+	                    searchIndex: this.props.searchIndex}), 
 	            
 
 	            (!this.props.developerMode || !this.props.jsonMode) &&
@@ -2517,25 +2540,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    hints: this.props.hints, 
 	                    imageUploader: this.props.imageUploader, 
 	                    onChange: this.handleChange, 
-	                    searchString: this.state.searchString, 
-	                    searchIndex: combinedHintsSearchIndex}), 
-	            
-
-	            (this.props.searchAndReplace) &&
-	                React.createElement(SearchAndReplaceDialog, {
-	                    ref: "searchAndReplace", 
-	                    question: this.props.question, 
-	                    answerArea: this.props.answerArea, 
-	                    hints: this.props.hints, 
-	                    onChange: this.handleStateChange, 
-	                    onReplaceAll: this.props.onChange})
+	                    searchString: this.props.searchString, 
+	                    searchIndex: hintSearchIndex})
 	            
 	        );
 
-	    },
-
-	    handleStateChange: function(newState, cb) {
-	        this.setState(newState, cb);
 	    },
 
 	    handleCheckAnswer: function() {
@@ -2609,7 +2618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    changeJSON: function(newJson) {
 	        this.setState({
-	            json: newJson
+	            json: newJson,
 	        });
 	        this.props.onChange(newJson);
 	    },
@@ -2647,7 +2656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var AnswerAreaRenderer = __webpack_require__(4);
@@ -3031,11 +3040,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
-	var HintRenderer = __webpack_require__(56);
-	var SvgImage = __webpack_require__(61);
+	var HintRenderer = __webpack_require__(55);
+	var SvgImage = __webpack_require__(60);
 
 	var HintsRenderer = React.createClass({displayName: 'HintsRenderer',
 	    render: function() {
@@ -3137,12 +3146,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
-	var PerseusMarkdown = __webpack_require__(52);
+	var PerseusMarkdown = __webpack_require__(54);
 	var QuestionParagraph = __webpack_require__(48);
-	var SvgImage = __webpack_require__(61);
+	var SvgImage = __webpack_require__(60);
 	var TeX = __webpack_require__(67);
 	var WidgetContainer = __webpack_require__(49);
 	var Widgets = __webpack_require__(15);
@@ -4168,10 +4177,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var EditorPage = __webpack_require__(8);
+	var SearchAndReplaceDialog = __webpack_require__(56);
 
 	/* Renders an EditorPage (or an ArticleEditor) as a non-controlled component.
 	 *
@@ -4188,12 +4198,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    getDefaultProps: function() {
 	        return {
-	            componentClass: EditorPage
+	            componentClass: EditorPage,
+	            searchString: "",
+	            searchIndex: 0
 	        };
 	    },
 
 	    render: function() {
-	        return React.createElement(this.props.componentClass, React.__spread({},  this.state));
+	        return React.createElement("div", null, 
+	            React.createElement(this.props.componentClass, React.__spread({},  this.state)), 
+	            React.createElement(SearchAndReplaceDialog, {
+	                ref: "searchAndReplace", 
+	                question: this.state.question, 
+	                hints: this.state.hints, 
+	                particle: this.state.json, 
+	                searchString: this.state.searchString, 
+	                searchIndex: this.state.searchIndex, 
+	                onChange: this.handleSearchChange})
+	        );
 	    },
 
 	    getInitialState: function() {
@@ -4222,6 +4244,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 
 	    handleChange: function(newState, cb) {
+	        if (this.isMounted()) {
+	            this.setState(newState, function()  {
+	                if (typeof cb === "function") {
+	                    cb();
+	                }
+	                // note: "json" represents a "particle"
+	                var newContent = _(newState).pick("question", "hints", "json");
+	                if (this.refs.searchAndReplace && Object.keys(newContent).length > 0) {
+	                    this.refs.searchAndReplace.updateSearchResults(newContent);
+	                }
+	            }.bind(this));
+	        }
+	    },
+
+	    // Have a separate handler for search changes so that we can avoid calling
+	    // updateSearchResults which sets searchIndex to 0.  This maintains the
+	    // searchIndex at the correct location when doing a replace operation.
+	    handleSearchChange: function(newState, cb) {
 	        if (this.isMounted()) {
 	            this.setState(newState, cb);
 	        }
@@ -4269,7 +4309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * semantic meaning across the same perseus api major version.
 	 */
 
-	var StubTagEditor = __webpack_require__(63);
+	var StubTagEditor = __webpack_require__(62);
 
 	module.exports = {
 	    Options: {
@@ -4600,7 +4640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var Changeable = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
@@ -4608,7 +4648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 	var InfoTip = __webpack_require__(71);
-	var PropCheckBox = __webpack_require__(62);
+	var PropCheckBox = __webpack_require__(61);
 	var Renderer = __webpack_require__(11);
 	var TextListEditor = __webpack_require__(72);
 	var Util = __webpack_require__(3);
@@ -4818,9 +4858,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var InfoTip = __webpack_require__(71);
-	var FancySelect = __webpack_require__(73);
+	var FancySelect = __webpack_require__(74);
 	var FancyOption = FancySelect.Option;
 	var _ = __webpack_require__(59);
 
@@ -5094,7 +5134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * TODO(jack): Add more comments
 	 */
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var Changeable = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 	var _ = __webpack_require__(59);
@@ -5283,7 +5323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * TODO(jack): Add more comments
 	 */
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Util = __webpack_require__(3);
@@ -5291,7 +5331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
 
-	var Graphie = __webpack_require__(74);
+	var Graphie = __webpack_require__(73);
 	var MovablePoint = Graphie.MovablePoint;
 
 	var knumber = __webpack_require__(105).number;
@@ -5477,10 +5517,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var InfoTip = __webpack_require__(71);
-	var SortableArea     = __webpack_require__(79);
-	var Tooltip = __webpack_require__(80);
+	var SortableArea     = __webpack_require__(75);
+	var Tooltip = __webpack_require__(76);
 	var _ = __webpack_require__(59);
 
 	var ApiOptions = __webpack_require__(13).Options;
@@ -5491,12 +5531,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 
 	var EnabledFeatures = __webpack_require__(50);
-	var PropCheckBox = __webpack_require__(62);
+	var PropCheckBox = __webpack_require__(61);
 
-	var InputWithExamples = __webpack_require__(81);
-	var MathInput = __webpack_require__(82);
+	var InputWithExamples = __webpack_require__(77);
+	var MathInput = __webpack_require__(78);
 	var TeX = __webpack_require__(67); // OldExpression only
-	var TexButtons = __webpack_require__(83);
+	var TexButtons = __webpack_require__(79);
 
 	var cx = React.addons.classSet;
 	var EnabledFeatures = __webpack_require__(50);
@@ -6628,16 +6668,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _ = __webpack_require__(59);
 
-	var ButtonGroup      = __webpack_require__(75);
-	var GraphSettings    = __webpack_require__(76);
+	var ButtonGroup      = __webpack_require__(81);
+	var GraphSettings    = __webpack_require__(82);
 	var InfoTip          = __webpack_require__(71);
-	var Interactive2     = __webpack_require__(77);
-	var MultiButtonGroup = __webpack_require__(78);
-	var SvgImage         = __webpack_require__(61);
+	var Interactive2     = __webpack_require__(83);
+	var MultiButtonGroup = __webpack_require__(84);
+	var SvgImage         = __webpack_require__(60);
 	var Util             = __webpack_require__(3);
 
 	/* Graphie and relevant components. */
-	var Graphie      = __webpack_require__(74);
+	var Graphie      = __webpack_require__(73);
 	var MovablePoint = Graphie.MovablePoint;
 	var Plot         = Graphie.Plot;
 	var MovableLine  = Graphie.MovableLine;
@@ -7938,10 +7978,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *  but could also be used for embedding viz's hosted elsewhere.
 	 */
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
-	var BlurInput    = __webpack_require__(84);
+	var BlurInput    = __webpack_require__(80);
 	var Changeable = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
@@ -8212,7 +8252,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _ = __webpack_require__(59);
 	var Util = __webpack_require__(3);
 
-	var BlurInput    = __webpack_require__(84);
+	var BlurInput    = __webpack_require__(80);
 	var Editor       = __webpack_require__(7);
 	var InfoTip      = __webpack_require__(71);
 	var Renderer     = __webpack_require__(11);
@@ -8221,9 +8261,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
 
-	var Graphie      = __webpack_require__(74);
-	var RangeInput   = __webpack_require__(86);
-	var SvgImage     = __webpack_require__(61);
+	var Graphie      = __webpack_require__(73);
+	var RangeInput   = __webpack_require__(85);
+	var SvgImage     = __webpack_require__(60);
 
 	var defaultBoxSize = 400;
 	var defaultRange = [0, 10];
@@ -8597,13 +8637,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React             = __webpack_require__(60);
+	var React             = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
-	var BlurInput         = __webpack_require__(84);
+	var BlurInput         = __webpack_require__(80);
 	var InfoTip           = __webpack_require__(71);
-	var InputWithExamples = __webpack_require__(81);
-	var ParseTex          = __webpack_require__(85).parseTex;
+	var InputWithExamples = __webpack_require__(77);
+	var ParseTex          = __webpack_require__(86).parseTex;
 
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 	var ApiOptions = __webpack_require__(13).Options;
@@ -9034,14 +9074,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Changeable   = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 
-	var ArrowPicker = __webpack_require__(95);
-	var ColorPicker = __webpack_require__(96);
-	var ConstraintEditor = __webpack_require__(97);
-	var DashPicker = __webpack_require__(98);
-	var ElementContainer = __webpack_require__(99);
-	var Graphie = __webpack_require__(74);
-	var GraphSettings = __webpack_require__(76);
-	var MathInput = __webpack_require__(82);
+	var ArrowPicker = __webpack_require__(97);
+	var ColorPicker = __webpack_require__(98);
+	var ConstraintEditor = __webpack_require__(99);
+	var DashPicker = __webpack_require__(100);
+	var ElementContainer = __webpack_require__(101);
+	var Graphie = __webpack_require__(73);
+	var GraphSettings = __webpack_require__(82);
+	var MathInput = __webpack_require__(78);
 	var NumberInput = __webpack_require__(87);
 	var TeX = __webpack_require__(67);
 	var TextInput = __webpack_require__(88);
@@ -10437,13 +10477,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Graph         = __webpack_require__(89);
-	var GraphSettings = __webpack_require__(76);
+	var GraphSettings = __webpack_require__(82);
 	var InfoTip       = __webpack_require__(71);
-	var Interactive2  = __webpack_require__(77);
+	var Interactive2  = __webpack_require__(83);
 	var NumberInput   = __webpack_require__(87);
 	var Util          = __webpack_require__(3);
 
@@ -12959,13 +12999,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var Changeable = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 	var WidgetJsonifyDeprecated = __webpack_require__(70);
 
 	var NumberInput = __webpack_require__(87);
-	var PropCheckBox = __webpack_require__(62);
+	var PropCheckBox = __webpack_require__(61);
 	var InfoTip = __webpack_require__(71);
 
 	var MAX_SIZE = 8;
@@ -13424,7 +13464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable = __webpack_require__(68);
@@ -13432,7 +13472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Editor = __webpack_require__(7);
 	var NumberInput = __webpack_require__(87);
-	var RangeInput = __webpack_require__(86);
+	var RangeInput = __webpack_require__(85);
 	var Renderer = __webpack_require__(11);
 	var TextInput = __webpack_require__(88);
 	var MathOutput = __webpack_require__(90);
@@ -13967,11 +14007,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var InfoTip        = __webpack_require__(71);
-	var PropCheckBox   = __webpack_require__(62);
+	var PropCheckBox   = __webpack_require__(61);
 	var Renderer       = __webpack_require__(11);
 	var Sortable       = __webpack_require__(92);
 	var TextListEditor = __webpack_require__(72);
@@ -14218,7 +14258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React        = __webpack_require__(60);
+	var React        = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
@@ -14226,8 +14266,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var InfoTip       = __webpack_require__(71);
 	var NumberInput   = __webpack_require__(87);
-	var PropCheckBox  = __webpack_require__(62);
-	var RangeInput    = __webpack_require__(86);
+	var PropCheckBox  = __webpack_require__(61);
+	var RangeInput    = __webpack_require__(85);
 
 	var defaultImage = {
 	    url: null,
@@ -14584,23 +14624,23 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 
-	var ButtonGroup  = __webpack_require__(75);
+	var ButtonGroup  = __webpack_require__(81);
 	var InfoTip      = __webpack_require__(71);
-	var Interactive2 = __webpack_require__(77);
+	var Interactive2 = __webpack_require__(83);
 	var NumberInput  = __webpack_require__(87);
-	var PropCheckBox = __webpack_require__(62);
-	var RangeInput   = __webpack_require__(86);
+	var PropCheckBox = __webpack_require__(61);
+	var RangeInput   = __webpack_require__(85);
 	var MathOutput   = __webpack_require__(90);
 
 	var ApiOptions = __webpack_require__(13).Options;
 
-	var Graphie = __webpack_require__(74);
+	var Graphie = __webpack_require__(73);
 	var MovablePoint = Graphie.MovablePoint;
 	var Line = Graphie.Line;
 	var Label = Graphie.Label;
@@ -15525,19 +15565,19 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React         = __webpack_require__(60);
+	var React         = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable    = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 
 	var InfoTip = __webpack_require__(71);
-	var PropCheckBox = __webpack_require__(62);
+	var PropCheckBox = __webpack_require__(61);
 	var NumberInput = __webpack_require__(87);
-	var ButtonGroup = __webpack_require__(75);
-	var MultiButtonGroup = __webpack_require__(78);
-	var InputWithExamples = __webpack_require__(81);
-	var ParseTex = __webpack_require__(85).parseTex;
+	var ButtonGroup = __webpack_require__(81);
+	var MultiButtonGroup = __webpack_require__(84);
+	var InputWithExamples = __webpack_require__(77);
+	var ParseTex = __webpack_require__(86).parseTex;
 
 	var ApiClassNames   = __webpack_require__(13).ClassNames;
 	var ApiOptions      = __webpack_require__(13).Options;
@@ -16161,7 +16201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var InfoTip = __webpack_require__(71);
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Renderer = __webpack_require__(11);
@@ -16844,7 +16884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
@@ -16854,8 +16894,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Editor = __webpack_require__(7);
 	var Renderer = __webpack_require__(11);
 	var InfoTip = __webpack_require__(71);
-	var PropCheckBox  = __webpack_require__(62);
-	var PassageMarkdown = __webpack_require__(100);
+	var PropCheckBox  = __webpack_require__(61);
+	var PassageMarkdown = __webpack_require__(102);
 
 	var Passage = React.createClass({displayName: 'Passage',
 	    mixins: [WidgetJsonifyDeprecated, Changeable],
@@ -17174,7 +17214,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
@@ -17328,7 +17368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable   = __webpack_require__(68);
@@ -17422,15 +17462,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var InfoTip = __webpack_require__(71);
-	var BlurInput = __webpack_require__(84);
+	var BlurInput = __webpack_require__(80);
 	var _ = __webpack_require__(59);
 
 	var NumberInput = __webpack_require__(87);
 	var TextListEditor = __webpack_require__(72);
-	var RangeInput = __webpack_require__(86);
-	var SvgImage = __webpack_require__(61);
+	var RangeInput = __webpack_require__(85);
+	var SvgImage = __webpack_require__(60);
 
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 
@@ -18434,14 +18474,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable = __webpack_require__(68);
 	var ApiClassNames = __webpack_require__(13).ClassNames;
 
 	var Editor = __webpack_require__(7);
-	var PropCheckBox = __webpack_require__(62);
+	var PropCheckBox = __webpack_require__(61);
 	var Renderer = __webpack_require__(11);
 	var PassageRef = __webpack_require__(36);
 	var Util = __webpack_require__(3);
@@ -19383,7 +19423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var ApiOptions = __webpack_require__(13).Options;
 	var assert = __webpack_require__(91).assert;
 
-	var Graphie = __webpack_require__(74);
+	var Graphie = __webpack_require__(73);
 	var $__0=
 	    
 	    
@@ -20181,13 +20221,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable = __webpack_require__(68);
 	var EditorJsonify = __webpack_require__(69);
 
-	var PerseusMarkdown = __webpack_require__(52);
+	var PerseusMarkdown = __webpack_require__(54);
 	var mdParse = PerseusMarkdown.parse;
 	var mdOutput = PerseusMarkdown.testOutput;
 
@@ -20340,11 +20380,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React          = __webpack_require__(60);
+	var React          = __webpack_require__(63);
 	var InfoTip        = __webpack_require__(71);
 	var _ = __webpack_require__(59);
 
-	var PropCheckBox   = __webpack_require__(62);
+	var PropCheckBox   = __webpack_require__(61);
 	var Sortable       = __webpack_require__(92);
 	var TextListEditor = __webpack_require__(72);
 
@@ -20498,7 +20538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Editor = __webpack_require__(7);
@@ -20954,15 +20994,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Graph         = __webpack_require__(89);
-	var GraphSettings = __webpack_require__(76);
+	var GraphSettings = __webpack_require__(82);
 	var InfoTip       = __webpack_require__(71);
 	var NumberInput   = __webpack_require__(87);
 	var MathOutput    = __webpack_require__(90);
-	var PropCheckBox  = __webpack_require__(62);
+	var PropCheckBox  = __webpack_require__(61);
 	var TeX           = __webpack_require__(67);
 
 	var ApiOptions = __webpack_require__(13).Options;
@@ -24251,7 +24291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 
 	var QuestionParagraph = React.createClass({displayName: 'QuestionParagraph',
 	    render: function() {
@@ -24271,7 +24311,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var cx = React.addons.classSet;
 
 	var WidgetContainer = React.createClass({displayName: 'WidgetContainer',
@@ -24344,7 +24384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 
 	module.exports = {
 	    propTypes: React.PropTypes.shape({
@@ -24472,6 +24512,383 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* Collection of classes for rendering the hint editor area,
+	 * hint editor boxes, and hint previews
+	 */
+
+	var React = __webpack_require__(63);
+	var _ = __webpack_require__(59);
+
+	var Editor = __webpack_require__(7);
+	var HintRenderer = __webpack_require__(55);
+	var InfoTip = __webpack_require__(71);
+	var Util = __webpack_require__(3);
+
+	/* Renders a hint editor box
+	 *
+	 * This includes:
+	 *  ~ A "Hint" title
+	 *  ~ the textarea for the hint
+	 *  ~ the "remove this hint" box
+	 *  ~ the move hint up/down arrows
+	 */
+	var HintEditor = React.createClass({displayName: 'HintEditor',
+	    propTypes: {
+	        imageUploader: React.PropTypes.func
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            content: ""
+	        };
+	    },
+
+	    render: function() {
+	        return React.createElement("div", {className: "perseus-hint-editor perseus-editor-left-cell"}, 
+	            React.createElement("div", {className: "pod-title"}, "Hint"), 
+	            React.createElement(Editor, {ref: "editor", 
+	                    widgets: this.props.widgets, 
+	                    content: this.props.content, 
+	                    images: this.props.images, 
+	                    placeholder: "Type your hint here...", 
+	                    imageUploader: this.props.imageUploader, 
+	                    onChange: this.props.onChange, 
+	                    searchString: this.props.searchString, 
+	                    searchIndex: this.props.searchIndex}), 
+	            React.createElement("div", {className: "hint-controls-container clearfix"}, 
+	                React.createElement("span", {className: "reorder-hints"}, 
+	                    React.createElement("button", {type: "button", 
+	                            className: this.props.isLast ? "hidden" : "", 
+	                            onClick: _.partial(this.props.onMove, 1)}, 
+	                        React.createElement("span", {className: "icon-circle-arrow-down"})
+	                    ), 
+	                    ' ', 
+	                    React.createElement("button", {type: "button", 
+	                            className: this.props.isFirst ? "hidden" : "", 
+	                            onClick: _.partial(this.props.onMove, -1)}, 
+	                        React.createElement("span", {className: "icon-circle-arrow-up"})
+	                    ), 
+	                    ' ', 
+	                    this.props.isLast &&
+	                    React.createElement(InfoTip, null, 
+	                        React.createElement("p", null, "The last hint is automatically bolded.")
+	                    )
+	                ), 
+	                React.createElement("button", {type: "button", 
+	                        className: "remove-hint simple-button orange", 
+	                        onClick: this.props.onRemove}, 
+	                    React.createElement("span", {className: "icon-trash"}), " Remove this hint", ' '
+	                )
+	            )
+	        );
+	    },
+
+	    focus: function() {
+	        this.refs.editor.focus();
+	    },
+
+	    getSaveWarnings: function() {
+	        return this.refs.editor.getSaveWarnings();
+	    },
+
+	    serialize: function(options) {
+	        return this.refs.editor.serialize(options);
+	    }
+	});
+
+
+	/* A single hint-row containing a hint editor and preview */
+	var CombinedHintEditor = React.createClass({displayName: 'CombinedHintEditor',
+	    propTypes: {
+	        imageUploader: React.PropTypes.func
+	    },
+
+	    render: function() {
+	        var shouldBold = this.props.isLast &&
+	                         !(/\*\*/).test(this.props.hint.content);
+	        return React.createElement("div", {className: "perseus-combined-hint-editor " +
+	                    "perseus-editor-row"}, 
+	            React.createElement(HintEditor, {
+	                ref: "editor", 
+	                isFirst: this.props.isFirst, 
+	                isLast: this.props.isLast, 
+	                widgets: this.props.hint.widgets, 
+	                content: this.props.hint.content, 
+	                images: this.props.hint.images, 
+	                imageUploader: this.props.imageUploader, 
+	                onChange: this.props.onChange, 
+	                onRemove: this.props.onRemove, 
+	                onMove: this.props.onMove, 
+	                searchString: this.props.searchString, 
+	                searchIndex: this.props.searchIndex}), 
+
+	            React.createElement("div", {className: "perseus-editor-right-cell"}, 
+	                React.createElement(HintRenderer, {hint: this.props.hint, bold: shouldBold})
+	            )
+	        );
+	    },
+
+	    getSaveWarnings: function() {
+	        return this.refs.editor.getSaveWarnings();
+	    },
+
+	    serialize: function(options) {
+	        return this.refs.editor.serialize(options);
+	    },
+
+	    focus: function() {
+	        this.refs.editor.focus();
+	    }
+	});
+
+
+	/* The entire hints editing/preview area
+	 *
+	 * Includes:
+	 *  ~ All the hint edit boxes, move and remove buttons
+	 *  ~ All the hint previews
+	 *  ~ The "add a hint" button
+	 */
+	var CombinedHintsEditor = React.createClass({displayName: 'CombinedHintsEditor',
+	    propTypes: {
+	        imageUploader: React.PropTypes.func
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            onChange: function()  {},
+	            hints: []
+	        };
+	    },
+
+	    render: function() {
+	        var hints = this.props.hints;
+	        var searchIndex = this.props.searchIndex;
+	        var searchString = this.props.searchString;
+
+	        var hintElems = _.map(hints, function(hint, i) {
+	            var hintElem = React.createElement(CombinedHintEditor, {
+	                        ref: "hintEditor" + i, 
+	                        key: "hintEditor" + i, 
+	                        isFirst: i === 0, 
+	                        isLast: i + 1 === hints.length, 
+	                        hint: hint, 
+	                        imageUploader: this.props.imageUploader, 
+	                        onChange: this.handleHintChange.bind(this, i), 
+	                        onRemove: this.handleHintRemove.bind(this, i), 
+	                        onMove: this.handleHintMove.bind(this, i), 
+	                        searchString: searchString, 
+	                        searchIndex: searchIndex});
+
+	            // adjust searchIndex based on the number of occurences in the 
+	            // the previous hint
+	            searchIndex -= Util.countOccurrences(hint.content, searchString);
+	            return hintElem;
+	        }, this);
+
+	        return React.createElement("div", {className: "perseus-hints-editor perseus-editor-table"}, 
+	            hintElems, 
+	            React.createElement("div", {className: "perseus-editor-row"}, 
+	                React.createElement("div", {className: "add-hint-container perseus-editor-left-cell"}, 
+	                React.createElement("button", {type: "button", 
+	                        className: "add-hint simple-button orange", 
+	                        onClick: this.addHint}, 
+	                    React.createElement("span", {className: "icon-plus"}), 
+	                    ' ', "Add a hint"
+	                )
+	                ), 
+	                React.createElement("div", {className: "perseus-editor-right-cell"})
+	            )
+	        );
+	    },
+
+	    handleHintChange: function(i, newProps, cb, silent) {
+	        // TODO(joel) - lens
+	        var hints = _(this.props.hints).clone();
+	        hints[i] = _.extend(
+	            {},
+	            this.serializeHint(i, {keepDeletedWidgets: true}),
+	            newProps
+	        );
+
+	        this.props.onChange({hints: hints}, cb, silent);
+	    },
+
+	    handleHintRemove: function(i) {
+	        var hints = _(this.props.hints).clone();
+	        hints.splice(i, 1);
+	        this.props.onChange({hints: hints});
+	    },
+
+	    handleHintMove: function(i, dir) {
+	        var hints = _(this.props.hints).clone();
+	        var hint = hints.splice(i, 1)[0];
+	        hints.splice(i + dir, 0, hint);
+	        this.props.onChange({hints: hints}, function()  {
+	            this.refs["hintEditor" + (i + dir)].focus();
+	        }.bind(this));
+	    },
+
+	    addHint: function() {
+	        var hints = _(this.props.hints).clone().concat([{ content: "" }]);
+	        this.props.onChange({hints: hints}, function()  {
+	            var i = hints.length - 1;
+	            this.refs["hintEditor" + i].focus();
+	        }.bind(this));
+	    },
+
+	    getSaveWarnings: function() {
+	        return this.props.hints.map(function(hint, i)  {
+	            return this.refs["hintEditor" + i].getSaveWarnings();
+	        }.bind(this));
+	    },
+
+	    serialize: function(options) {
+	        return this.props.hints.map(function(hint, i)  {
+	            return this.serializeHint(i, options);
+	        }.bind(this));
+	    },
+
+	    serializeHint: function(index, options) {
+	        return this.refs["hintEditor" + index].serialize(options);
+	    }
+	});
+
+	module.exports = CombinedHintsEditor;
+
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(63);
+	var _ = __webpack_require__(59);
+
+	var AnswerAreaEditor = __webpack_require__(94);
+	var Editor = __webpack_require__(7);
+	var ApiOptions = __webpack_require__(13).Options;
+	var ITEM_DATA_VERSION = __webpack_require__(47).itemDataVersion;
+	var Util = __webpack_require__(3);
+
+	var ItemEditor = React.createClass({displayName: 'ItemEditor',
+	    propTypes: {
+	        imageUploader: React.PropTypes.func,
+	        wasAnswered: React.PropTypes.bool,
+	        gradeMessage: React.PropTypes.string,
+	        apiOptions: ApiOptions.propTypes,
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            onChange: function()  {},
+	            question: {},
+	            answerArea: {},
+	            apiOptions: ApiOptions.defaults,
+	        };
+	    },
+
+	    // Notify the parent that the question or answer area has been updated.
+	    updateProps: function(newProps, cb, silent) {
+	        var props = _(this.props).pick("question", "answerArea");
+
+	        this.props.onChange(_(props).extend(newProps), cb, silent);
+	    },
+
+	    render: function() {
+	        return React.createElement("div", {className: "perseus-editor-table"}, 
+	            React.createElement("div", {className: "perseus-editor-row perseus-question-container"}, 
+	                React.createElement("div", {className: "perseus-editor-left-cell"}, 
+	                    React.createElement("div", {className: "pod-title"}, "Question"), 
+	                    React.createElement(Editor, React.__spread({
+	                        ref: "questionEditor", 
+	                        placeholder: "Type your question here...", 
+	                        className: "perseus-question-editor", 
+	                        imageUploader: this.props.imageUploader, 
+	                        onChange: this.handleEditorChange, 
+	                        apiOptions: this.props.apiOptions, 
+	                        showWordCount: true, 
+	                        searchString: this.props.searchString, 
+	                        searchIndex: this.props.searchIndex}, 
+	                        this.props.question))
+	                ), 
+
+	                React.createElement("div", {className: "perseus-editor-right-cell"}, 
+	                    React.createElement("div", {id: "problemarea"}, 
+	                        React.createElement("div", {id: "workarea", className: "workarea"}), 
+	                        React.createElement("div", {id: "hintsarea", 
+	                             className: "hintsarea", 
+	                             style: {display: "none"}})
+	                    )
+	                )
+	            ), 
+
+	            React.createElement("div", {className: "perseus-editor-row perseus-answer-container"}, 
+	                React.createElement("div", {className: "perseus-editor-left-cell"}, 
+	                    React.createElement("div", {className: "pod-title"}, "Answer"), 
+	                    React.createElement(AnswerAreaEditor, React.__spread({
+	                        ref: "answerAreaEditor", 
+	                        onChange: this.handleAnswerAreaChange, 
+	                        apiOptions: this.props.apiOptions}, 
+	                        this.props.answerArea))
+	                ), 
+
+	                React.createElement("div", {className: "perseus-editor-right-cell"}, 
+	                    React.createElement("div", {id: "answer_area"}, 
+	                        React.createElement("div", {id: "solutionarea", className: "solutionarea"}), 
+	                        React.createElement("div", {className: "answer-buttons"}, 
+	                            React.createElement("input", {
+	                                type: "button", 
+	                                className: "simple-button green", 
+	                                onClick: this.props.onCheckAnswer, 
+	                                value: "Check Answer"}), 
+	                            this.props.wasAnswered &&
+	                                React.createElement("img", {src: "/images/face-smiley.png", 
+	                                    className: "smiley"}), 
+	                            this.props.gradeMessage &&
+	                                React.createElement("span", null, this.props.gradeMessage)
+	                        )
+	                    )
+	                )
+	            )
+	        );
+	    },
+
+	    handleEditorChange: function(newProps, cb, silent) {
+	        var question = _.extend({}, this.props.question, newProps);
+	        this.updateProps({ question:question }, cb, silent);
+	    },
+
+	    handleAnswerAreaChange: function(newProps, cb, silent) {
+	        var answerArea = _.extend({}, this.props.answerArea, newProps);
+	        this.updateProps({ answerArea:answerArea }, cb, silent);
+	    },
+
+	    getSaveWarnings: function() {
+	        var issues1 = this.refs.questionEditor.getSaveWarnings();
+	        var issues2 = this.refs.answerAreaEditor.getSaveWarnings();
+	        return issues1.concat(issues2);
+	    },
+
+	    serialize: function(options) {
+	        return {
+	            question: this.refs.questionEditor.serialize(options),
+	            answerArea: this.refs.answerAreaEditor.serialize(options),
+	            itemDataVersion: ITEM_DATA_VERSION
+	        };
+	    },
+
+	    focus: function() {
+	        this.questionEditor.focus();
+	    }
+	});
+
+	module.exports = ItemEditor;
+
+
+/***/ },
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(59);
@@ -24768,617 +25185,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 53 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* Collection of classes for rendering the hint editor area,
-	 * hint editor boxes, and hint previews
-	 */
-
-	var React = __webpack_require__(60);
-	var _ = __webpack_require__(59);
-
-	var Editor = __webpack_require__(7);
-	var HintRenderer = __webpack_require__(56);
-	var InfoTip = __webpack_require__(71);
-	var Util = __webpack_require__(3);
-
-	/* Renders a hint editor box
-	 *
-	 * This includes:
-	 *  ~ A "Hint" title
-	 *  ~ the textarea for the hint
-	 *  ~ the "remove this hint" box
-	 *  ~ the move hint up/down arrows
-	 */
-	var HintEditor = React.createClass({displayName: 'HintEditor',
-	    propTypes: {
-	        imageUploader: React.PropTypes.func
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            content: ""
-	        };
-	    },
-
-	    render: function() {
-	        return React.createElement("div", {className: "perseus-hint-editor perseus-editor-left-cell"}, 
-	            React.createElement("div", {className: "pod-title"}, "Hint"), 
-	            React.createElement(Editor, {ref: "editor", 
-	                    widgets: this.props.widgets, 
-	                    content: this.props.content, 
-	                    images: this.props.images, 
-	                    placeholder: "Type your hint here...", 
-	                    imageUploader: this.props.imageUploader, 
-	                    onChange: this.props.onChange, 
-	                    searchString: this.props.searchString, 
-	                    searchIndex: this.props.searchIndex}), 
-	            React.createElement("div", {className: "hint-controls-container clearfix"}, 
-	                React.createElement("span", {className: "reorder-hints"}, 
-	                    React.createElement("button", {type: "button", 
-	                            className: this.props.isLast ? "hidden" : "", 
-	                            onClick: _.partial(this.props.onMove, 1)}, 
-	                        React.createElement("span", {className: "icon-circle-arrow-down"})
-	                    ), 
-	                    ' ', 
-	                    React.createElement("button", {type: "button", 
-	                            className: this.props.isFirst ? "hidden" : "", 
-	                            onClick: _.partial(this.props.onMove, -1)}, 
-	                        React.createElement("span", {className: "icon-circle-arrow-up"})
-	                    ), 
-	                    ' ', 
-	                    this.props.isLast &&
-	                    React.createElement(InfoTip, null, 
-	                        React.createElement("p", null, "The last hint is automatically bolded.")
-	                    )
-	                ), 
-	                React.createElement("button", {type: "button", 
-	                        className: "remove-hint simple-button orange", 
-	                        onClick: this.props.onRemove}, 
-	                    React.createElement("span", {className: "icon-trash"}), " Remove this hint", ' '
-	                )
-	            )
-	        );
-	    },
-
-	    focus: function() {
-	        this.refs.editor.focus();
-	    },
-
-	    getSaveWarnings: function() {
-	        return this.refs.editor.getSaveWarnings();
-	    },
-
-	    serialize: function(options) {
-	        return this.refs.editor.serialize(options);
-	    }
-	});
-
-
-	/* A single hint-row containing a hint editor and preview */
-	var CombinedHintEditor = React.createClass({displayName: 'CombinedHintEditor',
-	    propTypes: {
-	        imageUploader: React.PropTypes.func
-	    },
-
-	    render: function() {
-	        var shouldBold = this.props.isLast &&
-	                         !(/\*\*/).test(this.props.hint.content);
-	        return React.createElement("div", {className: "perseus-combined-hint-editor " +
-	                    "perseus-editor-row"}, 
-	            React.createElement(HintEditor, {
-	                ref: "editor", 
-	                isFirst: this.props.isFirst, 
-	                isLast: this.props.isLast, 
-	                widgets: this.props.hint.widgets, 
-	                content: this.props.hint.content, 
-	                images: this.props.hint.images, 
-	                imageUploader: this.props.imageUploader, 
-	                onChange: this.props.onChange, 
-	                onRemove: this.props.onRemove, 
-	                onMove: this.props.onMove, 
-	                searchString: this.props.searchString, 
-	                searchIndex: this.props.searchIndex}), 
-
-	            React.createElement("div", {className: "perseus-editor-right-cell"}, 
-	                React.createElement(HintRenderer, {hint: this.props.hint, bold: shouldBold})
-	            )
-	        );
-	    },
-
-	    getSaveWarnings: function() {
-	        return this.refs.editor.getSaveWarnings();
-	    },
-
-	    serialize: function(options) {
-	        return this.refs.editor.serialize(options);
-	    },
-
-	    focus: function() {
-	        this.refs.editor.focus();
-	    }
-	});
-
-
-	/* The entire hints editing/preview area
-	 *
-	 * Includes:
-	 *  ~ All the hint edit boxes, move and remove buttons
-	 *  ~ All the hint previews
-	 *  ~ The "add a hint" button
-	 */
-	var CombinedHintsEditor = React.createClass({displayName: 'CombinedHintsEditor',
-	    propTypes: {
-	        imageUploader: React.PropTypes.func
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            onChange: function()  {},
-	            hints: []
-	        };
-	    },
-
-	    render: function() {
-	        var hints = this.props.hints;
-	        var searchIndex = this.props.searchIndex;
-	        var searchString = this.props.searchString;
-	        
-	        var hintElems = _.map(hints, function(hint, i) {
-	            var hintSearchCount = Util.countOccurences(hint.content, searchString);
-	            var hintSearchIndex = -1;
-	            if (searchIndex >= 0) {
-	                if (searchIndex < hintSearchCount) {
-	                    hintSearchIndex = searchIndex;
-	                }
-	                searchIndex -= hintSearchCount;
-	            }
-
-	            return React.createElement(CombinedHintEditor, {
-	                        ref: "hintEditor" + i, 
-	                        key: "hintEditor" + i, 
-	                        isFirst: i === 0, 
-	                        isLast: i + 1 === hints.length, 
-	                        hint: hint, 
-	                        imageUploader: this.props.imageUploader, 
-	                        onChange: this.handleHintChange.bind(this, i), 
-	                        onRemove: this.handleHintRemove.bind(this, i), 
-	                        onMove: this.handleHintMove.bind(this, i), 
-	                        searchString: searchString, 
-	                        searchIndex: hintSearchIndex});
-	        }, this);
-
-	        return React.createElement("div", {className: "perseus-hints-editor perseus-editor-table"}, 
-	            hintElems, 
-	            React.createElement("div", {className: "perseus-editor-row"}, 
-	                React.createElement("div", {className: "add-hint-container perseus-editor-left-cell"}, 
-	                React.createElement("button", {type: "button", 
-	                        className: "add-hint simple-button orange", 
-	                        onClick: this.addHint}, 
-	                    React.createElement("span", {className: "icon-plus"}), 
-	                    ' ', "Add a hint"
-	                )
-	                ), 
-	                React.createElement("div", {className: "perseus-editor-right-cell"})
-	            )
-	        );
-	    },
-
-	    handleHintChange: function(i, newProps, cb, silent) {
-	        // TODO(joel) - lens
-	        var hints = _(this.props.hints).clone();
-	        hints[i] = _.extend(
-	            {},
-	            this.serializeHint(i, {keepDeletedWidgets: true}),
-	            newProps
-	        );
-
-	        this.props.onChange({hints: hints}, cb, silent);
-	    },
-
-	    handleHintRemove: function(i) {
-	        var hints = _(this.props.hints).clone();
-	        hints.splice(i, 1);
-	        this.props.onChange({hints: hints});
-	    },
-
-	    handleHintMove: function(i, dir) {
-	        var hints = _(this.props.hints).clone();
-	        var hint = hints.splice(i, 1)[0];
-	        hints.splice(i + dir, 0, hint);
-	        this.props.onChange({hints: hints}, function()  {
-	            this.refs["hintEditor" + (i + dir)].focus();
-	        }.bind(this));
-	    },
-
-	    addHint: function() {
-	        var hints = _(this.props.hints).clone().concat([{ content: "" }]);
-	        this.props.onChange({hints: hints}, function()  {
-	            var i = hints.length - 1;
-	            this.refs["hintEditor" + i].focus();
-	        }.bind(this));
-	    },
-
-	    getSaveWarnings: function() {
-	        return this.props.hints.map(function(hint, i)  {
-	            return this.refs["hintEditor" + i].getSaveWarnings();
-	        }.bind(this));
-	    },
-
-	    serialize: function(options) {
-	        return this.props.hints.map(function(hint, i)  {
-	            return this.serializeHint(i, options);
-	        }.bind(this));
-	    },
-
-	    serializeHint: function(index, options) {
-	        return this.refs["hintEditor" + index].serialize(options);
-	    }
-	});
-
-	module.exports = CombinedHintsEditor;
-
-
-/***/ },
-/* 54 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(60);
-	var _ = __webpack_require__(59);
-
-	var AnswerAreaEditor = __webpack_require__(94);
-	var Editor = __webpack_require__(7);
-	var ApiOptions = __webpack_require__(13).Options;
-	var ITEM_DATA_VERSION = __webpack_require__(47).itemDataVersion;
-	var Util = __webpack_require__(3);
-
-	var ItemEditor = React.createClass({displayName: 'ItemEditor',
-	    propTypes: {
-	        imageUploader: React.PropTypes.func,
-	        wasAnswered: React.PropTypes.bool,
-	        gradeMessage: React.PropTypes.string,
-	        apiOptions: ApiOptions.propTypes
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            onChange: function()  {},
-	            question: {},
-	            answerArea: {},
-	            apiOptions: ApiOptions.defaults
-	        };
-	    },
-
-	    // Notify the parent that the question or answer area has been updated.
-	    updateProps: function(newProps, cb, silent) {
-	        var props = _(this.props).pick("question", "answerArea");
-
-	        this.props.onChange(_(props).extend(newProps), cb, silent);
-	    },
-
-	    render: function() {
-	        var questionSearchIndex = -1;
-	        var answerAreaSearchIndex = -1;
-
-	        if (this.props.searchIndex !== -1) {
-	            var questionSearchCount = Util.countOccurences(this.props.question.content, this.props.searchString);
-	            var answerAreaSearchCount = Util.countOccurences(this.props.answerArea.options.content, this.props.searchString);
-	            
-	            if (this.props.searchIndex < questionSearchCount) {
-	                questionSearchIndex = this.props.searchIndex;
-	            } else if (this.props.searchIndex < questionSearchCount + answerAreaSearchCount) {
-	                answerAreaSearchIndex = this.props.searchIndex - questionSearchCount;
-	            }
-	        }
-	        
-	        return React.createElement("div", {className: "perseus-editor-table"}, 
-	            React.createElement("div", {className: "perseus-editor-row perseus-question-container"}, 
-	                React.createElement("div", {className: "perseus-editor-left-cell"}, 
-	                    React.createElement("div", {className: "pod-title"}, "Question"), 
-	                    React.createElement(Editor, React.__spread({
-	                        ref: "questionEditor", 
-	                        placeholder: "Type your question here...", 
-	                        className: "perseus-question-editor", 
-	                        imageUploader: this.props.imageUploader, 
-	                        onChange: this.handleEditorChange, 
-	                        apiOptions: this.props.apiOptions, 
-	                        showWordCount: true, 
-	                        searchString: this.props.searchString, 
-	                        searchIndex: questionSearchIndex}, 
-	                        this.props.question))
-	                ), 
-
-	                React.createElement("div", {className: "perseus-editor-right-cell"}, 
-	                    React.createElement("div", {id: "problemarea"}, 
-	                        React.createElement("div", {id: "workarea", className: "workarea"}), 
-	                        React.createElement("div", {id: "hintsarea", 
-	                             className: "hintsarea", 
-	                             style: {display: "none"}})
-	                    )
-	                )
-	            ), 
-
-	            React.createElement("div", {className: "perseus-editor-row perseus-answer-container"}, 
-	                React.createElement("div", {className: "perseus-editor-left-cell"}, 
-	                    React.createElement("div", {className: "pod-title"}, "Answer"), 
-	                    React.createElement(AnswerAreaEditor, React.__spread({
-	                        ref: "answerAreaEditor", 
-	                        onChange: this.handleAnswerAreaChange, 
-
-	                        apiOptions: this.props.apiOptions, 
-
-	                        searchString: this.props.searchString, 
-	                        searchIndex: answerAreaSearchIndex}, 
-
-	                        this.props.answerArea))
-	                ), 
-
-	                React.createElement("div", {className: "perseus-editor-right-cell"}, 
-	                    React.createElement("div", {id: "answer_area"}, 
-	                        React.createElement("div", {id: "solutionarea", className: "solutionarea"}), 
-	                        React.createElement("div", {className: "answer-buttons"}, 
-	                            React.createElement("input", {
-	                                type: "button", 
-	                                className: "simple-button green", 
-	                                onClick: this.props.onCheckAnswer, 
-	                                value: "Check Answer"}), 
-	                            this.props.wasAnswered &&
-	                                React.createElement("img", {src: "/images/face-smiley.png", 
-	                                    className: "smiley"}), 
-	                            this.props.gradeMessage &&
-	                                React.createElement("span", null, this.props.gradeMessage)
-	                        )
-	                    )
-	                )
-	            )
-	        );
-	    },
-
-	    handleEditorChange: function(newProps, cb, silent) {
-	        var question = _.extend({}, this.props.question, newProps);
-	        this.updateProps({ question:question }, cb, silent);
-	    },
-
-	    handleAnswerAreaChange: function(newProps, cb, silent) {
-	        var answerArea = _.extend({}, this.props.answerArea, newProps);
-	        this.updateProps({ answerArea:answerArea }, cb, silent);
-	    },
-
-	    getSaveWarnings: function() {
-	        var issues1 = this.refs.questionEditor.getSaveWarnings();
-	        var issues2 = this.refs.answerAreaEditor.getSaveWarnings();
-	        return issues1.concat(issues2);
-	    },
-
-	    serialize: function(options) {
-	        return {
-	            question: this.refs.questionEditor.serialize(options),
-	            answerArea: this.refs.answerAreaEditor.serialize(options),
-	            itemDataVersion: ITEM_DATA_VERSION
-	        };
-	    },
-
-	    focus: function() {
-	        this.questionEditor.focus();
-	    }
-	});
-
-	module.exports = ItemEditor;
-
-
-/***/ },
 /* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/** @jsx React.DOM */
-
-	var React = __webpack_require__(60);
-	var Util = __webpack_require__(3);
-
-	var SearchAndReplaceDialog = React.createClass({displayName: 'SearchAndReplaceDialog',
-
-	    getInitialState:function() {
-	        return {
-	            searchString: "",
-	            replaceString: "",
-	            searchIndex: 0
-	        }
-	    },
-
-	    updateSearchValue:function(event) {
-	        var searchString = event.target.value;
-
-	        this.setState({ searchString:searchString });
-	        this.props.onChange({
-	            searchString:searchString, searchIndex: 0
-	        });
-	    },
-
-	    updateReplaceValue:function(event) {
-	        this.setState({ replaceString: event.target.value });
-	    },
-
-	    getTotalSearchCount: function() {
-	        var count = 0;
-
-	        count += Util.countOccurences(this.props.question.content, this.state.searchString);
-	        count += Util.countOccurences(this.props.answerArea.options.content, this.state.searchString);
-	        this.props.hints.forEach(function(hint)  {
-	            count += Util.countOccurences(hint.content, this.state.searchString);
-	        }.bind(this));
-
-	        return count;
-	    },
-
-	    handleNextSearchResult:function() {
-	        var searchIndex = this.state.searchIndex;
-	        searchIndex ++;
-	        searchIndex = searchIndex % this.getTotalSearchCount();
-
-	        this.setState({ searchIndex:searchIndex }); // TODO: have a current of total indicator
-	        this.props.onChange({ searchIndex:searchIndex });
-	    },
-
-	    handlePreviousSearchResult:function() {
-	        var searchIndex = this.state.searchIndex;
-	        searchIndex --;
-	        if (searchIndex < 0) {
-	            searchIndex = this.getTotalSearchCount() - 1;
-	        }
-
-	        this.setState({ searchIndex:searchIndex });
-	        this.props.onChange({ searchIndex:searchIndex });
-	    },
-
-	    handleReplaceAll:function() {
-	        var searchString = this.state.searchString;
-	        var replaceString = this.state.replaceString;
-
-	        var question = this.props.question;
-	        var answerArea = this.props.answerArea;
-	        var hints = this.props.hints;
-
-	        var regex = new RegExp(searchString, "g");
-
-	        question.content = question.content.replace(regex, replaceString);
-	        answerArea.options.content = answerArea.options.content.replace(regex, replaceString);
-	        hints.forEach(function(hint)  {
-	            hint.content = hint.content.replace(regex, replaceString)
-	        });
-
-	        this.props.onReplaceAll({ question:question, answerArea:answerArea, hints:hints });
-	        // TODO: disable 'Replace' and 'Replace All' buttons
-	    },
-	    
-	    handleReplace:function() {
-	        var searchIndex = this.state.searchIndex;
-	        var searchString = this.state.searchString;
-	        var replaceString = this.state.replaceString;
-
-	        var question = this.props.question;
-	        var answerArea = this.props.answerArea;
-	        var hints = this.props.hints;
-
-	        var regex = new RegExp(searchString, "g");
-	        var replaced = false;
-	        var globalIndex = 0;
-
-	        question.content = question.content.replace(regex, function(match)  {
-	            if (!replaced && globalIndex === searchIndex) {
-	                replaced = true;
-	                globalIndex ++;
-	                return replaceString;
-	            } else {
-	                globalIndex ++;
-	                return match;
-	            }
-	        });
-
-	        if (!replaced) {
-	            answerArea.options.content = answerArea.options.content.replace(regex, function(match)  {
-	                if (!replaced && globalIndex === searchIndex) {
-	                    replaced = true;
-	                    globalIndex ++;
-	                    return replaceString;
-	                } else {
-	                    globalIndex ++;
-	                    return match;
-	                }
-	            });
-	        }
-
-	        if (!replaced) {
-	            hints.forEach(function(hint)  {
-	                if (replaced) {
-	                    return;
-	                }
-	                hint.content = hint.content.replace(regex, function(match)  {
-	                    if (!replaced && globalIndex === searchIndex) {
-	                        replaced = true;
-	                        globalIndex ++;
-	                        return replaceString;
-	                    } else {
-	                        globalIndex ++;
-	                        return match;
-	                    }
-	                });
-	            });
-	        }
-
-	        this.props.onReplaceAll({ question:question, answerArea:answerArea, hints:hints });
-	        
-	        // TODO: disable 'Replace' and 'Replace All' buttons when there are no matches
-	    },
-
-	    style: {
-	        padding: '10px',
-	        position: 'fixed',
-	        right: 0,
-	        top: 0,
-	        width: '300px',
-	        backgroundColor: '#EEE',
-	        border: 'solid 1px #DDD',
-	        zIndex: 100
-	    },
-
-	    labelStyle: {
-	        display: 'inline-block',
-	        float: 'right',
-	        textAlign: 'right',
-	        width: '60px',
-	        marginRight: '8px'
-	    },
-
-	    inputStyle: {
-	        display: 'inline-block',
-	        float: 'right',
-	        clear: 'right',
-	        width: '220px'
-	    },
-
-	    buttonStyle: {
-	        float: 'right',
-	        marginLeft: '8px'
-	    },
-
-	    render:function() {
-	        return React.createElement("div", {style: this.style}, 
-	            React.createElement("div", {style: { overflow: 'auto'}}, 
-	                React.createElement("input", {
-	                    type: "text", 
-	                    value: this.state.searchString, 
-	                    onChange: this.updateSearchValue, 
-	                    style: this.inputStyle}), 
-	                React.createElement("label", {style: this.labelStyle}, "Search:"), 
-
-	                React.createElement("input", {
-	                    type: "text", 
-	                    value: this.state.replaceString, 
-	                    onChange: this.updateReplaceValue, 
-	                    style: this.inputStyle}), 
-	                React.createElement("label", {style: this.labelStyle}, "Replace:")
-
-	            ), 
-	            React.createElement("div", {style: { overflow: 'auto', marginTop: '8px'}}, 
-	                React.createElement("button", {style: this.buttonStyle, onClick: this.handleReplaceAll}, "Replace All"), 
-	                React.createElement("button", {style: this.buttonStyle, onClick: this.handleNextSearchResult}, "Next"), 
-	                React.createElement("button", {style: this.buttonStyle, onClick: this.handlePreviousSearchResult}, "Previous"), 
-	                React.createElement("button", {style: this.buttonStyle, onClick: this.handleReplace}, "Replace")
-	            )
-	        );
-	    }
-
-	});
-
-	module.exports = SearchAndReplaceDialog;
-
-
-/***/ },
-/* 56 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var Renderer = __webpack_require__(11);
 
 	/* Renders just a hint preview */
@@ -25414,12 +25224,304 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @jsx React.DOM */
+
+	var React = __webpack_require__(63);
+	var Util = __webpack_require__(3);
+
+	var SearchAndReplaceDialog = React.createClass({displayName: 'SearchAndReplaceDialog',
+
+	    getDefaultProps: function() {
+	        return {
+	            onChange:function() {}    // TODO: throw an error
+	        };
+	    },
+
+	    getInitialState:function() {
+	        return {
+	            replaceString: "",
+	            searchResultCount: 0
+	        }
+	    },
+
+	    updateSearchString:function(event) {
+	        var searchIndex = 0;
+	        var searchString = event.target.value;
+	        var searchResultCount = this.getSearchResultCount(searchString);
+
+	        this.setState({ searchResultCount:searchResultCount });
+	        this.props.onChange({ searchString:searchString, searchIndex:searchIndex });
+	    },
+
+	    updateReplaceString:function(event) {
+	        this.setState({ replaceString: event.target.value });
+	    },
+
+	    updateSearchResults:function() {
+	        var searchIndex = 0;
+	        var searchResultCount = this.getSearchResultCount(this.props.searchString);
+
+	        this.setState({ searchResultCount:searchResultCount });
+	        this.props.onChange({ searchIndex:searchIndex });
+	    },
+
+	    getSearchResultCount:function(searchString) {
+	        if (searchString === "") {
+	            return 0;
+	        }
+
+	        var count = 0;
+
+	        if (this.props.question) {
+	            count += Util.countOccurrences(this.props.question.content, searchString);
+	        }
+
+	        if (this.props.hints) {
+	            this.props.hints.forEach(function(hint)  {
+	                count += Util.countOccurrences(hint.content, searchString);
+	            });
+	        }
+
+	        if (this.props.particle) {
+	            var particle = this.props.particle;
+	            if (Array.isArray(particle)) {
+	                particle.forEach(function(section)  {
+	                    if (section.content) {
+	                        count += Util.countOccurrences(section.content, searchString);
+	                    }
+	                });
+	            } else {
+	                if (particle.content) {
+	                    count += Util.countOccurrences(particle.content, searchString);
+	                }
+	            }
+	        }
+
+	        return count;
+	    },
+
+	    handleNextSearchResult:function() {
+	        var searchIndex = this.props.searchIndex;
+	        searchIndex ++;
+	        searchIndex = searchIndex % this.state.searchResultCount;
+
+	        this.props.onChange({ searchIndex:searchIndex });
+	    },
+
+	    handlePreviousSearchResult:function() {
+	        var searchIndex = this.props.searchIndex;
+	        searchIndex --;
+	        if (searchIndex < 0) {
+	            searchIndex = this.state.searchResultCount - 1;
+	        }
+
+	        this.props.onChange({ searchIndex:searchIndex });
+	    },
+
+	    handleReplaceAll:function() {
+	        var replaceString = this.state.replaceString;
+	        var $__0=       this.props,searchString=$__0.searchString,question=$__0.question,hints=$__0.hints,particle=$__0.particle;
+
+	        var regex = new RegExp(Util.escapeRegExp(searchString), "g");
+
+	        var replaceFunc = function(obj) {
+	            if (obj) {
+	                if (Array.isArray(obj)) {
+	                    obj.forEach(replaceFunc);
+	                } else {
+	                    // excludes occurrences within widget references
+	                    var indices = Util.getIndicesOf(obj.content, searchString);
+	                    obj.content = obj.content.replace(regex, function(match, offset)  {
+	                        // make sure this match isn't inside a widget reference
+	                        if (indices.indexOf(offset) !== -1) {
+	                            return replaceString
+	                        } else {
+	                            return match;
+	                        }
+	                    });
+	                }
+	            }
+	        };
+
+	        replaceFunc(question);
+	        replaceFunc(hints);
+	        replaceFunc(particle);
+
+	        // handle the case where the replaceString contains one or more copies
+	        // of searchString
+	        // TODO(kevinb7) this is quite right
+	        var searchResultCount = this.getSearchResultCount(searchString);
+
+	        this.setState({ searchResultCount:searchResultCount });
+	        this.props.onChange({ question:question, hints:hints, json: particle, searchIndex: 0 });
+	    },
+
+	    handleReplace:function() {
+	        var replaceString = this.state.replaceString;
+	        var $__0=        this.props,searchIndex=$__0.searchIndex,searchString=$__0.searchString,question=$__0.question,hints=$__0.hints,particle=$__0.particle;
+
+	        var regex = new RegExp(searchString, "g");
+	        var replaced = false;
+	        var globalIndex = 0;
+
+	        var replaceFunc = function(obj) {
+	            if (!replaced && obj) {
+	                if (Array.isArray(obj)) {
+	                    obj.forEach(replaceFunc);
+	                } else {
+	                    // excludes occurrences within widget references
+	                    var indices = Util.getIndicesOf(obj.content, searchString);
+	                    obj.content = obj.content.replace(regex, function(match, offset)  {
+	                        // make sure this match isn't inside a widget reference
+	                        if (indices.indexOf(offset) !== -1) {
+	                            if (!replaced && globalIndex === searchIndex) {
+	                                replaced = true;
+	                                globalIndex++;
+	                                return replaceString;
+	                            } else {
+	                                globalIndex++;
+	                                return match;
+	                            }
+	                        } else {
+	                            return match;
+	                        }
+	                    });
+	                }
+	            }
+	        };
+
+	        replaceFunc(question);
+	        replaceFunc(hints);
+	        replaceFunc(particle);
+
+	        var searchResultCount = this.state.searchResultCount;
+
+	        if (replaceString.indexOf(searchString) === -1) {
+	            // normal case: replaceString doesn't contain searchString so we
+	            // can decrement searchResultCount because we just replaced one 
+	            // occurence of searchString
+	            searchResultCount --;
+	        } else {
+	            // edge case: replaceString contains one or more instances of
+	            // searchString which means the searchResultCount will either 
+	            // stay the same if the number of instances is one or increase
+	            // if it's more than one
+	            var matches = replaceString.match(regex);
+	            if (matches) {
+	                searchResultCount += matches.length - 1;
+	            }
+	        }
+
+	        if (searchIndex >= searchResultCount) {
+	            searchIndex = searchResultCount - 1;
+	        }
+
+	        this.setState({ searchResultCount:searchResultCount });
+	        this.props.onChange({ question:question, hints:hints, json: particle, searchIndex:searchIndex });
+	    },
+
+	    render:function() {
+	        var displayCount = this.state.searchResultCount;
+	        var disabled = displayCount === 0;
+
+	        var displayIndex = this.props.searchIndex + 1;
+	        if (displayIndex > displayCount) {
+	            displayIndex = displayCount;
+	        }
+
+	        var gridSpace = 8;
+
+	        var style = {
+	            padding: 10,
+	            position: 'fixed',
+	            right: 0,
+	            top: 0,
+	            width: 300,
+	            backgroundColor: '#EEE',
+	            border: 'solid 1px #DDD',
+	            zIndex: 100,
+	            display: 'flex',
+	            flexDirection: 'row'
+	        };
+
+	        var labelStyle = {
+	            display: 'inline-block',
+	            textAlign: 'right',
+	            width: 60,
+	            marginRight: gridSpace
+	        };
+
+	        var inputStyle = {
+	            display: 'inline-block',
+	            width: '100%',
+	            boxSizing: 'border-box'
+	        };
+
+	        return React.createElement("div", {style: style}, 
+	            React.createElement("div", {style: { flexShrink: 0, flexGrow: 0}}, 
+	                React.createElement("label", {style: labelStyle}, "Search:"), 
+	                React.createElement("br", null), 
+	                React.createElement("label", {style: labelStyle}, "Replace:"), 
+	                React.createElement("br", null), 
+	                React.createElement("span", {style: labelStyle}, displayIndex, " of ", displayCount)
+	            ), 
+	            React.createElement("div", {style: { flexShrink: 0, flexGrow: 1}}, 
+	                React.createElement("input", {
+	                    ref: "searchInput", 
+	                    type: "text", 
+	                    value: this.props.searchString, 
+	                    onChange: this.updateSearchString, 
+	                    style: inputStyle}), 
+	                React.createElement("br", null), 
+	                React.createElement("input", {
+	                    ref: "replaceInput", 
+	                    type: "text", 
+	                    value: this.props.replaceString, 
+	                    onChange: this.updateReplaceString, 
+	                    style: inputStyle}), 
+	                React.createElement("br", null), 
+	                React.createElement("div", null, 
+	                    React.createElement("button", {
+	                        ref: "previousButton", 
+	                        style: { float: 'left', marginRight: gridSpace}, 
+	                        onClick: this.handlePreviousSearchResult, 
+	                        disabled: disabled}, "<"), 
+	                    React.createElement("button", {
+	                        ref: "nextButton", 
+	                        style: { float: 'left'}, 
+	                        onClick: this.handleNextSearchResult, 
+	                        disabled: disabled}, ">"), 
+
+	                    React.createElement("button", {
+	                        ref: "replaceAllButton", 
+	                        style: { float: 'right', marginLeft: gridSpace}, 
+	                        onClick: this.handleReplaceAll, 
+	                        disabled: disabled}, "Replace All"), 
+	                    React.createElement("button", {
+	                        ref: "replaceButton", 
+	                        style: { float: 'right'}, 
+	                        onClick: this.handleReplace, 
+	                        disabled: disabled}, "Replace")
+	                )
+	            )
+	        );
+	    }
+
+	});
+
+	module.exports = SearchAndReplaceDialog;
+
+
+/***/ },
 /* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var diff = __webpack_require__(104);
-	var splitDiff = __webpack_require__(101);
-	var stringArrayDiff = __webpack_require__(102);
+	var splitDiff = __webpack_require__(95);
+	var stringArrayDiff = __webpack_require__(96);
 
 	var cx = React.addons.classSet;
 
@@ -25805,37 +25907,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* This note applies to rcss, react, and underscore.
-	 *
-	 * We're faking a node module for this package by just exporting the global.
-	 * There are a few complications which led us to this solution as a temporary
-	 * fix.
-	 *
-	 * - Browserify can slow down a lot when you include the other packages (and
-	 *   their dependency graphs). We were also battling general browserify
-	 *   slowness at this time - browserify 3.4.0 is "good" but later versions
-	 *   (3.53 if I remember correctly) are terribly slow (on the order of 20x
-	 *   slower).
-	 *
-	 * - I'm not clear on the details of packaging this so we don't duplicate
-	 *   dependencies anywhere. For instance when packaging perseus for webapp we
-	 *   need to be careful not to include packages like underscore from our
-	 *   dependencies or from the packages we depend on. (note: this is a very good
-	 *   opportunity to either explain how existing tools solve the problem or
-	 *   create a new tool to solve it)
-	 *
-	 * - Joel (and Jack)
-	 */
-	module.exports = window.React;
-
-
-/***/ },
-/* 61 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var _ = __webpack_require__(59);
 
-	var Graphie = __webpack_require__(74);
+	var Graphie = __webpack_require__(73);
 	var Util = __webpack_require__(3);
 
 	// The global cache of label data. Its format is:
@@ -26131,10 +26205,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 62 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	/* A checkbox that syncs its value to props using the
@@ -26196,7 +26270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 63 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26244,6 +26318,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	module.exports = StubTagEditor;
+
+
+/***/ },
+/* 63 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* This note applies to rcss, react, and underscore.
+	 *
+	 * We're faking a node module for this package by just exporting the global.
+	 * There are a few complications which led us to this solution as a temporary
+	 * fix.
+	 *
+	 * - Browserify can slow down a lot when you include the other packages (and
+	 *   their dependency graphs). We were also battling general browserify
+	 *   slowness at this time - browserify 3.4.0 is "good" but later versions
+	 *   (3.53 if I remember correctly) are terribly slow (on the order of 20x
+	 *   slower).
+	 *
+	 * - I'm not clear on the details of packaging this so we don't duplicate
+	 *   dependencies anywhere. For instance when packaging perseus for webapp we
+	 *   need to be careful not to include packages like underscore from our
+	 *   dependencies or from the packages we depend on. (note: this is a very good
+	 *   opportunity to either explain how existing tools solve the problem or
+	 *   create a new tool to solve it)
+	 *
+	 * - Joel (and Jack)
+	 */
+	module.exports = window.React;
 
 
 /***/ },
@@ -26349,7 +26451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	/* This component makes its children a drag target. Example:
@@ -26437,7 +26539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	// TODO(joel) - require MathJax / katex so they don't have to be global
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 
 	var pendingScripts = [];
 	var needsProcess = false;
@@ -26731,7 +26833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var RCSS = __webpack_require__(116);
 	var _ = __webpack_require__(59);
 
@@ -26987,227 +27089,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 73 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * A <select> component rendered with classes instead of natively,
-	 * so that the classes may be styled/animated/magics
-	 *
-	 * Usage:
-	 * <FancySelect value={1}>
-	 *     <FancySelect.Option value={0}>text0</FancySelect.Option>
-	 *     <FancySelect.Option value={1}>text1</FancySelect.Option>
-	 *     <FancySelect.Option value={2}>text2</FancySelect.Option>
-	 * </FancySelect>
-	 *
-	 * Here be dragons.
-	 */
-
-	var React = __webpack_require__(60);
-
-	var DROPDOWN_OFFSET = 76;
-
-	var FancyOption = React.createClass({displayName: 'FancyOption',
-	    render: function() {
-	        throw new Error("FancyOption shouldn't ever be actually rendered");
-	    }
-	});
-
-	var FancySelect = React.createClass({displayName: 'FancySelect',
-
-	    propTypes: {
-	        value: React.PropTypes.any.isRequired,
-	        className: React.PropTypes.string,
-	        onChange: React.PropTypes.func
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            onChange: function()  { }
-	        };
-	    },
-
-	    getInitialState: function() {
-	        return {
-	            active: false,
-	            // Keep track of whether we've closed this select
-	            // from open so that we can only run CSS animations
-	            // when closing/opening, and not on page load
-	            // If we just use active, we get a closing animation
-	            // when the element loads :(.
-	            closed: false,
-	            // Used to namespace $(document) event handlers
-	            selectorNamespace: _.uniqueId("fancy")
-	        };
-	    },
-
-	    render: function() {
-	        var children = _.flatten([this.props.children || []]);
-
-	        // Some css-box magic:
-	        // We render all of the options on top of each other in a hidden,
-	        // floated span. This span then forces the <FancySelect>'s
-	        // width to be large enough to fit the largest option when
-	        // selected, so that the page doesn't have to re-flow when changing
-	        // select items.
-	        var optionSizer = React.createElement("span", {style: {
-	                    display: "inline-block",
-	                    float: "left",
-	                    visibility: "hidden",
-	                    height: 0
-	                }}, 
-	            _.map(children, function(option)  {
-	                return React.createElement("div", {className: "fancy-select-value-hidden", 
-	                            style: {height: 0}}, 
-	                    option.props.children
-	                );
-	            })
-	        );
-
-	        var selectedOption = _.find(
-	            children,
-	            function(c)  {return c.props.value === this.props.value;}.bind(this)
-	        );
-
-	        var selectBoxClassName = React.addons.classSet({
-	            "fancy-select": true,
-	            active: this.state.active,
-	            closed: this.state.closed
-	        });
-
-	        var selectBox = React.createElement("div", {className: selectBoxClassName, 
-	                onClick: this._swapActive}, 
-	                optionSizer, 
-	                /* position this absolutely so it goes on top
-	                    of the optionSizer, not next to it */
-	                React.createElement("span", {
-	                        className: "fancy-select-value", 
-	                        style: {position: "absolute"}}, 
-	                    selectedOption.props.children
-	                )
-	        );
-
-	        var options = _.map(children, function(option, i)  {
-	            // options can specify visible={true|false|null/undefined} to
-	            // control whether they are displayed always, never, or when
-	            // active (the default). `true` is useful if you want to manage
-	            // visibility manually via css.
-	            var visible = option.props.visible != null ?
-	                    option.props.visible :
-	                    this.state.active;
-	            if (!visible) {
-	                return null;
-	            }
-
-	            var className = React.addons.classSet({
-	                "fancy-option": true,
-	                active: this.state.active,
-	                closed: this.state.closed,
-	                selected: option.props.value === this.props.value
-	            });
-	            if (option.props.className) {
-	                className += " " + option.props.className;
-	            }
-
-	            var translate;
-	            var transition;
-	            if (this.state.active) {
-	                var offset = DROPDOWN_OFFSET * i;
-	                translate = "translate3d(0, " + offset + "px, 0)";
-	                transition = "0.35s ease-in";
-	            } else {
-	                translate = "translate3d(0, 0, 0)";
-	                transition = "0.35s ease-out";
-	            }
-	            var style = _.extend({}, option.props.style, {
-	                WebkitTransform: translate,
-	                transform: translate,
-	                WebkitTransition: transition,
-	                transition: transition
-	            });
-
-	            return React.createElement("li", {
-	                    className: className, 
-	                    key: i, 
-	                    style: style, 
-	                    onClick: function()  {
-	                        this._unbindClickHandler();
-	                        this.props.onChange(option.props.value, option);
-	                        this.setState({
-	                            active: false,
-	                            closed: true
-	                        });
-	                    }.bind(this)}, 
-	                option.props.children
-	            );
-	        }.bind(this));
-
-	        var optionsBoxClassName = React.addons.classSet({
-	            "fancy-select-options": true,
-	            active: this.state.active,
-	            closed: this.state.closed
-	        });
-
-	        var height = DROPDOWN_OFFSET * _.size(children);
-	        var style = {
-	            clip: "rect(0, auto, " + height + "px, 0)"
-	        };
-
-	        return React.createElement("div", {className: this.props.className}, 
-	            selectBox, 
-	            React.createElement("div", {className: "fancy-select-options-wrapper"}, 
-	                React.createElement("ul", {className: optionsBoxClassName, style: style}, 
-	                    options
-	                )
-	            )
-	        );
-	    },
-
-	    _swapActive: function() {
-	        var active = !this.state.active;
-	        var closed = !active;
-
-	        // Prepare to detect clicks outside of the dropdown
-	        if (active) {
-	            this._bindClickHandler();
-	        } else {
-	            this._unbindClickHandler();
-	        }
-
-	        this.setState({
-	            active: active,
-	            closed: closed
-	        });
-	    },
-
-	    _bindClickHandler: function() {
-	        // Close the dropdown when the user clicks elsewhere
-	        $(document).on("vclick." + this.state.selectorNamespace, function(e)  {
-	            // Detect whether the target has our React DOM node as a parent
-	            var $this = $(this.getDOMNode());
-	            var $closestWidget = $(e.target).closest($this);
-	            if (!$closestWidget.length) {
-	                this._swapActive();
-	            }
-	        }.bind(this));
-	    },
-
-	    _unbindClickHandler: function() {
-	        $(document).off("." + this.state.selectorNamespace);
-	    },
-
-	    componentWillUnmount: function() {
-	        this._unbindClickHandler();
-	    },
-	});
-
-	FancySelect.Option = FancyOption;
-
-	module.exports = FancySelect;
-
-
-/***/ },
-/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(59);
@@ -27507,13 +27388,1434 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 74 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * A <select> component rendered with classes instead of natively,
+	 * so that the classes may be styled/animated/magics
+	 *
+	 * Usage:
+	 * <FancySelect value={1}>
+	 *     <FancySelect.Option value={0}>text0</FancySelect.Option>
+	 *     <FancySelect.Option value={1}>text1</FancySelect.Option>
+	 *     <FancySelect.Option value={2}>text2</FancySelect.Option>
+	 * </FancySelect>
+	 *
+	 * Here be dragons.
+	 */
+
+	var React = __webpack_require__(63);
+
+	var DROPDOWN_OFFSET = 76;
+
+	var FancyOption = React.createClass({displayName: 'FancyOption',
+	    render: function() {
+	        throw new Error("FancyOption shouldn't ever be actually rendered");
+	    }
+	});
+
+	var FancySelect = React.createClass({displayName: 'FancySelect',
+
+	    propTypes: {
+	        value: React.PropTypes.any.isRequired,
+	        className: React.PropTypes.string,
+	        onChange: React.PropTypes.func
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            onChange: function()  { }
+	        };
+	    },
+
+	    getInitialState: function() {
+	        return {
+	            active: false,
+	            // Keep track of whether we've closed this select
+	            // from open so that we can only run CSS animations
+	            // when closing/opening, and not on page load
+	            // If we just use active, we get a closing animation
+	            // when the element loads :(.
+	            closed: false,
+	            // Used to namespace $(document) event handlers
+	            selectorNamespace: _.uniqueId("fancy")
+	        };
+	    },
+
+	    render: function() {
+	        var children = _.flatten([this.props.children || []]);
+
+	        // Some css-box magic:
+	        // We render all of the options on top of each other in a hidden,
+	        // floated span. This span then forces the <FancySelect>'s
+	        // width to be large enough to fit the largest option when
+	        // selected, so that the page doesn't have to re-flow when changing
+	        // select items.
+	        var optionSizer = React.createElement("span", {style: {
+	                    display: "inline-block",
+	                    float: "left",
+	                    visibility: "hidden",
+	                    height: 0
+	                }}, 
+	            _.map(children, function(option)  {
+	                return React.createElement("div", {className: "fancy-select-value-hidden", 
+	                            style: {height: 0}}, 
+	                    option.props.children
+	                );
+	            })
+	        );
+
+	        var selectedOption = _.find(
+	            children,
+	            function(c)  {return c.props.value === this.props.value;}.bind(this)
+	        );
+
+	        var selectBoxClassName = React.addons.classSet({
+	            "fancy-select": true,
+	            active: this.state.active,
+	            closed: this.state.closed
+	        });
+
+	        var selectBox = React.createElement("div", {className: selectBoxClassName, 
+	                onClick: this._swapActive}, 
+	                optionSizer, 
+	                /* position this absolutely so it goes on top
+	                    of the optionSizer, not next to it */
+	                React.createElement("span", {
+	                        className: "fancy-select-value", 
+	                        style: {position: "absolute"}}, 
+	                    selectedOption.props.children
+	                )
+	        );
+
+	        var options = _.map(children, function(option, i)  {
+	            // options can specify visible={true|false|null/undefined} to
+	            // control whether they are displayed always, never, or when
+	            // active (the default). `true` is useful if you want to manage
+	            // visibility manually via css.
+	            var visible = option.props.visible != null ?
+	                    option.props.visible :
+	                    this.state.active;
+	            if (!visible) {
+	                return null;
+	            }
+
+	            var className = React.addons.classSet({
+	                "fancy-option": true,
+	                active: this.state.active,
+	                closed: this.state.closed,
+	                selected: option.props.value === this.props.value
+	            });
+	            if (option.props.className) {
+	                className += " " + option.props.className;
+	            }
+
+	            var translate;
+	            var transition;
+	            if (this.state.active) {
+	                var offset = DROPDOWN_OFFSET * i;
+	                translate = "translate3d(0, " + offset + "px, 0)";
+	                transition = "0.35s ease-in";
+	            } else {
+	                translate = "translate3d(0, 0, 0)";
+	                transition = "0.35s ease-out";
+	            }
+	            var style = _.extend({}, option.props.style, {
+	                WebkitTransform: translate,
+	                transform: translate,
+	                WebkitTransition: transition,
+	                transition: transition
+	            });
+
+	            return React.createElement("li", {
+	                    className: className, 
+	                    key: i, 
+	                    style: style, 
+	                    onClick: function()  {
+	                        this._unbindClickHandler();
+	                        this.props.onChange(option.props.value, option);
+	                        this.setState({
+	                            active: false,
+	                            closed: true
+	                        });
+	                    }.bind(this)}, 
+	                option.props.children
+	            );
+	        }.bind(this));
+
+	        var optionsBoxClassName = React.addons.classSet({
+	            "fancy-select-options": true,
+	            active: this.state.active,
+	            closed: this.state.closed
+	        });
+
+	        var height = DROPDOWN_OFFSET * _.size(children);
+	        var style = {
+	            clip: "rect(0, auto, " + height + "px, 0)"
+	        };
+
+	        return React.createElement("div", {className: this.props.className}, 
+	            selectBox, 
+	            React.createElement("div", {className: "fancy-select-options-wrapper"}, 
+	                React.createElement("ul", {className: optionsBoxClassName, style: style}, 
+	                    options
+	                )
+	            )
+	        );
+	    },
+
+	    _swapActive: function() {
+	        var active = !this.state.active;
+	        var closed = !active;
+
+	        // Prepare to detect clicks outside of the dropdown
+	        if (active) {
+	            this._bindClickHandler();
+	        } else {
+	            this._unbindClickHandler();
+	        }
+
+	        this.setState({
+	            active: active,
+	            closed: closed
+	        });
+	    },
+
+	    _bindClickHandler: function() {
+	        // Close the dropdown when the user clicks elsewhere
+	        $(document).on("vclick." + this.state.selectorNamespace, function(e)  {
+	            // Detect whether the target has our React DOM node as a parent
+	            var $this = $(this.getDOMNode());
+	            var $closestWidget = $(e.target).closest($this);
+	            if (!$closestWidget.length) {
+	                this._swapActive();
+	            }
+	        }.bind(this));
+	    },
+
+	    _unbindClickHandler: function() {
+	        $(document).off("." + this.state.selectorNamespace);
+	    },
+
+	    componentWillUnmount: function() {
+	        this._unbindClickHandler();
+	    },
+	});
+
+	FancySelect.Option = FancyOption;
+
+	module.exports = FancySelect;
+
+
+/***/ },
 /* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
+	var _     = __webpack_require__(59);
+
+	var PT    = React.PropTypes;
+
+	var sortableDragging = {
+	    cursor: "ns-resize"
+	};
+
+	var sortableEnabled = {
+	    cursor: "pointer"
+	};
+
+	var userSelect = function(rhs)  {
+	    return {
+	        "-webkit-user-select": rhs,
+	        "-khtml-user-drag": rhs,
+	        "-khtml-user-select": rhs,
+	        "-moz-user-select": rhs,
+	        "-ms-user-select": rhs,
+	        userSelect: rhs
+	    };
+	};
+
+	var sortableDisabled = userSelect("none");
+
+	// Takes an array of components to sort
+	var SortableArea = React.createClass({displayName: 'SortableArea',
+	    propTypes: {
+	        components: PT.arrayOf(PT.node).isRequired,
+	        onReorder: PT.func.isRequired,
+	        verify: PT.func
+	    },
+	    render: function() {
+	        var sortables = _(this.state.components).map(function(component, index) 
+	            {return React.createElement(SortableItem, {
+	                index: index, 
+	                component: component, 
+	                area: this, 
+	                key: component.key, 
+	                draggable: component.props.draggable, 
+	                dragging: index === this.state.dragging});}.bind(this)
+	        );
+	        return React.createElement("ol", {className: this.props.className, style: this.props.style}, 
+	            sortables
+	        );
+	    },
+	    getDefaultProps: function() {
+	        return { verify: function()  {return true;} };
+	    },
+	    getInitialState: function() {
+	        return {
+	            // index of the component being dragged
+	            dragging: null,
+	            components: this.props.components
+	        };
+	    },
+	    componentWillReceiveProps: function(nextProps) {
+	        this.setState({ components: nextProps.components });
+	    },
+	    // Alternatively send each handler to each component individually,
+	    // partially applied
+	    onDragStart: function(startIndex) {
+	        this.setState({ dragging: startIndex });
+	    },
+	    onDrop: function() {
+	        // tell the parent component
+	        this.setState({ dragging: null });
+	        this.props.onReorder(this.state.components);
+	    },
+	    onDragEnter: function(enterIndex) {
+	        // When a label is first dragged it triggers a dragEnter with itself,
+	        // which we don't care about.
+	        if (this.state.dragging === enterIndex) {
+	            return;
+	        }
+
+	        var newComponents = this.state.components.slice();
+
+	        // splice the tab out of its old position
+	        var removed = newComponents.splice(this.state.dragging, 1);
+	        // ... and into its new position
+	        newComponents.splice(enterIndex, 0, removed[0]);
+
+	        var verified = this.props.verify(newComponents);
+	        if (verified) {
+	            this.setState({
+	                dragging: enterIndex,
+	                components: newComponents
+	            });
+	        }
+	        return verified;
+	    },
+
+	    // Firefox refuses to drag an element unless you set data on it. Hackily
+	    // add data each time an item is dragged.
+	    componentDidMount: function() {
+	        this._setDragEvents();
+	    },
+	    componentDidUpdate: function() {
+	        this._setDragEvents();
+	    },
+	    _listenEvent: function(e) {
+	        e.dataTransfer.setData('hackhackhack', 'because browsers!');
+	    },
+	    _cancelEvent: function(e) {
+	        // prevent the browser from redirecting to 'because browsers!'
+	        e.preventDefault();
+	    },
+	    _setDragEvents: function() {
+	        this._dragItems = this._dragItems || [];
+	        var items = this.getDOMNode().querySelectorAll('[draggable=true]');
+	        var oldItems = _(this._dragItems).difference(items);
+	        var newItems = _(items).difference(this._dragItems);
+
+	        _(newItems).each(function(dragItem)  {
+	            dragItem.addEventListener('dragstart', this._listenEvent);
+	            dragItem.addEventListener('drop',      this._cancelEvent);
+	        }.bind(this));
+
+	        _(oldItems).each(function(dragItem)  {
+	            dragItem.removeEventListener('dragstart', this._listenEvent);
+	            dragItem.removeEventListener('drop',      this._cancelEvent);
+	        }.bind(this));
+	    }
+	});
+
+	// An individual sortable item
+	var SortableItem = React.createClass({displayName: 'SortableItem',
+	    propTypes: {
+	        // item: what is this?
+	    },
+	    render: function() {
+	        var dragState = "sortable-disabled";
+	        if (this.props.dragging) {
+	            dragState = "sortable-dragging";
+	        } else if (this.props.draggable) {
+	            dragState = "sortable-enabled";
+	        }
+
+	        return React.createElement("li", {draggable: this.props.draggable, 
+	                   className: dragState, 
+	                   onDragStart: this.handleDragStart, 
+	                   onDrop: this.handleDrop, 
+	                   onDragEnter: this.handleDragEnter, 
+	                   onDragOver: this.handleDragOver}, 
+	            this.props.component
+	        );
+	    },
+	    handleDragStart: function(e) {
+	        e.nativeEvent.dataTransfer.effectAllowed = "move";
+	        this.props.area.onDragStart(this.props.index);
+	    },
+	    handleDrop: function() {
+	        this.props.area.onDrop(this.props.index);
+	    },
+	    handleDragEnter: function(e) {
+	        var verified = this.props.area.onDragEnter(this.props.index);
+	        // Ideally this would change the cursor based on whether this is a
+	        // valid place to drop.
+	        e.nativeEvent.dataTransfer.effectAllowed = verified ? "move" : "none";
+	    },
+	    handleDragOver: function(e) {
+	        // allow a drop by preventing default handling
+	        e.preventDefault();
+	    }
+	});
+
+	module.exports = SortableArea;
+
+
+/***/ },
+/* 76 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(63);
+	var _ = __webpack_require__(59);
+
+	// TODO(joel/jack) fix z-index issues https://s3.amazonaws.com/uploads.hipchat.com/6574/29028/yOApjwmgiMhEZYJ/Screen%20Shot%202014-05-30%20at%203.34.18%20PM.png
+	// z-index: 3 on perseus-formats-tooltip seemed to work
+
+	/**
+	 * A generic tooltip library for React.js
+	 *
+	 * This should eventually end up in react-components
+	 *
+	 * Interface: ({a, b} means one of a or b)
+	 * var Tooltip = require("./tooltip.jsx");
+	 * <Tooltip
+	 *         className="class-for-tooltip-contents"
+	 *         horizontalPosition="left" // one of "left", "right"
+	 *         horizontalAlign="left" // one of "left", "right"
+	 *         verticalPosition="bottom" // one of "top", "bottom"
+	 *         arrowSize={10} // arrow size in pixels
+	 *         borderColor="#ccc" // color of the border for the tooltip
+	 *         show={true} // whether the tooltip should currently be visible
+	 *         >
+	 *     <TargetElementOfTheTooltip />
+	 *     <TooltipContents1 />
+	 *     <TooltipContents2 />
+	 * </Tooltip>
+	 *
+	 * To show/hide the tooltip, the parent component should call the
+	 * .show() and .hide() methods of the tooltip when appropriate.
+	 * (These are usually set up as handlers of events on the target element.)
+	 *
+	 * Notes:
+	 *     className should not specify a border; that is handled by borderColor
+	 *     so that the arrow and tooltip match
+	 */
+
+	//          __,,--``\\
+	//  _,,-''``         \\     ,
+	// '----------_.------'-.___|\__
+	//    _.--''``    `)__   )__   @\__
+	//   (  .. ''---/___,,E/__,E'------`
+	//    `-''`''
+	// Here be dragons.
+
+	var zIndex = 10;
+
+	var Triangle = React.createClass({displayName: 'Triangle',
+	    propTypes: {
+	        color: React.PropTypes.string.isRequired,
+	        left: React.PropTypes.number.isRequired,
+	        "top": React.PropTypes.number.isRequired,
+	        width: React.PropTypes.number.isRequired,
+	        height: React.PropTypes.number.isRequired,
+	        horizontalDirection: React.PropTypes.oneOf(
+	            ["left", "right"]
+	        ).isRequired,
+	        verticalDirection: React.PropTypes.oneOf(
+	            ["top", "bottom"]
+	        ).isRequired,
+	    },
+
+	    render: function() {
+	        var borderLeft, borderRight, borderTop, borderBottom;
+
+	        var hBorder = (this.props.width + "px solid transparent");
+	        if (this.props.horizontalDirection === "right") {
+	            borderLeft = hBorder;
+	        } else {
+	            borderRight = hBorder;
+	        }
+
+	        var vBorder = (this.props.height + "px solid " + this.props.color);
+	        if (this.props.verticalDirection === "top") {
+	            borderTop = vBorder;
+	        } else {
+	            borderBottom = vBorder;
+	        }
+
+	        return React.createElement("div", {style: {
+	            display: "block",
+	            height: 0,
+	            width: 0,
+	            position: "absolute",
+	            left: this.props.left,
+	            "top": this.props["top"],
+	            borderLeft: borderLeft,
+	            borderRight: borderRight,
+	            borderTop: borderTop,
+	            borderBottom: borderBottom
+	        }});
+	    }
+	});
+
+	var TooltipArrow = React.createClass({displayName: 'TooltipArrow',
+	    propTypes: {
+	        position: React.PropTypes.string,
+	        visibility: React.PropTypes.string,
+	        left: React.PropTypes.number,
+	        "top": React.PropTypes.number,
+	        color: React.PropTypes.string.isRequired,  // a css color
+	        border: React.PropTypes.string.isRequired,  // a css color
+	        width: React.PropTypes.number.isRequired,
+	        height: React.PropTypes.number.isRequired,
+	        horizontalDirection: React.PropTypes.oneOf(
+	            ["left", "right"]
+	        ).isRequired,
+	        verticalDirection: React.PropTypes.oneOf(
+	            ["top", "bottom"]
+	        ).isRequired
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            position: "relative",
+	            visibility: "visible",
+	            left: 0,
+	            "top": 0
+	        };
+	    },
+
+	    // TODO(jack): Think about adding a box-shadow to the triangle here
+	    // See http://css-tricks.com/triangle-with-shadow/
+	    render: function() {
+	        var isRight = (this.props.horizontalDirection === "right");
+	        var isTop = (this.props.verticalDirection === "top");
+
+	        var frontTopOffset = isTop ? 0 : 1;
+	        var borderTopOffset = isTop ? 0 : -1;
+
+	        return React.createElement("div", {style: {
+	                display: "block",
+	                position: this.props.position,
+	                visibility: this.props.visibility,
+	                left: this.props.left,
+	                "top": this.props["top"],
+	                width: this.props.width + 2,
+	                height: this.props.height + 1,
+	                marginTop: -1,
+	                marginBottom: -2,
+	                zIndex: zIndex
+	            }}, 
+	            /* The background triangle used to create the effect of a
+	                border around the foreground triangle*/
+	            React.createElement(Triangle, {
+	                horizontalDirection: this.props.horizontalDirection, 
+	                verticalDirection: this.props.verticalDirection, 
+	                color: this.props.border, 
+	                left: 0, 
+	                top: borderTopOffset, 
+	                width: this.props.width + 2, // one extra for the diagonal
+	                height: this.props.height + 2}), 
+	            /* The foreground triangle covers all but the left/right edges
+	                of the background triangle */
+	            React.createElement(Triangle, {
+	                horizontalDirection: this.props.horizontalDirection, 
+	                verticalDirection: this.props.verticalDirection, 
+	                color: this.props.color, 
+	                left: 1, 
+	                top: frontTopOffset, 
+	                width: this.props.width, 
+	                height: this.props.height})
+	        );
+	    }
+	});
+
+	var VERTICAL_CORNERS = {
+	    "top": {
+	        "top": "-100%"
+	    },
+	    bottom: {
+	        "top": 0
+	    }
+	};
+
+	var HORIZONTAL_CORNERS = {
+	    left: {
+	        targetLeft: 0,
+	    },
+
+	    right: {
+	        targetLeft: "100%",
+	    }
+	};
+
+	var HORIZONTAL_ALIGNMNENTS = {
+	    left: {
+	        tooltipLeft: 0,
+	        arrowLeft: function(arrowSize)  {return 0;}
+	    },
+	    right: {
+	        tooltipLeft: "-100%",
+	        arrowLeft: function(arrowSize)  {return -arrowSize - 2;}
+	    }
+	};
+
+
+	var Tooltip = React.createClass({displayName: 'Tooltip',
+	    propTypes: {
+	        show: React.PropTypes.bool.isRequired,
+	        className: React.PropTypes.string,
+	        arrowSize: React.PropTypes.number,
+	        borderColor: React.PropTypes.string,
+	        verticalPosition: React.PropTypes.oneOf(
+	            _.keys(VERTICAL_CORNERS)
+	        ),
+	        horizontalPosition: React.PropTypes.oneOf(
+	            _.keys(HORIZONTAL_CORNERS)
+	        ),
+	        horizontalAlign: React.PropTypes.oneOf(
+	            _.keys(HORIZONTAL_ALIGNMNENTS)
+	        ),
+	        children: React.PropTypes.arrayOf(
+	            React.PropTypes.element
+	        ).isRequired
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            className: "",
+	            arrowSize: 10,
+	            borderColor: "#ccc",
+	            verticalPosition: "bottom",
+	            horizontalPosition: "left",
+	            horizontalAlign: "left"
+	        };
+	    },
+
+	    getInitialState: function() {
+	        return {
+	            height: null  // used for offsetting "top" positioned tooltips
+	        };
+	    },
+
+	    componentWillReceiveProps: function() {
+	        // If the contents have changed, reset our measure of the height
+	        this.setState({height: null});
+	    },
+
+	    render: function() {
+	        var isTooltipAbove = this.props.verticalPosition === "top";
+
+	        /* We wrap the entire output in a span so that it displays inline */
+	        return React.createElement("span", null, 
+	            isTooltipAbove && this._renderToolTipDiv(isTooltipAbove), 
+
+	            /* We wrap our input in a div so that we can put the tooltip in a
+	                div above/below it */
+	            React.createElement("div", null, 
+	                _.first(this.props.children)
+	            ), 
+
+	            !isTooltipAbove && this._renderToolTipDiv()
+	        );
+	    },
+
+	    _renderToolTipDiv: function(isTooltipAbove) {
+	        var settings = _.extend({},
+	            HORIZONTAL_CORNERS[this.props.horizontalPosition],
+	            HORIZONTAL_ALIGNMNENTS[this.props.horizontalAlign],
+	            VERTICAL_CORNERS[this.props.verticalPosition]
+	        );
+
+	        var arrowAbove;
+	        var arrowBelow;
+
+	        if (isTooltipAbove) {
+	            // We put an absolutely positioned arrow in the correct place
+	            arrowAbove = React.createElement(TooltipArrow, {
+	                verticalDirection: "top", 
+	                horizontalDirection: this.props.horizontalAlign, 
+	                position: "absolute", 
+	                color: "white", 
+	                border: this.props.borderColor, 
+	                left: settings.arrowLeft(this.props.arrowSize), 
+	                top: -this.props.arrowSize + 2, 
+	                width: this.props.arrowSize, 
+	                height: this.props.arrowSize, 
+	                zIndex: zIndex});
+
+	            // And we use a visibility: hidden arrow below to shift up the
+	            // content by the correct amount
+	            arrowBelow = React.createElement(TooltipArrow, {
+	                verticalDirection: "top", 
+	                horizontalDirection: this.props.horizontalAlign, 
+	                visibility: "hidden", 
+	                color: "white", 
+	                border: this.props.borderColor, 
+	                left: settings.arrowLeft(this.props.arrowSize), 
+	                top: -1, 
+	                width: this.props.arrowSize, 
+	                height: this.props.arrowSize, 
+	                zIndex: zIndex});
+	        } else {
+	            arrowAbove = React.createElement(TooltipArrow, {
+	                verticalDirection: "bottom", 
+	                horizontalDirection: this.props.horizontalAlign, 
+	                color: "white", 
+	                border: this.props.borderColor, 
+	                left: settings.arrowLeft(this.props.arrowSize), 
+	                top: -1, 
+	                width: this.props.arrowSize, 
+	                height: this.props.arrowSize, 
+	                zIndex: zIndex});
+
+	            arrowBelow = null;
+	        }
+
+	        /* A positioned div below the input to be the parent for our
+	            tooltip */
+	        return React.createElement("div", {style: {
+	                position: "relative",
+	                height: 0,
+	                display: this.props.show ? "block" : "none",
+	                }}, 
+	            React.createElement("div", {ref: "tooltipContainer", className: "tooltipContainer", style: {
+	                        position: "absolute",
+	                        // height must start out undefined, not null, so that
+	                        // we can measure the actual height with jquery.
+	                        // This is used to position the tooltip with top: -100%
+	                        // when in verticalPosition: "top" mode
+	                        height: this.state.height || undefined,
+	                        left: settings.targetLeft
+	                    }}, 
+	                arrowAbove, 
+
+	                /* The contents of the tooltip */
+	                React.createElement("div", {className: this.props.className, 
+	                        ref: "tooltipContent", 
+	                        style: {
+	                            position: "relative",
+	                            top: settings["top"],
+	                            left: settings.tooltipLeft,
+	                            border: "1px solid " + this.props.borderColor,
+	                            WebkitBoxShadow: "0 1px 3px " +
+	                                    this.props.borderColor,
+	                            MozBoxShadow: "0 1px 3px " +
+	                                    this.props.borderColor,
+	                            boxShadow: "0 1px 3px " +
+	                                    this.props.borderColor,
+	                            zIndex: zIndex - 1
+	                        }}, 
+	                    _.rest(this.props.children)
+	                ), 
+
+	                arrowBelow
+	            )
+	        );
+	    },
+
+	    componentDidMount: function() {
+	        this._updateHeight();
+	    },
+
+	    componentDidUpdate: function() {
+	        this._updateHeight();
+	    },
+
+	    _updateHeight: function() {
+	        var height = this.refs.tooltipContainer.getDOMNode().offsetHeight;
+	        if (height !== this.state.height) {
+	            this.setState({height:height});
+	        }
+	    }
+	});
+
+	// Sorry.  // Apology-Oriented-Programming
+	module.exports = Tooltip;
+
+
+/***/ },
+/* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(63);
+	var Tooltip = __webpack_require__(76);
+	var _ = __webpack_require__(59);
+
+	var ApiClassNames = __webpack_require__(13).ClassNames;
+	var MathInput  = __webpack_require__(78);
+	var Renderer   = __webpack_require__(11);
+	var TextInput  = __webpack_require__(88);
+	var MathOutput = __webpack_require__(90);
+
+	var captureScratchpadTouchStart =
+	        __webpack_require__(3).captureScratchpadTouchStart;
+
+	var MATH = "math";
+	var TEXT = "text";
+	var TEX = "tex";
+
+	var InputWithExamples = React.createClass({displayName: 'InputWithExamples',
+	    propTypes: {
+	        type: React.PropTypes.oneOf([MATH, TEXT, TEX]),
+	        value: React.PropTypes.string,
+	        onChange: React.PropTypes.func.isRequired,
+	        className: React.PropTypes.string,
+	        examples: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+	        shouldShowExamples: React.PropTypes.bool,
+	        convertDotToTimes: React.PropTypes.bool,
+	        buttonSet: React.PropTypes.string,
+	        buttonsVisible: React.PropTypes.oneOf(['always', 'never', 'focused']),
+	        onFocus: React.PropTypes.func,
+	        onBlur: React.PropTypes.func,
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            type: TEXT,
+	            shouldShowExamples: true,
+	            onFocus: function() { },
+	            onBlur: function() { }
+	        };
+	    },
+
+	    getInitialState: function() {
+	        return {
+	            focused: false,
+	            showExamples: false
+	        };
+	    },
+
+	    _getInputClassName: function() {
+	        // <MathOutput> is a special component that manages its own class and
+	        // state, as it's a <span> that wants to act like an <input>.
+	        if (this.props.type === TEX) {
+	            return this.props.className;
+	        }
+
+	        // Otherwise, we need to add these INPUT and FOCUSED tags here.
+	        var className = ApiClassNames.INPUT + " " + ApiClassNames.INTERACTIVE;
+	        if (this.state.focused) {
+	            className += " " + ApiClassNames.FOCUSED;
+	        }
+	        if (this.props.className) {
+	            className += " " + this.props.className;
+	        }
+	        return className;
+	    },
+
+	    _getPropsForInputType: function() {
+	        // Minimal set of props, used by each input type
+	        var inputProps = {
+	            ref: "input",
+	            className: this._getInputClassName(),
+	            value: this.props.value,
+	            onFocus: this._handleFocus,
+	            onBlur: this._handleBlur
+	        };
+
+	        if (this.props.type === TEX) {
+	            return inputProps;
+	        }
+
+	        // Add useful props required for MATH and TEXT modes
+	        _.extend(inputProps, {
+	            buttonSet: this.props.buttonSet,
+	            buttonsVisible: this.props.buttonsVisible,
+	            onChange: this.props.onChange,
+	            onTouchStart: captureScratchpadTouchStart
+	        });
+
+	        // And add final props that are MATH- and TEXT-specific
+	        if (this.props.type === MATH) {
+	            return _.extend({
+	                convertDotToTimes: this.props.convertDotToTimes,
+	            }, inputProps);
+	        } else if (this.props.type === TEXT) {
+	            return _.extend({
+	                autoCapitalize: "off",
+	                autoComplete: "off",
+	                autoCorrect: "off",
+	                spellCheck: "false",
+	            }, inputProps);
+	        }
+	    },
+
+	    _getComponentForInputType: function() {
+	        switch (this.props.type) {
+	            case TEX:
+	                return MathOutput;
+
+	            case MATH:
+	                return MathInput;
+
+	            case TEXT:
+	                return TextInput;
+
+	            default:
+	                return null;
+	        }
+	    },
+
+	    _renderInput: function() {
+	        var inputProps = this._getPropsForInputType();
+	        var InputComponent = this._getComponentForInputType();
+	        return React.createElement(InputComponent, React.__spread({},  inputProps));
+	    },
+
+	    render: function() {
+	        var input = this._renderInput();
+
+	        // Static rendering, which doesn't include the 'tooltip' logic that the
+	        // other types require, and is hence handled separately.
+	        if (this.props.type === TEX) {
+	            return input;
+	        }
+
+	        // Else, we need to be able to show examples
+	        var examplesContent = _.map(this.props.examples, function(example)  {
+	            return "- " + example;
+	        }).join("\n");
+
+	        var showExamples = this.props.shouldShowExamples &&
+	                this.state.showExamples;
+
+	        return React.createElement(Tooltip, {
+	                ref: "tooltip", 
+	                className: "perseus-formats-tooltip", 
+	                horizontalPosition: "left", 
+	                horizontalAlign: "left", 
+	                verticalPosition: "bottom", 
+	                arrowSize: 10, 
+	                borderColor: "#ccc", 
+	                show: showExamples}, 
+	            input, 
+	            React.createElement(Renderer, {content: examplesContent})
+	        );
+	    },
+
+	    _handleFocus: function() {
+	        this.props.onFocus();
+	        this.setState({
+	            focused: true,
+	            showExamples: true
+	        });
+	    },
+
+	    show: function() {
+	        this.setState({showExamples: true});
+	    },
+
+	    hide: function() {
+	        this.setState({showExamples: false});
+	    },
+
+	    _handleBlur: function() {
+	        this.props.onBlur();
+	        this.setState({
+	            focused: false,
+	            showExamples: false
+	        });
+	    },
+
+	    focus: function() {
+	        this.refs.input.focus();
+	    },
+
+	    blur: function() {
+	        this.refs.input.blur();
+	    },
+
+	    handleChange: function(e) {
+	        this.props.onChange(e.target.value);
+	    }
+	});
+
+	module.exports = InputWithExamples;
+
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// TODO(alex): Package MathQuill
+	var MathQuill = window.MathQuill;
+	var React     = __webpack_require__(63);
+	var _         = __webpack_require__(59);
+	var cx        = React.addons.classSet;
+	var PT = React.PropTypes;
+	var TexButtons = __webpack_require__(79);
+
+	// A WYSIWYG math input that calls `onChange(LaTeX-string)`
+	var MathInput = React.createClass({displayName: 'MathInput',
+	    propTypes: {
+	        value: PT.string,
+	        onChange: PT.func.isRequired,
+	        convertDotToTimes: PT.bool,
+	        buttonsVisible: PT.oneOf(['always', 'never', 'focused']),
+	        buttonSets: TexButtons.buttonSetsType.isRequired,
+	        onFocus: PT.func,
+	        onBlur: PT.func
+	    },
+
+	    render: function() {
+	        var className = cx({
+	            "perseus-math-input": true,
+
+	            // mathquill usually adds these itself but react removes them when
+	            // updating the component.
+	            "mq-editable-field": true,
+	            "mq-math-mode": true
+	        });
+
+	        if (this.props.className) {
+	            className = className + " " + this.props.className;
+	        }
+
+	        var buttons = null;
+	        if (this._shouldShowButtons()) {
+	            buttons = React.createElement(TexButtons, {
+	                sets: this.props.buttonSets, 
+	                className: "math-input-buttons absolute", 
+	                convertDotToTimes: this.props.convertDotToTimes, 
+	                onInsert: this.insert});
+	        }
+
+	        return React.createElement("div", {style: {display: "inline-block"}}, 
+	            React.createElement("div", {style: {display: 'inline-block'}}, 
+	                React.createElement("span", {className: className, 
+	                      ref: "mathinput", 
+	                      onFocus: this.handleFocus, 
+	                      onBlur: this.handleBlur})
+	            ), 
+	            React.createElement("div", {style: {position: "relative"}}, 
+	                buttons
+	            )
+	        );
+	    },
+
+	    // handlers:
+	    // keep track of two related bits of state:
+	    // * this.state.focused - whether the buttons are currently shown
+	    // * this.mouseDown - whether a mouse click is active that started in the
+	    //   buttons div
+
+	    handleFocus: function() {
+	        this.setState({ focused: true });
+	        // TODO(joel) fix properly - we should probably allow onFocus handlers
+	        // to this property, but we need to work correctly with them.
+	        // if (this.props.onFocus) {
+	        //     this.props.onFocus();
+	        // }
+	    },
+
+	    handleMouseDown: function(event) {
+	        var focused = this.getDOMNode().contains(event.target);
+	        this.mouseDown = focused;
+	        if (!focused) {
+	            this.setState({ focused: false });
+	        }
+	    },
+
+	    handleMouseUp: function() {
+	        // this mouse click started in the buttons div so we should focus the
+	        // input
+	        if (this.mouseDown) {
+	            this.focus();
+	        }
+	        this.mouseDown = false;
+	    },
+
+	    handleBlur: function() {
+	        if (!this.mouseDown) {
+	            this.setState({ focused: false });
+	        }
+	    },
+
+	    _shouldShowButtons: function() {
+	        if (this.props.buttonsVisible === 'always') {
+	            return true;
+	        } else if (this.props.buttonsVisible === 'never') {
+	            return false;
+	        } else {
+	            return this.state.focused;
+	        }
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            value: "",
+	            convertDotToTimes: false,
+	            buttonsVisible: 'focused'
+	        };
+	    },
+
+	    getInitialState: function() {
+	        return { focused: false };
+	    },
+
+	    insert: function(value) {
+	        var input = this.mathField();
+	        if (_(value).isFunction()) {
+	            value(input);
+	        } else if (value[0] === '\\') {
+	            input.cmd(value).focus();
+	        } else {
+	            input.write(value).focus();
+	        }
+	        input.focus();
+	    },
+
+	    mathField: function(options) {
+	        // MathQuill.MathField takes a DOM node, MathQuill-ifies it if it's
+	        // seeing that node for the first time, then returns the associated
+	        // MathQuill object for that node. It is stable - will always return
+	        // the same object when called on the same DOM node.
+	        return MathQuill.MathField(this.refs.mathinput.getDOMNode(), options);
+	    },
+
+	    componentWillUnmount: function() {
+	        window.removeEventListener("mousedown", this.handleMouseDown);
+	        window.removeEventListener("mouseup", this.handleMouseUp);
+	    },
+
+	    componentDidMount: function() {
+	        window.addEventListener("mousedown", this.handleMouseDown);
+	        window.addEventListener("mouseup", this.handleMouseUp);
+
+	        // These options can currently only be set globally. (Hopefully this
+	        // will change at some point.) They appear safe to set multiple times.
+
+	        // LaTeX commands that, when typed, are immediately replaced by the
+	        // appropriate symbol. This does not include ln, log, or any of the
+	        // trig functions; those are always interpreted as commands.
+	        MathQuill.addAutoCommands("pi theta phi sqrt");
+
+	        // Pop the cursor out of super/subscripts on arithmetic operators or
+	        // (in)equalities.
+	        MathQuill.addCharsThatBreakOutOfSupSub("+-*/=<>≠≤≥");
+
+	        // Prevent excessive super/subscripts or fractions from being created
+	        // without operands, e.g. when somebody holds down a key
+	        MathQuill.disableCharsWithoutOperand("^_/");
+
+	        var initialized = false;
+
+	        // Initialize MathQuill.MathField instance
+	        this.mathField({
+	            // The name of this option is somewhat misleading, as tabbing in
+	            // MathQuill breaks you out of a nested context (fraction/script)
+	            // if you're in one, but moves focus to the next input if you're
+	            // not. Spaces (with this option enabled) are just ignored in the
+	            // latter case.
+	            //
+	            // TODO(alex): In order to allow inputting mixed numbers, we will
+	            // have to accept spaces in certain cases. The desired behavior is
+	            // still to escape nested contexts if currently in one, but to
+	            // insert a space if not (we don't expect mixed numbers in nested
+	            // contexts). We should also limit to one consecutive space.
+	            spaceBehavesLikeTab: true,
+
+	            handlers: {
+	                edited: function(mathField)  {
+	                    // This handler is guaranteed to be called on change, but
+	                    // unlike React it sometimes generates false positives.
+	                    // One of these is on initialization (with an empty string
+	                    // value), so we have to guard against that below.
+	                    var value = mathField.latex();
+
+	                    // Provide a MathQuill-compatible way to generate the
+	                    // not-equals sign without pasting unicode or typing TeX
+	                    value = value.replace(/<>/g, "\\ne");
+
+	                    // Use the specified symbol to represent multiplication
+	                    // TODO(alex): Add an option to disallow variables, in
+	                    // which case 'x' should get converted to '\\times'
+	                    if (this.props.convertDotToTimes) {
+	                        value = value.replace(/\\cdot/g, "\\times");
+
+	                        // Preserve cursor position in the common case:
+	                        // typing '*' to insert a multiplication sign.
+	                        // We do this by modifying internal MathQuill state
+	                        // directly, instead of waiting for `.latex()` to be
+	                        // called in `componentDidUpdate()`.
+	                        var left = mathField.controller.cursor[MathQuill.L];
+	                        if (left && left.ctrlSeq === '\\cdot ') {
+	                            mathField.controller.backspace();
+	                            mathField.cmd('\\times');
+	                        }
+	                    } else {
+	                        value = value.replace(/\\times/g, "\\cdot");
+	                    }
+
+	                    if (initialized && this.props.value !== value) {
+	                        this.props.onChange(value);
+	                    }
+	                }.bind(this),
+	                enter: function()  {
+	                    // This handler is called when the user presses the enter
+	                    // key. Since this isn't an actual <input> element, we have
+	                    // to manually trigger the usually automatic form submit.
+	                    $(this.refs.mathinput.getDOMNode()).submit();
+	                }.bind(this),
+	                upOutOf: function(mathField)  {
+	                    // This handler is called when the user presses the up
+	                    // arrow key, but there is nowhere in the expression to go
+	                    // up to (no numerator or exponent). For ease of use,
+	                    // interpret this as an attempt to create an exponent.
+	                    mathField.typedText("^");
+	                }
+	            }
+	        });
+
+	        // Ideally, we would be able to pass an initial value directly into
+	        // the constructor above
+	        this.mathField().latex(this.props.value);
+
+	        initialized = true;
+	    },
+
+	    componentDidUpdate: function() {
+	        if (!_.isEqual(this.mathField().latex(), this.props.value)) {
+	            this.mathField().latex(this.props.value);
+	        }
+	    },
+
+	    focus: function() {
+	        this.mathField().focus();
+	        this.setState({ focused: true });
+	    },
+
+	    blur: function() {
+	        this.mathField().blur();
+	        this.setState({ focused: false });
+	    }
+	});
+
+	module.exports = MathInput;
+
+
+/***/ },
+/* 79 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React     = __webpack_require__(63);
+	var _ = __webpack_require__(59);
+
+	var TeX       = __webpack_require__(67);
+
+	var prettyBig = { fontSize: "150%" };
+	var slightlyBig = { fontSize: "120%" };
+	var trigStyle = { marginLeft: -4 };
+	var symbStyle = { fontSize: "130%" };
+
+	// These are functions because we want to generate a new component for each use
+	// on the page rather than reusing an instance (which will cause an error).
+	// Also, it's useful for things which might look different depending on the
+	// props.
+
+	var basic = [
+	    function()  {return [React.createElement("span", {style: slightlyBig}, "+"), "+"];},
+	    function()  {return [React.createElement("span", {style: prettyBig}, "-"), "-"];},
+
+	    // TODO(joel) - display as \cdot when appropriate
+	    function(props)  {
+	        if (props.convertDotToTimes) {
+	            return [React.createElement(TeX, {style: prettyBig}, "\\times"), "\\times"];
+	        } else {
+	            return [React.createElement(TeX, {style: prettyBig}, "\\cdot"), "\\cdot"];
+	        }
+	    },
+	    function()  {return [
+	        React.createElement(TeX, {style: prettyBig}, "\\frac{□}{□}"),
+
+	        // If there's something in the input that can become part of a
+	        // fraction, typing "/" puts it in the numerator. If not, typing
+	        // "/" does nothing. In that case, enter a \frac.
+	        function(input)  {
+	            var contents = input.latex();
+	            input.typedText("/");
+	            if (input.latex() === contents) {
+	                input.cmd("\\frac");
+	            }
+	        }
+	    ];}
+	];
+
+	var buttonSets = {
+	    basic:basic,
+
+	    "basic+div": basic.concat([
+	        function()  {return [React.createElement(TeX, null, "\\div"), "\\div"];}
+	    ]),
+
+	    trig: [
+	        function()  {return [React.createElement(TeX, null, "\\sin"), "\\sin"];},
+	        function()  {return [React.createElement(TeX, null, "\\cos"), "\\cos"];},
+	        function()  {return [React.createElement(TeX, null, "\\tan"), "\\tan"];},
+	        function()  {return [React.createElement(TeX, {style: symbStyle}, "\\theta"), "\\theta"];},
+	        function()  {return [React.createElement(TeX, {style: symbStyle}, "\\phi"), "\\phi"];}
+	    ],
+
+	    prealgebra: [
+	        function()  {return [React.createElement(TeX, null, "\\sqrt{x}"), "\\sqrt"];},
+	        // TODO(joel) - how does desmos do this?
+	        // ["\\sqrt[3]{x}", "\\sqrt[3]{x}"],
+	        function()  {return [
+	            React.createElement(TeX, {style: slightlyBig}, "□^a"),
+	            function(input)  {
+	                var contents = input.latex();
+	                input.keystroke("Up");
+	                if (input.latex() === contents) {
+	                    input.typedText("a^b");
+	                }
+	            }
+	        ];},
+	        function()  {return [React.createElement(TeX, {style: slightlyBig}, "\\pi"), "\\pi"];},
+	        function()  {return [React.createElement(TeX, null, "\\div"), "\\div"];},
+	    ],
+
+	    logarithms: [
+	        function()  {return [React.createElement(TeX, null, "\\log"), "\\log"];},
+	        function()  {return [React.createElement(TeX, null, "\\ln"), "\\ln"];}
+	    ],
+
+	    "basic relations": [
+	        function()  {return [React.createElement(TeX, null, "="), "\\eq"];},
+	        function()  {return [React.createElement(TeX, null, "\\lt"), "\\lt"];},
+	        function()  {return [React.createElement(TeX, null, "\\gt"), "\\gt"];},
+	    ],
+
+	    "advanced relations": [
+	        function()  {return [React.createElement(TeX, null, "\\neq"), "\\neq"];},
+	        function()  {return [React.createElement(TeX, null, "\\leq"), "\\leq"];},
+	        function()  {return [React.createElement(TeX, null, "\\geq"), "\\geq"];},
+	    ],
+	};
+
+	var buttonSetsType = React.PropTypes.arrayOf(
+	        React.PropTypes.oneOf(_(buttonSets).keys())
+	    );
+
+	var TexButtons = React.createClass({displayName: 'TexButtons',
+	    propTypes: {
+	        sets: buttonSetsType.isRequired,
+	        onInsert: React.PropTypes.func.isRequired
+	    },
+
+	    render: function() {
+	        var buttons = _(this.props.sets).map(function(setName)  {return buttonSets[setName];});
+
+	        var buttonRows = _(buttons).map(function(row)  {return row.map(function(symbGen)  {
+	            // create a (component, thing we should send to mathquill) pair
+	            var symbol = symbGen(this.props);
+	            return React.createElement("button", {onClick: function()  {return this.props.onInsert(symbol[1]);}.bind(this), 
+	                           className: "tex-button", 
+	                           tabIndex: -1, 
+	                           type: "button"}, 
+	                symbol[0]
+	            );
+	        }.bind(this));}.bind(this));
+
+	        var buttonPopup = _(buttonRows).map(function(row, i)  {
+	            return React.createElement("div", {className: "clearfix tex-button-row", 
+	                        key: this.props.sets[i]}, 
+	                row
+	            );
+	        }.bind(this));
+
+	        return React.createElement("div", {className: this.props.className}, 
+	            buttonPopup
+	        );
+	    },
+
+	    statics: {
+	        buttonSets:buttonSets,
+	        buttonSetsType:buttonSetsType
+	    }
+	});
+
+	module.exports = TexButtons;
+
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(63);
+
+	/* You know when you want to propagate input to a parent...
+	 * but then that parent does something with the input...
+	 * then changing the props of the input...
+	 * on every keystroke...
+	 * so if some input is invalid or incomplete...
+	 * the input gets reset or otherwise effed...
+	 *
+	 * This is the solution.
+	 *
+	 * Enough melodrama. Its an input that only sends changes
+	 * to its parent on blur.
+	 */
+	var BlurInput = React.createClass({displayName: 'BlurInput',
+	    propTypes: {
+	        value: React.PropTypes.string.isRequired,
+	        onChange: React.PropTypes.func.isRequired
+	    },
+	    getInitialState: function() {
+	        return { value: this.props.value };
+	    },
+	    render: function() {
+	        return React.createElement("input", React.__spread({}, 
+	            this.props, 
+	            {type: "text", 
+	            value: this.state.value, 
+	            onChange: this.handleChange, 
+	            onBlur: this.handleBlur}));
+	    },
+	    componentWillReceiveProps: function(nextProps) {
+	        this.setState({ value: nextProps.value });
+	    },
+	    handleChange: function(e) {
+	        this.setState({ value: e.target.value });
+	    },
+	    handleBlur: function(e) {
+	        this.props.onChange(e.target.value);
+	    }
+	});
+
+	module.exports = BlurInput;
+
+
+/***/ },
+/* 81 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(63);
 	var RCSS = __webpack_require__(116);
 	var _ = __webpack_require__(59);
-	var styles = __webpack_require__(109);
+	var styles = __webpack_require__(113);
 
 	var buttonStyle = styles.button.buttonStyle;
 	var selectedStyle = styles.button.selectedStyle;
@@ -27605,19 +28907,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Changeable  = __webpack_require__(68);
 
-	var ButtonGroup = __webpack_require__(75);
+	var ButtonGroup = __webpack_require__(81);
 	var InfoTip = __webpack_require__(71);
 	var NumberInput = __webpack_require__(87);
-	var PropCheckBox = __webpack_require__(62);
-	var RangeInput = __webpack_require__(86);
+	var PropCheckBox = __webpack_require__(61);
+	var RangeInput = __webpack_require__(85);
 	var TeX = __webpack_require__(67);
 	var Util = __webpack_require__(3);
 
@@ -28097,13 +29399,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 77 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Movable = __webpack_require__(110);
-	var MovablePoint = __webpack_require__(111);
-	var MovableLine = __webpack_require__(112);
-	var MovablePolygon = __webpack_require__(113);
+	var Movable = __webpack_require__(109);
+	var MovablePoint = __webpack_require__(110);
+	var MovableLine = __webpack_require__(111);
+	var MovablePolygon = __webpack_require__(112);
 
 	var Interactive2 = {
 	    MovablePoint: MovablePoint,
@@ -28127,13 +29429,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 78 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var RCSS = __webpack_require__(116);
 	var _ = __webpack_require__(59);
-	var styles = __webpack_require__(109);
+	var styles = __webpack_require__(113);
 
 	var buttonStyle = styles.button.buttonStyle;
 	var selectedStyle = styles.button.selectedStyle;
@@ -28226,1207 +29528,67 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 79 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(60);
-	var _     = __webpack_require__(59);
-
-	var PT    = React.PropTypes;
-
-	var sortableDragging = {
-	    cursor: "ns-resize"
-	};
-
-	var sortableEnabled = {
-	    cursor: "pointer"
-	};
-
-	var userSelect = function(rhs)  {
-	    return {
-	        "-webkit-user-select": rhs,
-	        "-khtml-user-drag": rhs,
-	        "-khtml-user-select": rhs,
-	        "-moz-user-select": rhs,
-	        "-ms-user-select": rhs,
-	        userSelect: rhs
-	    };
-	};
-
-	var sortableDisabled = userSelect("none");
-
-	// Takes an array of components to sort
-	var SortableArea = React.createClass({displayName: 'SortableArea',
-	    propTypes: {
-	        components: PT.arrayOf(PT.node).isRequired,
-	        onReorder: PT.func.isRequired,
-	        verify: PT.func
-	    },
-	    render: function() {
-	        var sortables = _(this.state.components).map(function(component, index) 
-	            {return React.createElement(SortableItem, {
-	                index: index, 
-	                component: component, 
-	                area: this, 
-	                key: component.key, 
-	                draggable: component.props.draggable, 
-	                dragging: index === this.state.dragging});}.bind(this)
-	        );
-	        return React.createElement("ol", {className: this.props.className, style: this.props.style}, 
-	            sortables
-	        );
-	    },
-	    getDefaultProps: function() {
-	        return { verify: function()  {return true;} };
-	    },
-	    getInitialState: function() {
-	        return {
-	            // index of the component being dragged
-	            dragging: null,
-	            components: this.props.components
-	        };
-	    },
-	    componentWillReceiveProps: function(nextProps) {
-	        this.setState({ components: nextProps.components });
-	    },
-	    // Alternatively send each handler to each component individually,
-	    // partially applied
-	    onDragStart: function(startIndex) {
-	        this.setState({ dragging: startIndex });
-	    },
-	    onDrop: function() {
-	        // tell the parent component
-	        this.setState({ dragging: null });
-	        this.props.onReorder(this.state.components);
-	    },
-	    onDragEnter: function(enterIndex) {
-	        // When a label is first dragged it triggers a dragEnter with itself,
-	        // which we don't care about.
-	        if (this.state.dragging === enterIndex) {
-	            return;
-	        }
-
-	        var newComponents = this.state.components.slice();
-
-	        // splice the tab out of its old position
-	        var removed = newComponents.splice(this.state.dragging, 1);
-	        // ... and into its new position
-	        newComponents.splice(enterIndex, 0, removed[0]);
-
-	        var verified = this.props.verify(newComponents);
-	        if (verified) {
-	            this.setState({
-	                dragging: enterIndex,
-	                components: newComponents
-	            });
-	        }
-	        return verified;
-	    },
-
-	    // Firefox refuses to drag an element unless you set data on it. Hackily
-	    // add data each time an item is dragged.
-	    componentDidMount: function() {
-	        this._setDragEvents();
-	    },
-	    componentDidUpdate: function() {
-	        this._setDragEvents();
-	    },
-	    _listenEvent: function(e) {
-	        e.dataTransfer.setData('hackhackhack', 'because browsers!');
-	    },
-	    _cancelEvent: function(e) {
-	        // prevent the browser from redirecting to 'because browsers!'
-	        e.preventDefault();
-	    },
-	    _setDragEvents: function() {
-	        this._dragItems = this._dragItems || [];
-	        var items = this.getDOMNode().querySelectorAll('[draggable=true]');
-	        var oldItems = _(this._dragItems).difference(items);
-	        var newItems = _(items).difference(this._dragItems);
-
-	        _(newItems).each(function(dragItem)  {
-	            dragItem.addEventListener('dragstart', this._listenEvent);
-	            dragItem.addEventListener('drop',      this._cancelEvent);
-	        }.bind(this));
-
-	        _(oldItems).each(function(dragItem)  {
-	            dragItem.removeEventListener('dragstart', this._listenEvent);
-	            dragItem.removeEventListener('drop',      this._cancelEvent);
-	        }.bind(this));
-	    }
-	});
-
-	// An individual sortable item
-	var SortableItem = React.createClass({displayName: 'SortableItem',
-	    propTypes: {
-	        // item: what is this?
-	    },
-	    render: function() {
-	        var dragState = "sortable-disabled";
-	        if (this.props.dragging) {
-	            dragState = "sortable-dragging";
-	        } else if (this.props.draggable) {
-	            dragState = "sortable-enabled";
-	        }
-
-	        return React.createElement("li", {draggable: this.props.draggable, 
-	                   className: dragState, 
-	                   onDragStart: this.handleDragStart, 
-	                   onDrop: this.handleDrop, 
-	                   onDragEnter: this.handleDragEnter, 
-	                   onDragOver: this.handleDragOver}, 
-	            this.props.component
-	        );
-	    },
-	    handleDragStart: function(e) {
-	        e.nativeEvent.dataTransfer.effectAllowed = "move";
-	        this.props.area.onDragStart(this.props.index);
-	    },
-	    handleDrop: function() {
-	        this.props.area.onDrop(this.props.index);
-	    },
-	    handleDragEnter: function(e) {
-	        var verified = this.props.area.onDragEnter(this.props.index);
-	        // Ideally this would change the cursor based on whether this is a
-	        // valid place to drop.
-	        e.nativeEvent.dataTransfer.effectAllowed = verified ? "move" : "none";
-	    },
-	    handleDragOver: function(e) {
-	        // allow a drop by preventing default handling
-	        e.preventDefault();
-	    }
-	});
-
-	module.exports = SortableArea;
-
-
-/***/ },
-/* 80 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(60);
-	var _ = __webpack_require__(59);
-
-	// TODO(joel/jack) fix z-index issues https://s3.amazonaws.com/uploads.hipchat.com/6574/29028/yOApjwmgiMhEZYJ/Screen%20Shot%202014-05-30%20at%203.34.18%20PM.png
-	// z-index: 3 on perseus-formats-tooltip seemed to work
-
-	/**
-	 * A generic tooltip library for React.js
-	 *
-	 * This should eventually end up in react-components
-	 *
-	 * Interface: ({a, b} means one of a or b)
-	 * var Tooltip = require("./tooltip.jsx");
-	 * <Tooltip
-	 *         className="class-for-tooltip-contents"
-	 *         horizontalPosition="left" // one of "left", "right"
-	 *         horizontalAlign="left" // one of "left", "right"
-	 *         verticalPosition="bottom" // one of "top", "bottom"
-	 *         arrowSize={10} // arrow size in pixels
-	 *         borderColor="#ccc" // color of the border for the tooltip
-	 *         show={true} // whether the tooltip should currently be visible
-	 *         >
-	 *     <TargetElementOfTheTooltip />
-	 *     <TooltipContents1 />
-	 *     <TooltipContents2 />
-	 * </Tooltip>
-	 *
-	 * To show/hide the tooltip, the parent component should call the
-	 * .show() and .hide() methods of the tooltip when appropriate.
-	 * (These are usually set up as handlers of events on the target element.)
-	 *
-	 * Notes:
-	 *     className should not specify a border; that is handled by borderColor
-	 *     so that the arrow and tooltip match
-	 */
-
-	//          __,,--``\\
-	//  _,,-''``         \\     ,
-	// '----------_.------'-.___|\__
-	//    _.--''``    `)__   )__   @\__
-	//   (  .. ''---/___,,E/__,E'------`
-	//    `-''`''
-	// Here be dragons.
-
-	var zIndex = 10;
-
-	var Triangle = React.createClass({displayName: 'Triangle',
-	    propTypes: {
-	        color: React.PropTypes.string.isRequired,
-	        left: React.PropTypes.number.isRequired,
-	        "top": React.PropTypes.number.isRequired,
-	        width: React.PropTypes.number.isRequired,
-	        height: React.PropTypes.number.isRequired,
-	        horizontalDirection: React.PropTypes.oneOf(
-	            ["left", "right"]
-	        ).isRequired,
-	        verticalDirection: React.PropTypes.oneOf(
-	            ["top", "bottom"]
-	        ).isRequired,
-	    },
-
-	    render: function() {
-	        var borderLeft, borderRight, borderTop, borderBottom;
-
-	        var hBorder = (this.props.width + "px solid transparent");
-	        if (this.props.horizontalDirection === "right") {
-	            borderLeft = hBorder;
-	        } else {
-	            borderRight = hBorder;
-	        }
-
-	        var vBorder = (this.props.height + "px solid " + this.props.color);
-	        if (this.props.verticalDirection === "top") {
-	            borderTop = vBorder;
-	        } else {
-	            borderBottom = vBorder;
-	        }
-
-	        return React.createElement("div", {style: {
-	            display: "block",
-	            height: 0,
-	            width: 0,
-	            position: "absolute",
-	            left: this.props.left,
-	            "top": this.props["top"],
-	            borderLeft: borderLeft,
-	            borderRight: borderRight,
-	            borderTop: borderTop,
-	            borderBottom: borderBottom
-	        }});
-	    }
-	});
-
-	var TooltipArrow = React.createClass({displayName: 'TooltipArrow',
-	    propTypes: {
-	        position: React.PropTypes.string,
-	        visibility: React.PropTypes.string,
-	        left: React.PropTypes.number,
-	        "top": React.PropTypes.number,
-	        color: React.PropTypes.string.isRequired,  // a css color
-	        border: React.PropTypes.string.isRequired,  // a css color
-	        width: React.PropTypes.number.isRequired,
-	        height: React.PropTypes.number.isRequired,
-	        horizontalDirection: React.PropTypes.oneOf(
-	            ["left", "right"]
-	        ).isRequired,
-	        verticalDirection: React.PropTypes.oneOf(
-	            ["top", "bottom"]
-	        ).isRequired
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            position: "relative",
-	            visibility: "visible",
-	            left: 0,
-	            "top": 0
-	        };
-	    },
-
-	    // TODO(jack): Think about adding a box-shadow to the triangle here
-	    // See http://css-tricks.com/triangle-with-shadow/
-	    render: function() {
-	        var isRight = (this.props.horizontalDirection === "right");
-	        var isTop = (this.props.verticalDirection === "top");
-
-	        var frontTopOffset = isTop ? 0 : 1;
-	        var borderTopOffset = isTop ? 0 : -1;
-
-	        return React.createElement("div", {style: {
-	                display: "block",
-	                position: this.props.position,
-	                visibility: this.props.visibility,
-	                left: this.props.left,
-	                "top": this.props["top"],
-	                width: this.props.width + 2,
-	                height: this.props.height + 1,
-	                marginTop: -1,
-	                marginBottom: -2,
-	                zIndex: zIndex
-	            }}, 
-	            /* The background triangle used to create the effect of a
-	                border around the foreground triangle*/
-	            React.createElement(Triangle, {
-	                horizontalDirection: this.props.horizontalDirection, 
-	                verticalDirection: this.props.verticalDirection, 
-	                color: this.props.border, 
-	                left: 0, 
-	                top: borderTopOffset, 
-	                width: this.props.width + 2, // one extra for the diagonal
-	                height: this.props.height + 2}), 
-	            /* The foreground triangle covers all but the left/right edges
-	                of the background triangle */
-	            React.createElement(Triangle, {
-	                horizontalDirection: this.props.horizontalDirection, 
-	                verticalDirection: this.props.verticalDirection, 
-	                color: this.props.color, 
-	                left: 1, 
-	                top: frontTopOffset, 
-	                width: this.props.width, 
-	                height: this.props.height})
-	        );
-	    }
-	});
-
-	var VERTICAL_CORNERS = {
-	    "top": {
-	        "top": "-100%"
-	    },
-	    bottom: {
-	        "top": 0
-	    }
-	};
-
-	var HORIZONTAL_CORNERS = {
-	    left: {
-	        targetLeft: 0,
-	    },
-
-	    right: {
-	        targetLeft: "100%",
-	    }
-	};
-
-	var HORIZONTAL_ALIGNMNENTS = {
-	    left: {
-	        tooltipLeft: 0,
-	        arrowLeft: function(arrowSize)  {return 0;}
-	    },
-	    right: {
-	        tooltipLeft: "-100%",
-	        arrowLeft: function(arrowSize)  {return -arrowSize - 2;}
-	    }
-	};
-
-
-	var Tooltip = React.createClass({displayName: 'Tooltip',
-	    propTypes: {
-	        show: React.PropTypes.bool.isRequired,
-	        className: React.PropTypes.string,
-	        arrowSize: React.PropTypes.number,
-	        borderColor: React.PropTypes.string,
-	        verticalPosition: React.PropTypes.oneOf(
-	            _.keys(VERTICAL_CORNERS)
-	        ),
-	        horizontalPosition: React.PropTypes.oneOf(
-	            _.keys(HORIZONTAL_CORNERS)
-	        ),
-	        horizontalAlign: React.PropTypes.oneOf(
-	            _.keys(HORIZONTAL_ALIGNMNENTS)
-	        ),
-	        children: React.PropTypes.arrayOf(
-	            React.PropTypes.element
-	        ).isRequired
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            className: "",
-	            arrowSize: 10,
-	            borderColor: "#ccc",
-	            verticalPosition: "bottom",
-	            horizontalPosition: "left",
-	            horizontalAlign: "left"
-	        };
-	    },
-
-	    getInitialState: function() {
-	        return {
-	            height: null  // used for offsetting "top" positioned tooltips
-	        };
-	    },
-
-	    componentWillReceiveProps: function() {
-	        // If the contents have changed, reset our measure of the height
-	        this.setState({height: null});
-	    },
-
-	    render: function() {
-	        var isTooltipAbove = this.props.verticalPosition === "top";
-
-	        /* We wrap the entire output in a span so that it displays inline */
-	        return React.createElement("span", null, 
-	            isTooltipAbove && this._renderToolTipDiv(isTooltipAbove), 
-
-	            /* We wrap our input in a div so that we can put the tooltip in a
-	                div above/below it */
-	            React.createElement("div", null, 
-	                _.first(this.props.children)
-	            ), 
-
-	            !isTooltipAbove && this._renderToolTipDiv()
-	        );
-	    },
-
-	    _renderToolTipDiv: function(isTooltipAbove) {
-	        var settings = _.extend({},
-	            HORIZONTAL_CORNERS[this.props.horizontalPosition],
-	            HORIZONTAL_ALIGNMNENTS[this.props.horizontalAlign],
-	            VERTICAL_CORNERS[this.props.verticalPosition]
-	        );
-
-	        var arrowAbove;
-	        var arrowBelow;
-
-	        if (isTooltipAbove) {
-	            // We put an absolutely positioned arrow in the correct place
-	            arrowAbove = React.createElement(TooltipArrow, {
-	                verticalDirection: "top", 
-	                horizontalDirection: this.props.horizontalAlign, 
-	                position: "absolute", 
-	                color: "white", 
-	                border: this.props.borderColor, 
-	                left: settings.arrowLeft(this.props.arrowSize), 
-	                top: -this.props.arrowSize + 2, 
-	                width: this.props.arrowSize, 
-	                height: this.props.arrowSize, 
-	                zIndex: zIndex});
-
-	            // And we use a visibility: hidden arrow below to shift up the
-	            // content by the correct amount
-	            arrowBelow = React.createElement(TooltipArrow, {
-	                verticalDirection: "top", 
-	                horizontalDirection: this.props.horizontalAlign, 
-	                visibility: "hidden", 
-	                color: "white", 
-	                border: this.props.borderColor, 
-	                left: settings.arrowLeft(this.props.arrowSize), 
-	                top: -1, 
-	                width: this.props.arrowSize, 
-	                height: this.props.arrowSize, 
-	                zIndex: zIndex});
-	        } else {
-	            arrowAbove = React.createElement(TooltipArrow, {
-	                verticalDirection: "bottom", 
-	                horizontalDirection: this.props.horizontalAlign, 
-	                color: "white", 
-	                border: this.props.borderColor, 
-	                left: settings.arrowLeft(this.props.arrowSize), 
-	                top: -1, 
-	                width: this.props.arrowSize, 
-	                height: this.props.arrowSize, 
-	                zIndex: zIndex});
-
-	            arrowBelow = null;
-	        }
-
-	        /* A positioned div below the input to be the parent for our
-	            tooltip */
-	        return React.createElement("div", {style: {
-	                position: "relative",
-	                height: 0,
-	                display: this.props.show ? "block" : "none",
-	                }}, 
-	            React.createElement("div", {ref: "tooltipContainer", className: "tooltipContainer", style: {
-	                        position: "absolute",
-	                        // height must start out undefined, not null, so that
-	                        // we can measure the actual height with jquery.
-	                        // This is used to position the tooltip with top: -100%
-	                        // when in verticalPosition: "top" mode
-	                        height: this.state.height || undefined,
-	                        left: settings.targetLeft
-	                    }}, 
-	                arrowAbove, 
-
-	                /* The contents of the tooltip */
-	                React.createElement("div", {className: this.props.className, 
-	                        ref: "tooltipContent", 
-	                        style: {
-	                            position: "relative",
-	                            top: settings["top"],
-	                            left: settings.tooltipLeft,
-	                            border: "1px solid " + this.props.borderColor,
-	                            WebkitBoxShadow: "0 1px 3px " +
-	                                    this.props.borderColor,
-	                            MozBoxShadow: "0 1px 3px " +
-	                                    this.props.borderColor,
-	                            boxShadow: "0 1px 3px " +
-	                                    this.props.borderColor,
-	                            zIndex: zIndex - 1
-	                        }}, 
-	                    _.rest(this.props.children)
-	                ), 
-
-	                arrowBelow
-	            )
-	        );
-	    },
-
-	    componentDidMount: function() {
-	        this._updateHeight();
-	    },
-
-	    componentDidUpdate: function() {
-	        this._updateHeight();
-	    },
-
-	    _updateHeight: function() {
-	        var height = this.refs.tooltipContainer.getDOMNode().offsetHeight;
-	        if (height !== this.state.height) {
-	            this.setState({height:height});
-	        }
-	    }
-	});
-
-	// Sorry.  // Apology-Oriented-Programming
-	module.exports = Tooltip;
-
-
-/***/ },
-/* 81 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(60);
-	var Tooltip = __webpack_require__(80);
-	var _ = __webpack_require__(59);
-
-	var ApiClassNames = __webpack_require__(13).ClassNames;
-	var MathInput  = __webpack_require__(82);
-	var Renderer   = __webpack_require__(11);
-	var TextInput  = __webpack_require__(88);
-	var MathOutput = __webpack_require__(90);
-
-	var captureScratchpadTouchStart =
-	        __webpack_require__(3).captureScratchpadTouchStart;
-
-	var MATH = "math";
-	var TEXT = "text";
-	var TEX = "tex";
-
-	var InputWithExamples = React.createClass({displayName: 'InputWithExamples',
-	    propTypes: {
-	        type: React.PropTypes.oneOf([MATH, TEXT, TEX]),
-	        value: React.PropTypes.string,
-	        onChange: React.PropTypes.func.isRequired,
-	        className: React.PropTypes.string,
-	        examples: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
-	        shouldShowExamples: React.PropTypes.bool,
-	        convertDotToTimes: React.PropTypes.bool,
-	        buttonSet: React.PropTypes.string,
-	        buttonsVisible: React.PropTypes.oneOf(['always', 'never', 'focused']),
-	        onFocus: React.PropTypes.func,
-	        onBlur: React.PropTypes.func,
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            type: TEXT,
-	            shouldShowExamples: true,
-	            onFocus: function() { },
-	            onBlur: function() { }
-	        };
-	    },
-
-	    getInitialState: function() {
-	        return {
-	            focused: false,
-	            showExamples: false
-	        };
-	    },
-
-	    _getInputClassName: function() {
-	        // <MathOutput> is a special component that manages its own class and
-	        // state, as it's a <span> that wants to act like an <input>.
-	        if (this.props.type === TEX) {
-	            return this.props.className;
-	        }
-
-	        // Otherwise, we need to add these INPUT and FOCUSED tags here.
-	        var className = ApiClassNames.INPUT + " " + ApiClassNames.INTERACTIVE;
-	        if (this.state.focused) {
-	            className += " " + ApiClassNames.FOCUSED;
-	        }
-	        if (this.props.className) {
-	            className += " " + this.props.className;
-	        }
-	        return className;
-	    },
-
-	    _getPropsForInputType: function() {
-	        // Minimal set of props, used by each input type
-	        var inputProps = {
-	            ref: "input",
-	            className: this._getInputClassName(),
-	            value: this.props.value,
-	            onFocus: this._handleFocus,
-	            onBlur: this._handleBlur
-	        };
-
-	        if (this.props.type === TEX) {
-	            return inputProps;
-	        }
-
-	        // Add useful props required for MATH and TEXT modes
-	        _.extend(inputProps, {
-	            buttonSet: this.props.buttonSet,
-	            buttonsVisible: this.props.buttonsVisible,
-	            onChange: this.props.onChange,
-	            onTouchStart: captureScratchpadTouchStart
-	        });
-
-	        // And add final props that are MATH- and TEXT-specific
-	        if (this.props.type === MATH) {
-	            return _.extend({
-	                convertDotToTimes: this.props.convertDotToTimes,
-	            }, inputProps);
-	        } else if (this.props.type === TEXT) {
-	            return _.extend({
-	                autoCapitalize: "off",
-	                autoComplete: "off",
-	                autoCorrect: "off",
-	                spellCheck: "false",
-	            }, inputProps);
-	        }
-	    },
-
-	    _getComponentForInputType: function() {
-	        switch (this.props.type) {
-	            case TEX:
-	                return MathOutput;
-
-	            case MATH:
-	                return MathInput;
-
-	            case TEXT:
-	                return TextInput;
-
-	            default:
-	                return null;
-	        }
-	    },
-
-	    _renderInput: function() {
-	        var inputProps = this._getPropsForInputType();
-	        var InputComponent = this._getComponentForInputType();
-	        return React.createElement(InputComponent, React.__spread({},  inputProps));
-	    },
-
-	    render: function() {
-	        var input = this._renderInput();
-
-	        // Static rendering, which doesn't include the 'tooltip' logic that the
-	        // other types require, and is hence handled separately.
-	        if (this.props.type === TEX) {
-	            return input;
-	        }
-
-	        // Else, we need to be able to show examples
-	        var examplesContent = _.map(this.props.examples, function(example)  {
-	            return "- " + example;
-	        }).join("\n");
-
-	        var showExamples = this.props.shouldShowExamples &&
-	                this.state.showExamples;
-
-	        return React.createElement(Tooltip, {
-	                ref: "tooltip", 
-	                className: "perseus-formats-tooltip", 
-	                horizontalPosition: "left", 
-	                horizontalAlign: "left", 
-	                verticalPosition: "bottom", 
-	                arrowSize: 10, 
-	                borderColor: "#ccc", 
-	                show: showExamples}, 
-	            input, 
-	            React.createElement(Renderer, {content: examplesContent})
-	        );
-	    },
-
-	    _handleFocus: function() {
-	        this.props.onFocus();
-	        this.setState({
-	            focused: true,
-	            showExamples: true
-	        });
-	    },
-
-	    show: function() {
-	        this.setState({showExamples: true});
-	    },
-
-	    hide: function() {
-	        this.setState({showExamples: false});
-	    },
-
-	    _handleBlur: function() {
-	        this.props.onBlur();
-	        this.setState({
-	            focused: false,
-	            showExamples: false
-	        });
-	    },
-
-	    focus: function() {
-	        this.refs.input.focus();
-	    },
-
-	    blur: function() {
-	        this.refs.input.blur();
-	    },
-
-	    handleChange: function(e) {
-	        this.props.onChange(e.target.value);
-	    }
-	});
-
-	module.exports = InputWithExamples;
-
-
-/***/ },
-/* 82 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// TODO(alex): Package MathQuill
-	var MathQuill = window.MathQuill;
-	var React     = __webpack_require__(60);
-	var _         = __webpack_require__(59);
-	var cx        = React.addons.classSet;
-	var PT = React.PropTypes;
-	var TexButtons = __webpack_require__(83);
-
-	// A WYSIWYG math input that calls `onChange(LaTeX-string)`
-	var MathInput = React.createClass({displayName: 'MathInput',
-	    propTypes: {
-	        value: PT.string,
-	        onChange: PT.func.isRequired,
-	        convertDotToTimes: PT.bool,
-	        buttonsVisible: PT.oneOf(['always', 'never', 'focused']),
-	        buttonSets: TexButtons.buttonSetsType.isRequired,
-	        onFocus: PT.func,
-	        onBlur: PT.func
-	    },
-
-	    render: function() {
-	        var className = cx({
-	            "perseus-math-input": true,
-
-	            // mathquill usually adds these itself but react removes them when
-	            // updating the component.
-	            "mq-editable-field": true,
-	            "mq-math-mode": true
-	        });
-
-	        if (this.props.className) {
-	            className = className + " " + this.props.className;
-	        }
-
-	        var buttons = null;
-	        if (this._shouldShowButtons()) {
-	            buttons = React.createElement(TexButtons, {
-	                sets: this.props.buttonSets, 
-	                className: "math-input-buttons absolute", 
-	                convertDotToTimes: this.props.convertDotToTimes, 
-	                onInsert: this.insert});
-	        }
-
-	        return React.createElement("div", {style: {display: "inline-block"}}, 
-	            React.createElement("div", {style: {display: 'inline-block'}}, 
-	                React.createElement("span", {className: className, 
-	                      ref: "mathinput", 
-	                      onFocus: this.handleFocus, 
-	                      onBlur: this.handleBlur})
-	            ), 
-	            React.createElement("div", {style: {position: "relative"}}, 
-	                buttons
-	            )
-	        );
-	    },
-
-	    // handlers:
-	    // keep track of two related bits of state:
-	    // * this.state.focused - whether the buttons are currently shown
-	    // * this.mouseDown - whether a mouse click is active that started in the
-	    //   buttons div
-
-	    handleFocus: function() {
-	        this.setState({ focused: true });
-	        // TODO(joel) fix properly - we should probably allow onFocus handlers
-	        // to this property, but we need to work correctly with them.
-	        // if (this.props.onFocus) {
-	        //     this.props.onFocus();
-	        // }
-	    },
-
-	    handleMouseDown: function(event) {
-	        var focused = this.getDOMNode().contains(event.target);
-	        this.mouseDown = focused;
-	        if (!focused) {
-	            this.setState({ focused: false });
-	        }
-	    },
-
-	    handleMouseUp: function() {
-	        // this mouse click started in the buttons div so we should focus the
-	        // input
-	        if (this.mouseDown) {
-	            this.focus();
-	        }
-	        this.mouseDown = false;
-	    },
-
-	    handleBlur: function() {
-	        if (!this.mouseDown) {
-	            this.setState({ focused: false });
-	        }
-	    },
-
-	    _shouldShowButtons: function() {
-	        if (this.props.buttonsVisible === 'always') {
-	            return true;
-	        } else if (this.props.buttonsVisible === 'never') {
-	            return false;
-	        } else {
-	            return this.state.focused;
-	        }
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            value: "",
-	            convertDotToTimes: false,
-	            buttonsVisible: 'focused'
-	        };
-	    },
-
-	    getInitialState: function() {
-	        return { focused: false };
-	    },
-
-	    insert: function(value) {
-	        var input = this.mathField();
-	        if (_(value).isFunction()) {
-	            value(input);
-	        } else if (value[0] === '\\') {
-	            input.cmd(value).focus();
-	        } else {
-	            input.write(value).focus();
-	        }
-	        input.focus();
-	    },
-
-	    mathField: function(options) {
-	        // MathQuill.MathField takes a DOM node, MathQuill-ifies it if it's
-	        // seeing that node for the first time, then returns the associated
-	        // MathQuill object for that node. It is stable - will always return
-	        // the same object when called on the same DOM node.
-	        return MathQuill.MathField(this.refs.mathinput.getDOMNode(), options);
-	    },
-
-	    componentWillUnmount: function() {
-	        window.removeEventListener("mousedown", this.handleMouseDown);
-	        window.removeEventListener("mouseup", this.handleMouseUp);
-	    },
-
-	    componentDidMount: function() {
-	        window.addEventListener("mousedown", this.handleMouseDown);
-	        window.addEventListener("mouseup", this.handleMouseUp);
-
-	        // These options can currently only be set globally. (Hopefully this
-	        // will change at some point.) They appear safe to set multiple times.
-
-	        // LaTeX commands that, when typed, are immediately replaced by the
-	        // appropriate symbol. This does not include ln, log, or any of the
-	        // trig functions; those are always interpreted as commands.
-	        MathQuill.addAutoCommands("pi theta phi sqrt");
-
-	        // Pop the cursor out of super/subscripts on arithmetic operators or
-	        // (in)equalities.
-	        MathQuill.addCharsThatBreakOutOfSupSub("+-*/=<>≠≤≥");
-
-	        // Prevent excessive super/subscripts or fractions from being created
-	        // without operands, e.g. when somebody holds down a key
-	        MathQuill.disableCharsWithoutOperand("^_/");
-
-	        var initialized = false;
-
-	        // Initialize MathQuill.MathField instance
-	        this.mathField({
-	            // The name of this option is somewhat misleading, as tabbing in
-	            // MathQuill breaks you out of a nested context (fraction/script)
-	            // if you're in one, but moves focus to the next input if you're
-	            // not. Spaces (with this option enabled) are just ignored in the
-	            // latter case.
-	            //
-	            // TODO(alex): In order to allow inputting mixed numbers, we will
-	            // have to accept spaces in certain cases. The desired behavior is
-	            // still to escape nested contexts if currently in one, but to
-	            // insert a space if not (we don't expect mixed numbers in nested
-	            // contexts). We should also limit to one consecutive space.
-	            spaceBehavesLikeTab: true,
-
-	            handlers: {
-	                edited: function(mathField)  {
-	                    // This handler is guaranteed to be called on change, but
-	                    // unlike React it sometimes generates false positives.
-	                    // One of these is on initialization (with an empty string
-	                    // value), so we have to guard against that below.
-	                    var value = mathField.latex();
-
-	                    // Provide a MathQuill-compatible way to generate the
-	                    // not-equals sign without pasting unicode or typing TeX
-	                    value = value.replace(/<>/g, "\\ne");
-
-	                    // Use the specified symbol to represent multiplication
-	                    // TODO(alex): Add an option to disallow variables, in
-	                    // which case 'x' should get converted to '\\times'
-	                    if (this.props.convertDotToTimes) {
-	                        value = value.replace(/\\cdot/g, "\\times");
-
-	                        // Preserve cursor position in the common case:
-	                        // typing '*' to insert a multiplication sign.
-	                        // We do this by modifying internal MathQuill state
-	                        // directly, instead of waiting for `.latex()` to be
-	                        // called in `componentDidUpdate()`.
-	                        var left = mathField.controller.cursor[MathQuill.L];
-	                        if (left && left.ctrlSeq === '\\cdot ') {
-	                            mathField.controller.backspace();
-	                            mathField.cmd('\\times');
-	                        }
-	                    } else {
-	                        value = value.replace(/\\times/g, "\\cdot");
-	                    }
-
-	                    if (initialized && this.props.value !== value) {
-	                        this.props.onChange(value);
-	                    }
-	                }.bind(this),
-	                enter: function()  {
-	                    // This handler is called when the user presses the enter
-	                    // key. Since this isn't an actual <input> element, we have
-	                    // to manually trigger the usually automatic form submit.
-	                    $(this.refs.mathinput.getDOMNode()).submit();
-	                }.bind(this),
-	                upOutOf: function(mathField)  {
-	                    // This handler is called when the user presses the up
-	                    // arrow key, but there is nowhere in the expression to go
-	                    // up to (no numerator or exponent). For ease of use,
-	                    // interpret this as an attempt to create an exponent.
-	                    mathField.typedText("^");
-	                }
-	            }
-	        });
-
-	        // Ideally, we would be able to pass an initial value directly into
-	        // the constructor above
-	        this.mathField().latex(this.props.value);
-
-	        initialized = true;
-	    },
-
-	    componentDidUpdate: function() {
-	        if (!_.isEqual(this.mathField().latex(), this.props.value)) {
-	            this.mathField().latex(this.props.value);
-	        }
-	    },
-
-	    focus: function() {
-	        this.mathField().focus();
-	        this.setState({ focused: true });
-	    },
-
-	    blur: function() {
-	        this.mathField().blur();
-	        this.setState({ focused: false });
-	    }
-	});
-
-	module.exports = MathInput;
-
-
-/***/ },
-/* 83 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React     = __webpack_require__(60);
-	var _ = __webpack_require__(59);
-
-	var TeX       = __webpack_require__(67);
-
-	var prettyBig = { fontSize: "150%" };
-	var slightlyBig = { fontSize: "120%" };
-	var trigStyle = { marginLeft: -4 };
-	var symbStyle = { fontSize: "130%" };
-
-	// These are functions because we want to generate a new component for each use
-	// on the page rather than reusing an instance (which will cause an error).
-	// Also, it's useful for things which might look different depending on the
-	// props.
-
-	var basic = [
-	    function()  {return [React.createElement("span", {style: slightlyBig}, "+"), "+"];},
-	    function()  {return [React.createElement("span", {style: prettyBig}, "-"), "-"];},
-
-	    // TODO(joel) - display as \cdot when appropriate
-	    function(props)  {
-	        if (props.convertDotToTimes) {
-	            return [React.createElement(TeX, {style: prettyBig}, "\\times"), "\\times"];
-	        } else {
-	            return [React.createElement(TeX, {style: prettyBig}, "\\cdot"), "\\cdot"];
-	        }
-	    },
-	    function()  {return [
-	        React.createElement(TeX, {style: prettyBig}, "\\frac{□}{□}"),
-
-	        // If there's something in the input that can become part of a
-	        // fraction, typing "/" puts it in the numerator. If not, typing
-	        // "/" does nothing. In that case, enter a \frac.
-	        function(input)  {
-	            var contents = input.latex();
-	            input.typedText("/");
-	            if (input.latex() === contents) {
-	                input.cmd("\\frac");
-	            }
-	        }
-	    ];}
-	];
-
-	var buttonSets = {
-	    basic:basic,
-
-	    "basic+div": basic.concat([
-	        function()  {return [React.createElement(TeX, null, "\\div"), "\\div"];}
-	    ]),
-
-	    trig: [
-	        function()  {return [React.createElement(TeX, null, "\\sin"), "\\sin"];},
-	        function()  {return [React.createElement(TeX, null, "\\cos"), "\\cos"];},
-	        function()  {return [React.createElement(TeX, null, "\\tan"), "\\tan"];},
-	        function()  {return [React.createElement(TeX, {style: symbStyle}, "\\theta"), "\\theta"];},
-	        function()  {return [React.createElement(TeX, {style: symbStyle}, "\\phi"), "\\phi"];}
-	    ],
-
-	    prealgebra: [
-	        function()  {return [React.createElement(TeX, null, "\\sqrt{x}"), "\\sqrt"];},
-	        // TODO(joel) - how does desmos do this?
-	        // ["\\sqrt[3]{x}", "\\sqrt[3]{x}"],
-	        function()  {return [
-	            React.createElement(TeX, {style: slightlyBig}, "□^a"),
-	            function(input)  {
-	                var contents = input.latex();
-	                input.keystroke("Up");
-	                if (input.latex() === contents) {
-	                    input.typedText("a^b");
-	                }
-	            }
-	        ];},
-	        function()  {return [React.createElement(TeX, {style: slightlyBig}, "\\pi"), "\\pi"];},
-	        function()  {return [React.createElement(TeX, null, "\\div"), "\\div"];},
-	    ],
-
-	    logarithms: [
-	        function()  {return [React.createElement(TeX, null, "\\log"), "\\log"];},
-	        function()  {return [React.createElement(TeX, null, "\\ln"), "\\ln"];}
-	    ],
-
-	    "basic relations": [
-	        function()  {return [React.createElement(TeX, null, "="), "\\eq"];},
-	        function()  {return [React.createElement(TeX, null, "\\lt"), "\\lt"];},
-	        function()  {return [React.createElement(TeX, null, "\\gt"), "\\gt"];},
-	    ],
-
-	    "advanced relations": [
-	        function()  {return [React.createElement(TeX, null, "\\neq"), "\\neq"];},
-	        function()  {return [React.createElement(TeX, null, "\\leq"), "\\leq"];},
-	        function()  {return [React.createElement(TeX, null, "\\geq"), "\\geq"];},
-	    ],
-	};
-
-	var buttonSetsType = React.PropTypes.arrayOf(
-	        React.PropTypes.oneOf(_(buttonSets).keys())
-	    );
-
-	var TexButtons = React.createClass({displayName: 'TexButtons',
-	    propTypes: {
-	        sets: buttonSetsType.isRequired,
-	        onInsert: React.PropTypes.func.isRequired
-	    },
-
-	    render: function() {
-	        var buttons = _(this.props.sets).map(function(setName)  {return buttonSets[setName];});
-
-	        var buttonRows = _(buttons).map(function(row)  {return row.map(function(symbGen)  {
-	            // create a (component, thing we should send to mathquill) pair
-	            var symbol = symbGen(this.props);
-	            return React.createElement("button", {onClick: function()  {return this.props.onInsert(symbol[1]);}.bind(this), 
-	                           className: "tex-button", 
-	                           tabIndex: -1, 
-	                           type: "button"}, 
-	                symbol[0]
-	            );
-	        }.bind(this));}.bind(this));
-
-	        var buttonPopup = _(buttonRows).map(function(row, i)  {
-	            return React.createElement("div", {className: "clearfix tex-button-row", 
-	                        key: this.props.sets[i]}, 
-	                row
-	            );
-	        }.bind(this));
-
-	        return React.createElement("div", {className: this.props.className}, 
-	            buttonPopup
-	        );
-	    },
-
-	    statics: {
-	        buttonSets:buttonSets,
-	        buttonSetsType:buttonSetsType
-	    }
-	});
-
-	module.exports = TexButtons;
-
-
-/***/ },
-/* 84 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(60);
-
-	/* You know when you want to propagate input to a parent...
-	 * but then that parent does something with the input...
-	 * then changing the props of the input...
-	 * on every keystroke...
-	 * so if some input is invalid or incomplete...
-	 * the input gets reset or otherwise effed...
-	 *
-	 * This is the solution.
-	 *
-	 * Enough melodrama. Its an input that only sends changes
-	 * to its parent on blur.
-	 */
-	var BlurInput = React.createClass({displayName: 'BlurInput',
-	    propTypes: {
-	        value: React.PropTypes.string.isRequired,
-	        onChange: React.PropTypes.func.isRequired
-	    },
-	    getInitialState: function() {
-	        return { value: this.props.value };
-	    },
-	    render: function() {
-	        return React.createElement("input", React.__spread({}, 
-	            this.props, 
-	            {type: "text", 
-	            value: this.state.value, 
-	            onChange: this.handleChange, 
-	            onBlur: this.handleBlur}));
-	    },
-	    componentWillReceiveProps: function(nextProps) {
-	        this.setState({ value: nextProps.value });
-	    },
-	    handleChange: function(e) {
-	        this.setState({ value: e.target.value });
-	    },
-	    handleBlur: function(e) {
-	        this.props.onChange(e.target.value);
-	    }
-	});
-
-	module.exports = BlurInput;
-
-
-/***/ },
 /* 85 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(63);
+	var NumberInput = __webpack_require__(87);
+
+	var truth = function()  {return true;};
+
+	/* A minor abstraction on top of NumberInput for ranges
+	 *
+	 */
+	var RangeInput = React.createClass({displayName: 'RangeInput',
+	    propTypes: {
+	        value: React.PropTypes.array.isRequired,
+	        onChange: React.PropTypes.func.isRequired,
+	        placeholder: React.PropTypes.array,
+	        checkValidity: React.PropTypes.func
+	    },
+
+	    getDefaultProps: function() {
+	        return {
+	            placeholder: [null, null]
+	        };
+	    },
+
+	    render: function() {
+	        var value = this.props.value;
+	        var checkValidity = this.props.checkValidity || truth;
+
+	        return React.createElement("div", {className: "range-input"}, 
+	            React.createElement(NumberInput, React.__spread({}, 
+	                this.props, 
+	                {value: value[0], 
+	                checkValidity: function(val)  {return checkValidity([val, value[1]]);}, 
+	                onChange: this.onChange.bind(this, 0), 
+	                placeholder: this.props.placeholder[0]})), 
+	            React.createElement(NumberInput, React.__spread({}, 
+	                this.props, 
+	                {value: value[1], 
+	                checkValidity: function(val)  {return checkValidity([value[0], val]);}, 
+	                onChange: this.onChange.bind(this, 1), 
+	                placeholder: this.props.placeholder[1]}))
+	        );
+	    },
+
+	    onChange: function(i, newVal) {
+	        var value = this.props.value;
+	        if (i === 0) {
+	            this.props.onChange([newVal, value[1]]);
+	        } else {
+	            this.props.onChange([value[0], newVal]);
+	        }
+	    }
+
+	});
+
+	module.exports = RangeInput;
+
+
+/***/ },
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -29593,70 +29755,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 86 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(60);
-	var NumberInput = __webpack_require__(87);
-
-	var truth = function()  {return true;};
-
-	/* A minor abstraction on top of NumberInput for ranges
-	 *
-	 */
-	var RangeInput = React.createClass({displayName: 'RangeInput',
-	    propTypes: {
-	        value: React.PropTypes.array.isRequired,
-	        onChange: React.PropTypes.func.isRequired,
-	        placeholder: React.PropTypes.array,
-	        checkValidity: React.PropTypes.func
-	    },
-
-	    getDefaultProps: function() {
-	        return {
-	            placeholder: [null, null]
-	        };
-	    },
-
-	    render: function() {
-	        var value = this.props.value;
-	        var checkValidity = this.props.checkValidity || truth;
-
-	        return React.createElement("div", {className: "range-input"}, 
-	            React.createElement(NumberInput, React.__spread({}, 
-	                this.props, 
-	                {value: value[0], 
-	                checkValidity: function(val)  {return checkValidity([val, value[1]]);}, 
-	                onChange: this.onChange.bind(this, 0), 
-	                placeholder: this.props.placeholder[0]})), 
-	            React.createElement(NumberInput, React.__spread({}, 
-	                this.props, 
-	                {value: value[1], 
-	                checkValidity: function(val)  {return checkValidity([value[0], val]);}, 
-	                onChange: this.onChange.bind(this, 1), 
-	                placeholder: this.props.placeholder[1]}))
-	        );
-	    },
-
-	    onChange: function(i, newVal) {
-	        var value = this.props.value;
-	        if (i === 0) {
-	            this.props.onChange([newVal, value[1]]);
-	        } else {
-	            this.props.onChange([value[0], newVal]);
-	        }
-	    }
-
-	});
-
-	module.exports = RangeInput;
-
-
-/***/ },
 /* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var firstNumericalParse = __webpack_require__(3).firstNumericalParse;
@@ -29900,12 +30002,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Util = __webpack_require__(3);
 
-	var SvgImage = __webpack_require__(61);
+	var SvgImage = __webpack_require__(60);
 
 	var defaultBoxSize = 400;
 	var defaultBackgroundImage = {
@@ -30236,11 +30338,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React         = __webpack_require__(60);
+	var React         = __webpack_require__(63);
 	var TeX           = __webpack_require__(67);
 	var ApiClassNames = __webpack_require__(13).ClassNames;
-	var Tooltip       = __webpack_require__(80);
-	var ModifyTex     = __webpack_require__(85).modifyTex;
+	var Tooltip       = __webpack_require__(76);
+	var ModifyTex     = __webpack_require__(86).modifyTex;
 
 	var MathOutput = React.createClass({displayName: 'MathOutput',
 	    propTypes: {
@@ -30493,7 +30595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var _ = __webpack_require__(59);
 
 	var Util     = __webpack_require__(3);
@@ -31482,7 +31584,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(60);
+	var React = __webpack_require__(63);
 	var Editor = __webpack_require__(7);
 	var InfoTip = __webpack_require__(71);
 	var Widgets = __webpack_require__(15);
@@ -31626,7 +31728,116 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ButtonGroup = __webpack_require__(75);
+	// Split a word-wise diff generated by jsdiff into multiple lines, for the
+	// purpose of breaking up the diffs into lines, so that modified lines can be
+	// faintly highlighted
+
+	var splitDiff = function(diffEntries) {
+	    var lines = [];
+	    var currentLine = [];
+	    _.each(diffEntries, function(entry)  {
+	        var values = entry.value.split("\n");
+	        _.each(values, function(value, i)  {
+	            var isNewline = i > 0;
+	            if (isNewline) {
+	                lines.push(currentLine);
+	                currentLine = [];
+	            }
+	            var newEntry = _.extend({}, entry, { value: value });
+	            currentLine.push(newEntry);
+	        });
+	    });
+
+	    if (currentLine.length) {
+	        lines.push(currentLine);
+	    }
+	    return lines;
+	};
+
+
+	module.exports = splitDiff;
+
+
+/***/ },
+/* 96 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var jsdiff = __webpack_require__(104);
+	var _ = __webpack_require__(59);
+
+	var statusFor = function(chunk) {
+	    if (chunk.added) {
+	        return "added";
+	    } else if (chunk.removed) {
+	        return "removed";
+	    } else {
+	        return "unchanged";
+	    }
+	};
+
+	// Turn a chunk (which contains an array of values and a status)
+	// into an array of values, each with the same status
+	var splitUpChunk = function(chunk)  {return _.map(chunk.value, function(value)  {
+	    return {
+	        value: value,
+	        status: statusFor(chunk)
+	    };
+	});};
+
+	// Apply `fn` to every element in `lst` and then concatenate all the results
+	// http://clojuredocs.org/clojure_core/clojure.core/mapcat
+	var mapcat = function(lst, fn) {
+	    return _.flatten(_.map(lst, fn), true /* only flatten one level */);
+	};
+
+	// > ArrayDiff.diff([1,2,3], [2,3,4]);
+	// = [{ "value": [1],
+	//      "removed": true },
+	//    { "value": [2, 3] },
+	//    { "value": [4],
+	//      "added": true }]
+	var ArrayDiff = new jsdiff.Diff();
+	ArrayDiff.tokenize = function(array)  {return _.map(array, function(elem)  {return [elem];});};
+	// The default is `+` for string concatenation, which doesn't work for array
+	// concatenation.
+	ArrayDiff.join = function(a, b)  {return a.concat(b);};
+	// By default jsDiff uses ===
+	ArrayDiff.equals = _.isEqual;
+
+	// Take the output of jsdiff's function (which concatenates adjacent entries)
+	// and make it just one entry per chunk
+	// > flattenChunks([{ "value": [1],
+	//                    "removed": true },
+	//                  { "value": [2, 3] },
+	//                  { "value": [4],
+	//                    "added": true }])
+	// = [{ "value":1, "status":"removed"},
+	//    { "value":2, "status":"unchanged"},
+	//    { "value":3, "status":"unchanged"},
+	//    { "value":4, "status":"added"}]
+	var flattenChunks = function(chunks)  {return mapcat(chunks, splitUpChunk);};
+
+	// Take two arrays and create a diff for them. The result is two arrays of
+	// objects, one for the things that should be included in a 'before', and one
+	// for 'after'
+	var stringArrayDiff = function(a, b) {
+	    var diffResult = ArrayDiff.diff(a, b);
+	    var flattened = flattenChunks(diffResult);
+
+	    return {
+	        before: _.filter(flattened, function(entry)  {return entry.status !== "added";}),
+	        after: _.filter(flattened, function(entry)  {return entry.status !== "removed";})
+	    };
+	};
+
+	module.exports = stringArrayDiff;
+
+
+/***/ },
+/* 97 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ButtonGroup = __webpack_require__(81);
 
 	var ArrowPicker = React.createClass({displayName: 'ArrowPicker',
 	    propTypes: {
@@ -31659,10 +31870,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 96 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ButtonGroup = __webpack_require__(75);
+	var ButtonGroup = __webpack_require__(81);
 
 	var ColorPicker = React.createClass({displayName: 'ColorPicker',
 	    COLORS: [KhanUtil.BLACK, KhanUtil.BLUE, KhanUtil.GREEN, KhanUtil.PINK,
@@ -31706,12 +31917,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 97 */
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ButtonGroup = __webpack_require__(75);
+	var ButtonGroup = __webpack_require__(81);
 	var Changeable = __webpack_require__(68);
-	var MathInput = __webpack_require__(82);
+	var MathInput = __webpack_require__(78);
 	var NumberInput = __webpack_require__(87);
 	var TeX = __webpack_require__(67);
 
@@ -31817,10 +32028,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 98 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ButtonGroup = __webpack_require__(75);
+	var ButtonGroup = __webpack_require__(81);
 
 	var DashPicker = React.createClass({displayName: 'DashPicker',
 	    propTypes: {
@@ -31852,7 +32063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 99 */
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var ElementContainer = React.createClass({displayName: 'ElementContainer',
@@ -31922,7 +32133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 100 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(59);
@@ -32108,115 +32319,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    START_REF_PREFIX: START_REF_PREFIX,
 	    END_REF_PREFIX: END_REF_PREFIX
 	};
-
-
-/***/ },
-/* 101 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// Split a word-wise diff generated by jsdiff into multiple lines, for the
-	// purpose of breaking up the diffs into lines, so that modified lines can be
-	// faintly highlighted
-
-	var splitDiff = function(diffEntries) {
-	    var lines = [];
-	    var currentLine = [];
-	    _.each(diffEntries, function(entry)  {
-	        var values = entry.value.split("\n");
-	        _.each(values, function(value, i)  {
-	            var isNewline = i > 0;
-	            if (isNewline) {
-	                lines.push(currentLine);
-	                currentLine = [];
-	            }
-	            var newEntry = _.extend({}, entry, { value: value });
-	            currentLine.push(newEntry);
-	        });
-	    });
-
-	    if (currentLine.length) {
-	        lines.push(currentLine);
-	    }
-	    return lines;
-	};
-
-
-	module.exports = splitDiff;
-
-
-/***/ },
-/* 102 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var jsdiff = __webpack_require__(104);
-	var _ = __webpack_require__(59);
-
-	var statusFor = function(chunk) {
-	    if (chunk.added) {
-	        return "added";
-	    } else if (chunk.removed) {
-	        return "removed";
-	    } else {
-	        return "unchanged";
-	    }
-	};
-
-	// Turn a chunk (which contains an array of values and a status)
-	// into an array of values, each with the same status
-	var splitUpChunk = function(chunk)  {return _.map(chunk.value, function(value)  {
-	    return {
-	        value: value,
-	        status: statusFor(chunk)
-	    };
-	});};
-
-	// Apply `fn` to every element in `lst` and then concatenate all the results
-	// http://clojuredocs.org/clojure_core/clojure.core/mapcat
-	var mapcat = function(lst, fn) {
-	    return _.flatten(_.map(lst, fn), true /* only flatten one level */);
-	};
-
-	// > ArrayDiff.diff([1,2,3], [2,3,4]);
-	// = [{ "value": [1],
-	//      "removed": true },
-	//    { "value": [2, 3] },
-	//    { "value": [4],
-	//      "added": true }]
-	var ArrayDiff = new jsdiff.Diff();
-	ArrayDiff.tokenize = function(array)  {return _.map(array, function(elem)  {return [elem];});};
-	// The default is `+` for string concatenation, which doesn't work for array
-	// concatenation.
-	ArrayDiff.join = function(a, b)  {return a.concat(b);};
-	// By default jsDiff uses ===
-	ArrayDiff.equals = _.isEqual;
-
-	// Take the output of jsdiff's function (which concatenates adjacent entries)
-	// and make it just one entry per chunk
-	// > flattenChunks([{ "value": [1],
-	//                    "removed": true },
-	//                  { "value": [2, 3] },
-	//                  { "value": [4],
-	//                    "added": true }])
-	// = [{ "value":1, "status":"removed"},
-	//    { "value":2, "status":"unchanged"},
-	//    { "value":3, "status":"unchanged"},
-	//    { "value":4, "status":"added"}]
-	var flattenChunks = function(chunks)  {return mapcat(chunks, splitUpChunk);};
-
-	// Take two arrays and create a diff for them. The result is two arrays of
-	// objects, one for the things that should be included in a 'before', and one
-	// for 'after'
-	var stringArrayDiff = function(a, b) {
-	    var diffResult = ArrayDiff.diff(a, b);
-	    var flattened = flattenChunks(diffResult);
-
-	    return {
-	        before: _.filter(flattened, function(entry)  {return entry.status !== "added";}),
-	        after: _.filter(flattened, function(entry)  {return entry.status !== "removed";})
-	    };
-	};
-
-	module.exports = stringArrayDiff;
 
 
 /***/ },
@@ -33026,7 +33128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _ = __webpack_require__(59);
 	var GraphieClasses = __webpack_require__(107);
-	var Interactive2 = __webpack_require__(77);
+	var Interactive2 = __webpack_require__(83);
 	var InteractiveUtil = __webpack_require__(91);
 
 	var assert = InteractiveUtil.assert;
@@ -33282,51 +33384,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 109 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var button = {
-	    buttonStyle: {
-	        backgroundColor: 'white',
-	        border: '1px solid #ccc',
-	        borderLeft: '0',
-	        cursor: 'pointer',
-	        margin: '0',
-	        padding: '5px 10px',
-	        position: 'relative', // for hover
-
-	        ':first-child': {
-	            borderLeft: '1px solid #ccc',
-	            borderTopLeftRadius: '3px',
-	            borderBottomLeftRadius: '3px'
-	        },
-
-	        ':last-child': {
-	            borderRight: '1px solid #ccc',
-	            borderTopRightRadius: '3px',
-	            borderBottomRightRadius: '3px'
-	        },
-
-	        ':hover': {
-	            backgroundColor: '#ccc'
-	        },
-
-	        ':focus': {
-	            zIndex: '2'
-	        }
-	    },
-
-	    selectedStyle: {
-	        backgroundColor: '#ddd'
-	    }
-	};
-
-	module.exports = {
-	    button: button
-	};
-
-
-/***/ },
-/* 110 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -33607,7 +33664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 111 */
+/* 110 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -33663,8 +33720,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var _ = __webpack_require__(59);
 
-	var MovablePointOptions = __webpack_require__(126);
-	var WrappedEllipse = __webpack_require__(127);
+	var MovablePointOptions = __webpack_require__(129);
+	var WrappedEllipse = __webpack_require__(130);
 	var InteractiveUtil = __webpack_require__(91);
 	var objective_ = __webpack_require__(65);
 	var assert = InteractiveUtil.assert;
@@ -33953,7 +34010,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 112 */
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -33961,8 +34018,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var _ = __webpack_require__(59);
 
-	var MovableLineOptions = __webpack_require__(128);
-	var WrappedLine = __webpack_require__(129);
+	var MovableLineOptions = __webpack_require__(127);
+	var WrappedLine = __webpack_require__(128);
 	var InteractiveUtil = __webpack_require__(91);
 	var objective_ = __webpack_require__(65);
 	var assert = InteractiveUtil.assert;
@@ -34151,7 +34208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    self._prevRefCoord,
 	                    self._initialRefCoord
 	                );
-	            }
+	            },
 	        }));
 
 	        // Trigger an add event if this hasn't been added before
@@ -34235,7 +34292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 113 */
+/* 112 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -34243,7 +34300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * It allows constraints on its movement and draws when moves happen.
 	 */
 
-	var MovablePolygonOptions = __webpack_require__(130);
+	var MovablePolygonOptions = __webpack_require__(126);
 	var InteractiveUtil = __webpack_require__(91);
 	var objective_ = __webpack_require__(65);
 	var assert = InteractiveUtil.assert;
@@ -34562,6 +34619,51 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 113 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var button = {
+	    buttonStyle: {
+	        backgroundColor: 'white',
+	        border: '1px solid #ccc',
+	        borderLeft: '0',
+	        cursor: 'pointer',
+	        margin: '0',
+	        padding: '5px 10px',
+	        position: 'relative', // for hover
+
+	        ':first-child': {
+	            borderLeft: '1px solid #ccc',
+	            borderTopLeftRadius: '3px',
+	            borderBottomLeftRadius: '3px'
+	        },
+
+	        ':last-child': {
+	            borderRight: '1px solid #ccc',
+	            borderTopRightRadius: '3px',
+	            borderBottomRightRadius: '3px'
+	        },
+
+	        ':hover': {
+	            backgroundColor: '#ccc'
+	        },
+
+	        ':focus': {
+	            zIndex: '2'
+	        }
+	    },
+
+	    selectedStyle: {
+	        backgroundColor: '#ddd'
+	    }
+	};
+
+	module.exports = {
+	    button: button
+	};
+
+
+/***/ },
 /* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -34761,7 +34863,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var _ = find("_") || __webpack_require__(59);
-	var React = find("React") || __webpack_require__(60);
+	var React = find("React") || __webpack_require__(63);
 
 	/**
 	 * Creates a parser for a given set of rules, with the precedence
@@ -36328,19 +36430,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * A library of options to pass to add/draw/remove/constraints
 	 */
-	var _ = __webpack_require__(59);
 
-	var WrappedEllipse = __webpack_require__(127);
 	var kpoint = __webpack_require__(105).point;
+	var kvector = __webpack_require__(105).vector;
+
+	function sum(array) {
+	    return _.reduce(array, function(memo, arg) { return memo + arg; }, 0);
+	}
+
+	function clockwise(points) {
+	    var segments = _.zip(points, points.slice(1).concat(points.slice(0, 1)));
+	    var areas = _.map(segments, function(segment) {
+	        var p1 = segment[0], p2 = segment[1];
+	        return (p2[0] - p1[0]) * (p2[1] + p1[1]);
+	    });
+	    return sum(areas) > 0;
+	}
 
 	var add = {
 	    constrain: function() {
 	        this.constrain();
+	    },
+
+	    pointsToFront: function(state) {
+	        _.invoke(state.points, "toFront");
 	    }
 	};
 
-	add.standard = [add.constrain];
-
+	add.standard = [add.constrain, add.pointsToFront];
 
 	var modify = {
 	    draw: function() {
@@ -36354,34 +36471,127 @@ return /******/ (function(modules) { // webpackBootstrap
 	var draw = {
 	    basic: function(state, prevState) {
 	        var graphie = this.graphie;
-	        if (!this.state.visibleShape) {
-	            var radii = [
-	                this.pointSize() / graphie.scale[0],
-	                this.pointSize() / graphie.scale[1]
-	            ];
-	            var options = {
-	                maxScale: Math.max(
-	                    this.highlightStyle().scale, this.normalStyle().scale)
-	            };
-	            this.state.visibleShape = new WrappedEllipse(graphie, this.coord(),
-	                radii, options);
-	            this.state.visibleShape.attr(_.omit(this.normalStyle(), "scale"));
-	            this.state.visibleShape.toFront();
+	        var path = this.path(state);
 
-	            // Keep mouseTarget in front of visible shape
-	            if (this.mouseTarget()) {
-	                this.mouseTarget().toFront();
-	            }
+	        if (!this.state.visibleShape) {
+	            this.state.visibleShape = graphie.raphael.path(path);
+	            this.state.visibleShape.attr(this.normalStyle());
 	        }
 	        if (state.normalStyle !== prevState.normalStyle &&
 	                !_.isEqual(state.normalStyle, prevState.normalStyle)) {
 	            this.state.visibleShape.attr(this.normalStyle());
 	        }
-
-	        this.state.visibleShape.moveTo(this.coord());
+	        this.state.visibleShape.attr({ path: path });
 	        if (this.mouseTarget()) {
-	            this.mouseTarget().moveTo(this.coord());
+	            this.mouseTarget().attr({ path: path });
 	        }
+	    },
+
+	    /* Labels are handled primarily by label objects, but sometimes require
+	     * extra movables, e.g., for the arcs drawn at labeled angles. These extra
+	     * movables are stored in the label cache. */
+	    labels: function(state, prevState) {
+	        var graphie = this.graphie;
+	        var self = this;
+
+	        var coords = _.invoke(state.points, "coord");
+	        var isClockwise = clockwise(coords);
+	        var n = coords.length;
+
+	        // graphie.labelAngle and similar methods attempt to re-use the label
+	        // provided, which will have been stored on state._labeledAngles.
+	        // If they cannot re-use the label, they make a new one, which will
+	        // get stored on state._labelCache. These will all be cleared out when
+	        // we remove the polygon.
+	        // (This logic is borrowed from graphie:addMovablePolygon.)
+	        if (self.state._labelCache != null) {
+	            _.invoke(self.state._labelCache, "remove");
+	        }
+	        self.state._labelCache = [];
+
+	        // Update angle labels
+	        if (state.angleLabels.length || state.showRightAngleMarkers.length) {
+	            // Generate labels
+	            if (self.state._labeledAngles == null) {
+	                self.state._labeledAngles = _.times(
+	                    Math.max(
+	                        state.angleLabels.length,
+	                        state.showRightAngleMarkers.length),
+	                    function() {
+	                        return graphie.label([0, 0], "", "center",
+	                            state.labelStyle);
+	                        }
+	                    );
+	            }
+
+	            _.each(self.state._labeledAngles, function(label, i) {
+	                self.state._labelCache.push(graphie.labelAngle({
+	                    point1: coords[(i - 1 + n) % n],
+	                    vertex: coords[i],
+	                    point3: coords[(i + 1) % n],
+	                    label: label,
+	                    text: state.angleLabels[i],
+	                    showRightAngleMarker: state.showRightAngleMarkers[i],
+	                    numArcs: state.numArcs[i],
+	                    clockwise: isClockwise,
+	                    style: state.labelStyle
+	                }));
+	            });
+	        }
+
+	        // Update side labels
+	        if (state.sideLabels.length) {
+	            // Generate labels
+	            if (self.state._labeledSides == null) {
+	                self.state._labeledSides = _.map(state.sideLabels,
+	                    function(label) {
+	                        return graphie.label([0, 0], "", "center",
+	                            state.labelStyle);
+	                    }
+	                );
+	            }
+
+	            _.each(self.state._labeledSides, function(label, i) {
+	                self.state._labelCache.push(graphie.labelSide({
+	                    point1: coords[i],
+	                    point2: coords[(i + 1) % n],
+	                    label: label,
+	                    text: state.sideLabels[i],
+	                    numArrows: state.numArrows[i],
+	                    numTicks: state.numTicks[i],
+	                    clockwise: isClockwise,
+	                    style: state.labelStyle
+	                }));
+	            });
+	        }
+
+	        // Update vertex labels
+	        if (state.vertexLabels.length) {
+	            // Generate labels
+	            if (self.state._labeledVertices == null) {
+	                self.state._labeledVertices = _.map(state.vertexLabels,
+	                    function(label) {
+	                        return graphie.label([0, 0], "", "center",
+	                            state.labelStyle);
+	                    }
+	                );
+	            }
+
+	            _.each(labeledVertices, function(label, i) {
+	                self.state._labelCache.push(graphie.labelVertex({
+	                    point1: coords[(i - 1 + n) % n],
+	                    vertex: coords[i],
+	                    point3: coords[(i + 1) % n],
+	                    label: label,
+	                    text: state.vertexLabels[i],
+	                    clockwise: isClockwise,
+	                    style: state.labelStyle
+	                }));
+	            });
+	        }
+
+	        // graphie.labelVertex and its peer methods return an array of movables
+	        self.state._labelCache = _.flatten(self.state._labelCache);
 	    },
 
 	    highlight: function(state, prevState) {
@@ -36399,19 +36609,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	};
 
-	draw.standard = [draw.basic, draw.highlight];
+	draw.standard = [draw.basic, draw.labels, draw.highlight];
 
 
 	var remove = {
 	    basic: function() {
 	        if (this.state.visibleShape) {
 	            this.state.visibleShape.remove();
-	            this.state.visibleShape = null;
 	        }
+	    },
+	    labels: function() {
+	        var labels = [this.state._labeledSides, this.state._labeledVertices,
+	            this.state._labeledAngles, this.state._labelCache];
+
+	        _.each(labels, function(labelType) {
+	            if (labelType != null && labelType.length) {
+	                _.invoke(labelType, "remove");
+	            }
+	        });
 	    }
 	};
 
-	remove.standard = remove.basic;
+	remove.standard = [remove.basic, remove.labels];
 
 
 	var constraints = {
@@ -36437,33 +36656,69 @@ return /******/ (function(modules) { // webpackBootstrap
 	                paddingPx = 0;
 	            }
 	        }
-	        return function(coord) {
+	        return function(coord, prevCoord) {
 	            var graphie = this.graphie;
-	            range = range || graphie.range;
+	            var delta = kvector.subtract(coord, prevCoord);
+	            var range = range || graphie.range;
+	            // A null snap means no snap; an undefined snap means
+	            // default to graphie's
 	            if (snap === undefined) {
 	                snap = graphie.snap;
 	            }
 
-	            var lower = graphie.unscalePoint([
+	            // Calculate the bounds for both points
+	            var absoluteLower = graphie.unscalePoint([
 	                paddingPx,
 	                graphie.ypixels - paddingPx
 	            ]);
-	            var upper = graphie.unscalePoint([
+	            var absoluteUpper = graphie.unscalePoint([
 	                graphie.xpixels - paddingPx,
 	                paddingPx
 	            ]);
 	            if (snap) {
-	                lower = kpoint.ceilTo(lower, snap);
-	                upper = kpoint.floorTo(upper, snap);
+	                absoluteLower = kpoint.ceilTo(absoluteLower, snap);
+	                absoluteUpper = kpoint.floorTo(absoluteUpper, snap);
 	            }
-	            var coordX = Math.max(lower[0], Math.min(upper[0], coord[0]));
-	            var coordY = Math.max(lower[1], Math.min(upper[1], coord[1]));
-	            return [coordX, coordY];
+
+	            // Calculate the bounds for the delta.
+	            var deltaBounds = _.map(this.coords(), function(coord, i) {
+	                var max = kvector.subtract(absoluteUpper, coord);
+	                var min = kvector.subtract(absoluteLower, coord);
+	                return [min, max];
+	            });
+
+	            // bound the delta by the calculated bounds
+	            var boundedDelta = _.reduce(deltaBounds,
+	                    function(delta, bound) {
+	                var lower = bound[0];
+	                var upper = bound[1];
+	                var deltaX = Math.max(lower[0], Math.min(upper[0], delta[0]));
+	                var deltaY = Math.max(lower[1], Math.min(upper[1], delta[1]));
+	                return [deltaX, deltaY];
+	            }, delta);
+
+	            return kvector.add(prevCoord, boundedDelta);
 	        };
 	    }
 	};
 
 	constraints.standard = null;
+
+
+	var onMove = {
+	    updatePoints: function(coord, prevCoord) {
+	        var actualDelta = kvector.subtract(coord, prevCoord);
+	        _.each(this.state.points, function(point) {
+	            point.setCoord(kvector.add(
+	                point.coord(),
+	                actualDelta
+	            ));
+	        });
+	    }
+	};
+
+	onMove.standard = null;
+
 
 	module.exports = {
 	    add: add,
@@ -36473,7 +36728,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    onMoveStart: {standard: null},
 	    constraints: constraints,
-	    onMove: {standard: null},
+	    onMove: onMove,
 	    onMoveEnd: {standard: null},
 	    onClick: {standard: null}
 	};
@@ -36483,46 +36738,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 127 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(59);
-	var WrappedDefaults = __webpack_require__(133);
-
-	var DEFAULT_OPTIONS = {
-	    maxScale: 1,
-	    mouselayer: false
-	};
-
-	var WrappedEllipse = function(graphie, center, radii, options) {
-	    options = _.extend({}, DEFAULT_OPTIONS, options);
-
-	    // Add `wrapper`, `visibleShape`, and remaining properties
-	    _.extend(this, graphie.fixedEllipse(center, radii, options.maxScale), {
-	        graphie: graphie,
-	        initialPoint: center
-	    });
-
-	    // Add to appropriate graphie layer
-	    if (options.mouselayer) {
-	        this.graphie.addToMouseLayerWrapper(this.wrapper);
-	    } else {
-	        this.graphie.addToVisibleLayerWrapper(this.wrapper);
-	    }
-	};
-
-	_.extend(WrappedEllipse.prototype,  WrappedDefaults);
-
-	module.exports = WrappedEllipse;
-
-
-/***/ },
-/* 128 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/**
 	 * A library of options to pass to add/draw/remove/constraints
 	 */
 	var _ = __webpack_require__(59);
-	var WrappedLine = __webpack_require__(129);
-	var WrappedPath = __webpack_require__(134);
+	var WrappedLine = __webpack_require__(128);
+	var WrappedPath = __webpack_require__(133);
 	var kvector = __webpack_require__(105).vector;
 	var kpoint = __webpack_require__(105).point;
 
@@ -36867,12 +37088,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 129 */
+/* 128 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(59);
 	var InteractiveUtil = __webpack_require__(91);
-	var WrappedDefaults = __webpack_require__(133);
+	var WrappedDefaults = __webpack_require__(134);
 	var kpoint = __webpack_require__(105).point;
 	var kvector = __webpack_require__(105).vector;
 
@@ -36951,40 +37172,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 130 */
+/* 129 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * A library of options to pass to add/draw/remove/constraints
 	 */
+	var _ = __webpack_require__(59);
 
+	var WrappedEllipse = __webpack_require__(130);
 	var kpoint = __webpack_require__(105).point;
-	var kvector = __webpack_require__(105).vector;
-
-	function sum(array) {
-	    return _.reduce(array, function(memo, arg) { return memo + arg; }, 0);
-	}
-
-	function clockwise(points) {
-	    var segments = _.zip(points, points.slice(1).concat(points.slice(0, 1)));
-	    var areas = _.map(segments, function(segment) {
-	        var p1 = segment[0], p2 = segment[1];
-	        return (p2[0] - p1[0]) * (p2[1] + p1[1]);
-	    });
-	    return sum(areas) > 0;
-	}
 
 	var add = {
 	    constrain: function() {
 	        this.constrain();
-	    },
-
-	    pointsToFront: function(state) {
-	        _.invoke(state.points, "toFront");
 	    }
 	};
 
-	add.standard = [add.constrain, add.pointsToFront];
+	add.standard = [add.constrain];
+
 
 	var modify = {
 	    draw: function() {
@@ -36998,127 +37204,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	var draw = {
 	    basic: function(state, prevState) {
 	        var graphie = this.graphie;
-	        var path = this.path(state);
-
 	        if (!this.state.visibleShape) {
-	            this.state.visibleShape = graphie.raphael.path(path);
-	            this.state.visibleShape.attr(this.normalStyle());
+	            var radii = [
+	                this.pointSize() / graphie.scale[0],
+	                this.pointSize() / graphie.scale[1]
+	            ];
+	            var options = {
+	                maxScale: Math.max(
+	                    this.highlightStyle().scale, this.normalStyle().scale)
+	            };
+	            this.state.visibleShape = new WrappedEllipse(graphie, this.coord(),
+	                radii, options);
+	            this.state.visibleShape.attr(_.omit(this.normalStyle(), "scale"));
+	            this.state.visibleShape.toFront();
+
+	            // Keep mouseTarget in front of visible shape
+	            if (this.mouseTarget()) {
+	                this.mouseTarget().toFront();
+	            }
 	        }
 	        if (state.normalStyle !== prevState.normalStyle &&
 	                !_.isEqual(state.normalStyle, prevState.normalStyle)) {
 	            this.state.visibleShape.attr(this.normalStyle());
 	        }
-	        this.state.visibleShape.attr({ path: path });
+
+	        this.state.visibleShape.moveTo(this.coord());
 	        if (this.mouseTarget()) {
-	            this.mouseTarget().attr({ path: path });
+	            this.mouseTarget().moveTo(this.coord());
 	        }
-	    },
-
-	    /* Labels are handled primarily by label objects, but sometimes require
-	     * extra movables, e.g., for the arcs drawn at labeled angles. These extra
-	     * movables are stored in the label cache. */
-	    labels: function(state, prevState) {
-	        var graphie = this.graphie;
-	        var self = this;
-
-	        var coords = _.invoke(state.points, "coord");
-	        var isClockwise = clockwise(coords);
-	        var n = coords.length;
-
-	        // graphie.labelAngle and similar methods attempt to re-use the label
-	        // provided, which will have been stored on state._labeledAngles.
-	        // If they cannot re-use the label, they make a new one, which will
-	        // get stored on state._labelCache. These will all be cleared out when
-	        // we remove the polygon.
-	        // (This logic is borrowed from graphie:addMovablePolygon.)
-	        if (self.state._labelCache != null) {
-	            _.invoke(self.state._labelCache, "remove");
-	        }
-	        self.state._labelCache = [];
-
-	        // Update angle labels
-	        if (state.angleLabels.length || state.showRightAngleMarkers.length) {
-	            // Generate labels
-	            if (self.state._labeledAngles == null) {
-	                self.state._labeledAngles = _.times(
-	                    Math.max(
-	                        state.angleLabels.length,
-	                        state.showRightAngleMarkers.length),
-	                    function() {
-	                        return graphie.label([0, 0], "", "center",
-	                            state.labelStyle);
-	                        }
-	                    );
-	            }
-
-	            _.each(self.state._labeledAngles, function(label, i) {
-	                self.state._labelCache.push(graphie.labelAngle({
-	                    point1: coords[(i - 1 + n) % n],
-	                    vertex: coords[i],
-	                    point3: coords[(i + 1) % n],
-	                    label: label,
-	                    text: state.angleLabels[i],
-	                    showRightAngleMarker: state.showRightAngleMarkers[i],
-	                    numArcs: state.numArcs[i],
-	                    clockwise: isClockwise,
-	                    style: state.labelStyle
-	                }));
-	            });
-	        }
-
-	        // Update side labels
-	        if (state.sideLabels.length) {
-	            // Generate labels
-	            if (self.state._labeledSides == null) {
-	                self.state._labeledSides = _.map(state.sideLabels,
-	                    function(label) {
-	                        return graphie.label([0, 0], "", "center",
-	                            state.labelStyle);
-	                    }
-	                );
-	            }
-
-	            _.each(self.state._labeledSides, function(label, i) {
-	                self.state._labelCache.push(graphie.labelSide({
-	                    point1: coords[i],
-	                    point2: coords[(i + 1) % n],
-	                    label: label,
-	                    text: state.sideLabels[i],
-	                    numArrows: state.numArrows[i],
-	                    numTicks: state.numTicks[i],
-	                    clockwise: isClockwise,
-	                    style: state.labelStyle
-	                }));
-	            });
-	        }
-
-	        // Update vertex labels
-	        if (state.vertexLabels.length) {
-	            // Generate labels
-	            if (self.state._labeledVertices == null) {
-	                self.state._labeledVertices = _.map(state.vertexLabels,
-	                    function(label) {
-	                        return graphie.label([0, 0], "", "center",
-	                            state.labelStyle);
-	                    }
-	                );
-	            }
-
-	            _.each(labeledVertices, function(label, i) {
-	                self.state._labelCache.push(graphie.labelVertex({
-	                    point1: coords[(i - 1 + n) % n],
-	                    vertex: coords[i],
-	                    point3: coords[(i + 1) % n],
-	                    label: label,
-	                    text: state.vertexLabels[i],
-	                    clockwise: isClockwise,
-	                    style: state.labelStyle
-	                }));
-	            });
-	        }
-
-	        // graphie.labelVertex and its peer methods return an array of movables
-	        self.state._labelCache = _.flatten(self.state._labelCache);
 	    },
 
 	    highlight: function(state, prevState) {
@@ -37136,28 +37249,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	};
 
-	draw.standard = [draw.basic, draw.labels, draw.highlight];
+	draw.standard = [draw.basic, draw.highlight];
 
 
 	var remove = {
 	    basic: function() {
 	        if (this.state.visibleShape) {
 	            this.state.visibleShape.remove();
+	            this.state.visibleShape = null;
 	        }
-	    },
-	    labels: function() {
-	        var labels = [this.state._labeledSides, this.state._labeledVertices,
-	            this.state._labeledAngles, this.state._labelCache];
-
-	        _.each(labels, function(labelType) {
-	            if (labelType != null && labelType.length) {
-	                _.invoke(labelType, "remove");
-	            }
-	        });
 	    }
 	};
 
-	remove.standard = [remove.basic, remove.labels];
+	remove.standard = remove.basic;
 
 
 	var constraints = {
@@ -37183,69 +37287,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	                paddingPx = 0;
 	            }
 	        }
-	        return function(coord, prevCoord) {
+	        return function(coord) {
 	            var graphie = this.graphie;
-	            var delta = kvector.subtract(coord, prevCoord);
-	            var range = range || graphie.range;
-	            // A null snap means no snap; an undefined snap means
-	            // default to graphie's
+	            range = range || graphie.range;
 	            if (snap === undefined) {
 	                snap = graphie.snap;
 	            }
 
-	            // Calculate the bounds for both points
-	            var absoluteLower = graphie.unscalePoint([
+	            var lower = graphie.unscalePoint([
 	                paddingPx,
 	                graphie.ypixels - paddingPx
 	            ]);
-	            var absoluteUpper = graphie.unscalePoint([
+	            var upper = graphie.unscalePoint([
 	                graphie.xpixels - paddingPx,
 	                paddingPx
 	            ]);
 	            if (snap) {
-	                absoluteLower = kpoint.ceilTo(absoluteLower, snap);
-	                absoluteUpper = kpoint.floorTo(absoluteUpper, snap);
+	                lower = kpoint.ceilTo(lower, snap);
+	                upper = kpoint.floorTo(upper, snap);
 	            }
-
-	            // Calculate the bounds for the delta.
-	            var deltaBounds = _.map(this.coords(), function(coord, i) {
-	                var max = kvector.subtract(absoluteUpper, coord);
-	                var min = kvector.subtract(absoluteLower, coord);
-	                return [min, max];
-	            });
-
-	            // bound the delta by the calculated bounds
-	            var boundedDelta = _.reduce(deltaBounds,
-	                    function(delta, bound) {
-	                var lower = bound[0];
-	                var upper = bound[1];
-	                var deltaX = Math.max(lower[0], Math.min(upper[0], delta[0]));
-	                var deltaY = Math.max(lower[1], Math.min(upper[1], delta[1]));
-	                return [deltaX, deltaY];
-	            }, delta);
-
-	            return kvector.add(prevCoord, boundedDelta);
+	            var coordX = Math.max(lower[0], Math.min(upper[0], coord[0]));
+	            var coordY = Math.max(lower[1], Math.min(upper[1], coord[1]));
+	            return [coordX, coordY];
 	        };
 	    }
 	};
 
 	constraints.standard = null;
-
-
-	var onMove = {
-	    updatePoints: function(coord, prevCoord) {
-	        var actualDelta = kvector.subtract(coord, prevCoord);
-	        _.each(this.state.points, function(point) {
-	            point.setCoord(kvector.add(
-	                point.coord(),
-	                actualDelta
-	            ));
-	        });
-	    }
-	};
-
-	onMove.standard = null;
-
 
 	module.exports = {
 	    add: add,
@@ -37255,10 +37323,44 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    onMoveStart: {standard: null},
 	    constraints: constraints,
-	    onMove: onMove,
+	    onMove: {standard: null},
 	    onMoveEnd: {standard: null},
 	    onClick: {standard: null}
 	};
+
+
+/***/ },
+/* 130 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _ = __webpack_require__(59);
+	var WrappedDefaults = __webpack_require__(134);
+
+	var DEFAULT_OPTIONS = {
+	    maxScale: 1,
+	    mouselayer: false
+	};
+
+	var WrappedEllipse = function(graphie, center, radii, options) {
+	    options = _.extend({}, DEFAULT_OPTIONS, options);
+
+	    // Add `wrapper`, `visibleShape`, and remaining properties
+	    _.extend(this, graphie.fixedEllipse(center, radii, options.maxScale), {
+	        graphie: graphie,
+	        initialPoint: center
+	    });
+
+	    // Add to appropriate graphie layer
+	    if (options.mouselayer) {
+	        this.graphie.addToMouseLayerWrapper(this.wrapper);
+	    } else {
+	        this.graphie.addToVisibleLayerWrapper(this.wrapper);
+	    }
+	};
+
+	_.extend(WrappedEllipse.prototype,  WrappedDefaults);
+
+	module.exports = WrappedEllipse;
 
 
 /***/ },
@@ -37309,6 +37411,45 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 133 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _ = __webpack_require__(59);
+	var WrappedDefaults = __webpack_require__(134);
+
+	var DEFAULT_OPTIONS = {
+	    center: null, // gets ignored in `graphie.fixedPath` if `null`
+	    createPath: null, // gets defaulted in `graphie.fixedPath` if `null`
+	    mouselayer: false
+	};
+
+	var WrappedPath = function(graphie, points, options) {
+	    options = _.extend({}, DEFAULT_OPTIONS, options);
+
+	    // Add `wrapper` and `visibleShape`
+	    _.extend(this, graphie.fixedPath(points, options.center,
+	        options.createPath));
+
+	    // Add remaining properties
+	    _.extend(this, {
+	        graphie: graphie,
+	        initialPoint: graphie.scalePoint(_.head(points))
+	    });
+
+	    // Add to appropriate graphie layer
+	    if (options.mouselayer) {
+	        this.graphie.addToMouseLayerWrapper(this.wrapper);
+	    } else {
+	        this.graphie.addToVisibleLayerWrapper(this.wrapper);
+	    }
+	};
+
+	_.extend(WrappedPath.prototype, WrappedDefaults);
+
+	module.exports = WrappedPath;
+
+
+/***/ },
+/* 134 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37385,45 +37526,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}));
 
 	module.exports = WrappedDefaults;
-
-
-/***/ },
-/* 134 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var _ = __webpack_require__(59);
-	var WrappedDefaults = __webpack_require__(133);
-
-	var DEFAULT_OPTIONS = {
-	    center: null, // gets ignored in `graphie.fixedPath` if `null`
-	    createPath: null, // gets defaulted in `graphie.fixedPath` if `null`
-	    mouselayer: false
-	};
-
-	var WrappedPath = function(graphie, points, options) {
-	    options = _.extend({}, DEFAULT_OPTIONS, options);
-
-	    // Add `wrapper` and `visibleShape`
-	    _.extend(this, graphie.fixedPath(points, options.center,
-	        options.createPath));
-
-	    // Add remaining properties
-	    _.extend(this, {
-	        graphie: graphie,
-	        initialPoint: graphie.scalePoint(_.head(points))
-	    });
-
-	    // Add to appropriate graphie layer
-	    if (options.mouselayer) {
-	        this.graphie.addToMouseLayerWrapper(this.wrapper);
-	    } else {
-	        this.graphie.addToVisibleLayerWrapper(this.wrapper);
-	    }
-	};
-
-	_.extend(WrappedPath.prototype, WrappedDefaults);
-
-	module.exports = WrappedPath;
 
 
 /***/ },
@@ -38017,8 +38119,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var bind = __webpack_require__(147),
-	    identity = __webpack_require__(146),
+	var bind = __webpack_require__(146),
+	    identity = __webpack_require__(147),
 	    setBindData = __webpack_require__(148),
 	    support = __webpack_require__(149);
 
@@ -38103,9 +38205,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(152),
+	var isNative = __webpack_require__(150),
 	    isObject = __webpack_require__(151),
-	    shimKeys = __webpack_require__(153);
+	    shimKeys = __webpack_require__(152);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -38145,7 +38247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var createCallback = __webpack_require__(150),
+	var createCallback = __webpack_require__(153),
 	    forOwn = __webpack_require__(154);
 
 	/**
@@ -38280,8 +38382,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 	var isNative = __webpack_require__(156),
-	    isObject = __webpack_require__(158),
-	    shimKeys = __webpack_require__(157);
+	    isObject = __webpack_require__(157),
+	    shimKeys = __webpack_require__(158);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -38342,40 +38444,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-
-	/**
-	 * This method returns the first argument provided to it.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @param {*} value Any value.
-	 * @returns {*} Returns `value`.
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.identity(object) === object;
-	 * // => true
-	 */
-	function identity(value) {
-	  return value;
-	}
-
-	module.exports = identity;
-
-
-/***/ },
-/* 147 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
 	var createWrapper = __webpack_require__(160),
 	    slice = __webpack_require__(161);
 
@@ -38411,6 +38479,40 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 147 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * This method returns the first argument provided to it.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @param {*} value Any value.
+	 * @returns {*} Returns `value`.
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.identity(object) === object;
+	 * // => true
+	 */
+	function identity(value) {
+	  return value;
+	}
+
+	module.exports = identity;
+
+
+/***/ },
 /* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -38423,7 +38525,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 	var isNative = __webpack_require__(162),
-	    noop = __webpack_require__(164);
+	    noop = __webpack_require__(163);
 
 	/** Used as the property descriptor for `__bindData__` */
 	var descriptor = {
@@ -38471,7 +38573,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(163);
+	var isNative = __webpack_require__(172);
 
 	/** Used to detect functions containing a `this` reference */
 	var reThis = /\bthis\b/;
@@ -38518,11 +38620,140 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreateCallback = __webpack_require__(165),
-	    baseIsEqual = __webpack_require__(166),
-	    isObject = __webpack_require__(167),
-	    keys = __webpack_require__(168),
-	    property = __webpack_require__(169);
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Used to resolve the internal [[Class]] of values */
+	var toString = objectProto.toString;
+
+	/** Used to detect if a method is native */
+	var reNative = RegExp('^' +
+	  String(toString)
+	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
+	);
+
+	/**
+	 * Checks if `value` is a native function.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
+	 */
+	function isNative(value) {
+	  return typeof value == 'function' && reNative.test(value);
+	}
+
+	module.exports = isNative;
+
+
+/***/ },
+/* 151 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var objectTypes = __webpack_require__(142);
+
+	/**
+	 * Checks if `value` is the language type of Object.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Objects
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(1);
+	 * // => false
+	 */
+	function isObject(value) {
+	  // check if the value is the ECMAScript language type of Object
+	  // http://es5.github.io/#x8
+	  // and avoid a V8 bug
+	  // http://code.google.com/p/v8/issues/detail?id=2291
+	  return !!(value && objectTypes[typeof value]);
+	}
+
+	module.exports = isObject;
+
+
+/***/ },
+/* 152 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var objectTypes = __webpack_require__(142);
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Native method shortcuts */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * A fallback implementation of `Object.keys` which produces an array of the
+	 * given object's own enumerable property names.
+	 *
+	 * @private
+	 * @type Function
+	 * @param {Object} object The object to inspect.
+	 * @returns {Array} Returns an array of property names.
+	 */
+	var shimKeys = function(object) {
+	  var index, iterable = object, result = [];
+	  if (!iterable) return result;
+	  if (!(objectTypes[typeof object])) return result;
+	    for (index in iterable) {
+	      if (hasOwnProperty.call(iterable, index)) {
+	        result.push(index);
+	      }
+	    }
+	  return result
+	};
+
+	module.exports = shimKeys;
+
+
+/***/ },
+/* 153 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var baseCreateCallback = __webpack_require__(164),
+	    baseIsEqual = __webpack_require__(165),
+	    isObject = __webpack_require__(166),
+	    keys = __webpack_require__(167),
+	    property = __webpack_require__(168);
 
 	/**
 	 * Produces a callback bound to an optional `thisArg`. If `func` is a property
@@ -38594,135 +38825,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 151 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(142);
-
-	/**
-	 * Checks if `value` is the language type of Object.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Objects
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(1);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // check if the value is the ECMAScript language type of Object
-	  // http://es5.github.io/#x8
-	  // and avoid a V8 bug
-	  // http://code.google.com/p/v8/issues/detail?id=2291
-	  return !!(value && objectTypes[typeof value]);
-	}
-
-	module.exports = isObject;
-
-
-/***/ },
-/* 152 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the internal [[Class]] of values */
-	var toString = objectProto.toString;
-
-	/** Used to detect if a method is native */
-	var reNative = RegExp('^' +
-	  String(toString)
-	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
-	);
-
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
-	 */
-	function isNative(value) {
-	  return typeof value == 'function' && reNative.test(value);
-	}
-
-	module.exports = isNative;
-
-
-/***/ },
-/* 153 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(142);
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Native method shortcuts */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-
-	/**
-	 * A fallback implementation of `Object.keys` which produces an array of the
-	 * given object's own enumerable property names.
-	 *
-	 * @private
-	 * @type Function
-	 * @param {Object} object The object to inspect.
-	 * @returns {Array} Returns an array of property names.
-	 */
-	var shimKeys = function(object) {
-	  var index, iterable = object, result = [];
-	  if (!iterable) return result;
-	  if (!(objectTypes[typeof object])) return result;
-	    for (index in iterable) {
-	      if (hasOwnProperty.call(iterable, index)) {
-	        result.push(index);
-	      }
-	    }
-	  return result
-	};
-
-	module.exports = shimKeys;
-
-
-/***/ },
 /* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -38734,8 +38836,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreateCallback = __webpack_require__(170),
-	    keys = __webpack_require__(172),
+	var baseCreateCallback = __webpack_require__(169),
+	    keys = __webpack_require__(170),
 	    objectTypes = __webpack_require__(171);
 
 	/**
@@ -38864,50 +38966,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var objectTypes = __webpack_require__(173);
 
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Native method shortcuts */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-
-	/**
-	 * A fallback implementation of `Object.keys` which produces an array of the
-	 * given object's own enumerable property names.
-	 *
-	 * @private
-	 * @type Function
-	 * @param {Object} object The object to inspect.
-	 * @returns {Array} Returns an array of property names.
-	 */
-	var shimKeys = function(object) {
-	  var index, iterable = object, result = [];
-	  if (!iterable) return result;
-	  if (!(objectTypes[typeof object])) return result;
-	    for (index in iterable) {
-	      if (hasOwnProperty.call(iterable, index)) {
-	        result.push(index);
-	      }
-	    }
-	  return result
-	};
-
-	module.exports = shimKeys;
-
-
-/***/ },
-/* 158 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(174);
-
 	/**
 	 * Checks if `value` is the language type of Object.
 	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
@@ -38937,6 +38995,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = isObject;
+
+
+/***/ },
+/* 158 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var objectTypes = __webpack_require__(174);
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Native method shortcuts */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * A fallback implementation of `Object.keys` which produces an array of the
+	 * given object's own enumerable property names.
+	 *
+	 * @private
+	 * @type Function
+	 * @param {Object} object The object to inspect.
+	 * @returns {Array} Returns an array of property names.
+	 */
+	var shimKeys = function(object) {
+	  var index, iterable = object, result = [];
+	  if (!iterable) return result;
+	  if (!(objectTypes[typeof object])) return result;
+	    for (index in iterable) {
+	      if (hasOwnProperty.call(iterable, index)) {
+	        result.push(index);
+	      }
+	    }
+	  return result
+	};
+
+	module.exports = shimKeys;
 
 
 /***/ },
@@ -38983,8 +39085,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseBind = __webpack_require__(176),
-	    baseCreateWrapper = __webpack_require__(175),
+	var baseBind = __webpack_require__(175),
+	    baseCreateWrapper = __webpack_require__(176),
 	    isFunction = __webpack_require__(177),
 	    slice = __webpack_require__(161);
 
@@ -39180,46 +39282,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the internal [[Class]] of values */
-	var toString = objectProto.toString;
-
-	/** Used to detect if a method is native */
-	var reNative = RegExp('^' +
-	  String(toString)
-	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
-	);
-
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
-	 */
-	function isNative(value) {
-	  return typeof value == 'function' && reNative.test(value);
-	}
-
-	module.exports = isNative;
-
-
-/***/ },
-/* 164 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
 	/**
 	 * A no-operation function.
 	 *
@@ -39240,7 +39302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 165 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -39251,10 +39313,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var bind = __webpack_require__(183),
-	    identity = __webpack_require__(184),
-	    setBindData = __webpack_require__(185),
-	    support = __webpack_require__(186);
+	var bind = __webpack_require__(180),
+	    identity = __webpack_require__(181),
+	    setBindData = __webpack_require__(182),
+	    support = __webpack_require__(183);
 
 	/** Used to detected named functions */
 	var reFuncName = /^\s*function[ \n\r\t]+\w/;
@@ -39326,7 +39388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 166 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -39337,11 +39399,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var forIn = __webpack_require__(178),
-	    getArray = __webpack_require__(179),
-	    isFunction = __webpack_require__(180),
-	    objectTypes = __webpack_require__(181),
-	    releaseArray = __webpack_require__(182);
+	var forIn = __webpack_require__(184),
+	    getArray = __webpack_require__(185),
+	    isFunction = __webpack_require__(186),
+	    objectTypes = __webpack_require__(187),
+	    releaseArray = __webpack_require__(188);
 
 	/** `Object#toString` result shortcuts */
 	var argsClass = '[object Arguments]',
@@ -39541,7 +39603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 167 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -39552,7 +39614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(190);
+	var objectTypes = __webpack_require__(196);
 
 	/**
 	 * Checks if `value` is the language type of Object.
@@ -39586,7 +39648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 168 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -39597,9 +39659,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(187),
-	    isObject = __webpack_require__(167),
-	    shimKeys = __webpack_require__(188);
+	var isNative = __webpack_require__(178),
+	    isObject = __webpack_require__(166),
+	    shimKeys = __webpack_require__(179);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -39628,7 +39690,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 169 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -39674,7 +39736,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 170 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -39686,7 +39748,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 	var bind = __webpack_require__(189),
-	    identity = __webpack_require__(193),
+	    identity = __webpack_require__(190),
 	    setBindData = __webpack_require__(191),
 	    support = __webpack_require__(192);
 
@@ -39760,6 +39822,48 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var isNative = __webpack_require__(193),
+	    isObject = __webpack_require__(194),
+	    shimKeys = __webpack_require__(195);
+
+	/* Native method shortcuts for methods with the same name as other `lodash` methods */
+	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
+
+	/**
+	 * Creates an array composed of the own enumerable property names of an object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Objects
+	 * @param {Object} object The object to inspect.
+	 * @returns {Array} Returns an array of property names.
+	 * @example
+	 *
+	 * _.keys({ 'one': 1, 'two': 2, 'three': 3 });
+	 * // => ['one', 'two', 'three'] (property order is not guaranteed across environments)
+	 */
+	var keys = !nativeKeys ? shimKeys : function(object) {
+	  if (!isObject(object)) {
+	    return [];
+	  }
+	  return nativeKeys(object);
+	};
+
+	module.exports = keys;
+
+
+/***/ },
 /* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -39797,34 +39901,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(194),
-	    isObject = __webpack_require__(195),
-	    shimKeys = __webpack_require__(196);
 
-	/* Native method shortcuts for methods with the same name as other `lodash` methods */
-	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Used to resolve the internal [[Class]] of values */
+	var toString = objectProto.toString;
+
+	/** Used to detect if a method is native */
+	var reNative = RegExp('^' +
+	  String(toString)
+	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
+	);
 
 	/**
-	 * Creates an array composed of the own enumerable property names of an object.
+	 * Checks if `value` is a native function.
 	 *
-	 * @static
-	 * @memberOf _
-	 * @category Objects
-	 * @param {Object} object The object to inspect.
-	 * @returns {Array} Returns an array of property names.
-	 * @example
-	 *
-	 * _.keys({ 'one': 1, 'two': 2, 'three': 3 });
-	 * // => ['one', 'two', 'three'] (property order is not guaranteed across environments)
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
 	 */
-	var keys = !nativeKeys ? shimKeys : function(object) {
-	  if (!isObject(object)) {
-	    return [];
-	  }
-	  return nativeKeys(object);
-	};
+	function isNative(value) {
+	  return typeof value == 'function' && reNative.test(value);
+	}
 
-	module.exports = keys;
+	module.exports = isNative;
 
 
 /***/ },
@@ -39891,8 +39993,76 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
+	var baseCreate = __webpack_require__(199),
+	    isObject = __webpack_require__(200),
+	    setBindData = __webpack_require__(148),
+	    slice = __webpack_require__(161);
+
+	/**
+	 * Used for `Array` method references.
+	 *
+	 * Normally `Array.prototype` would suffice, however, using an array literal
+	 * avoids issues in Narwhal.
+	 */
+	var arrayRef = [];
+
+	/** Native method shortcuts */
+	var push = arrayRef.push;
+
+	/**
+	 * The base implementation of `_.bind` that creates the bound function and
+	 * sets its meta data.
+	 *
+	 * @private
+	 * @param {Array} bindData The bind data array.
+	 * @returns {Function} Returns the new bound function.
+	 */
+	function baseBind(bindData) {
+	  var func = bindData[0],
+	      partialArgs = bindData[2],
+	      thisArg = bindData[4];
+
+	  function bound() {
+	    // `Function#bind` spec
+	    // http://es5.github.io/#x15.3.4.5
+	    if (partialArgs) {
+	      // avoid `arguments` object deoptimizations by using `slice` instead
+	      // of `Array.prototype.slice.call` and not assigning `arguments` to a
+	      // variable as a ternary expression
+	      var args = slice(partialArgs);
+	      push.apply(args, arguments);
+	    }
+	    // mimic the constructor's `return` behavior
+	    // http://es5.github.io/#x13.2.2
+	    if (this instanceof bound) {
+	      // ensure `new bound` is an instance of `func`
+	      var thisBinding = baseCreate(func.prototype),
+	          result = func.apply(thisBinding, args || arguments);
+	      return isObject(result) ? result : thisBinding;
+	    }
+	    return func.apply(thisArg, args || arguments);
+	  }
+	  setBindData(bound, bindData);
+	  return bound;
+	}
+
+	module.exports = baseBind;
+
+
+/***/ },
+/* 176 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
 	var baseCreate = __webpack_require__(197),
-	    isObject = __webpack_require__(199),
+	    isObject = __webpack_require__(198),
 	    setBindData = __webpack_require__(148),
 	    slice = __webpack_require__(161);
 
@@ -39964,74 +40134,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 176 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var baseCreate = __webpack_require__(198),
-	    isObject = __webpack_require__(200),
-	    setBindData = __webpack_require__(148),
-	    slice = __webpack_require__(161);
-
-	/**
-	 * Used for `Array` method references.
-	 *
-	 * Normally `Array.prototype` would suffice, however, using an array literal
-	 * avoids issues in Narwhal.
-	 */
-	var arrayRef = [];
-
-	/** Native method shortcuts */
-	var push = arrayRef.push;
-
-	/**
-	 * The base implementation of `_.bind` that creates the bound function and
-	 * sets its meta data.
-	 *
-	 * @private
-	 * @param {Array} bindData The bind data array.
-	 * @returns {Function} Returns the new bound function.
-	 */
-	function baseBind(bindData) {
-	  var func = bindData[0],
-	      partialArgs = bindData[2],
-	      thisArg = bindData[4];
-
-	  function bound() {
-	    // `Function#bind` spec
-	    // http://es5.github.io/#x15.3.4.5
-	    if (partialArgs) {
-	      // avoid `arguments` object deoptimizations by using `slice` instead
-	      // of `Array.prototype.slice.call` and not assigning `arguments` to a
-	      // variable as a ternary expression
-	      var args = slice(partialArgs);
-	      push.apply(args, arguments);
-	    }
-	    // mimic the constructor's `return` behavior
-	    // http://es5.github.io/#x13.2.2
-	    if (this instanceof bound) {
-	      // ensure `new bound` is an instance of `func`
-	      var thisBinding = baseCreate(func.prototype),
-	          result = func.apply(thisBinding, args || arguments);
-	      return isObject(result) ? result : thisBinding;
-	    }
-	    return func.apply(thisArg, args || arguments);
-	  }
-	  setBindData(bound, bindData);
-	  return bound;
-	}
-
-	module.exports = baseBind;
-
-
-/***/ },
 /* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -40076,8 +40178,268 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreateCallback = __webpack_require__(165),
-	    objectTypes = __webpack_require__(181);
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Used to resolve the internal [[Class]] of values */
+	var toString = objectProto.toString;
+
+	/** Used to detect if a method is native */
+	var reNative = RegExp('^' +
+	  String(toString)
+	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
+	);
+
+	/**
+	 * Checks if `value` is a native function.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
+	 */
+	function isNative(value) {
+	  return typeof value == 'function' && reNative.test(value);
+	}
+
+	module.exports = isNative;
+
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var objectTypes = __webpack_require__(203);
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Native method shortcuts */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * A fallback implementation of `Object.keys` which produces an array of the
+	 * given object's own enumerable property names.
+	 *
+	 * @private
+	 * @type Function
+	 * @param {Object} object The object to inspect.
+	 * @returns {Array} Returns an array of property names.
+	 */
+	var shimKeys = function(object) {
+	  var index, iterable = object, result = [];
+	  if (!iterable) return result;
+	  if (!(objectTypes[typeof object])) return result;
+	    for (index in iterable) {
+	      if (hasOwnProperty.call(iterable, index)) {
+	        result.push(index);
+	      }
+	    }
+	  return result
+	};
+
+	module.exports = shimKeys;
+
+
+/***/ },
+/* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var createWrapper = __webpack_require__(201),
+	    slice = __webpack_require__(202);
+
+	/**
+	 * Creates a function that, when called, invokes `func` with the `this`
+	 * binding of `thisArg` and prepends any additional `bind` arguments to those
+	 * provided to the bound function.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Functions
+	 * @param {Function} func The function to bind.
+	 * @param {*} [thisArg] The `this` binding of `func`.
+	 * @param {...*} [arg] Arguments to be partially applied.
+	 * @returns {Function} Returns the new bound function.
+	 * @example
+	 *
+	 * var func = function(greeting) {
+	 *   return greeting + ' ' + this.name;
+	 * };
+	 *
+	 * func = _.bind(func, { 'name': 'fred' }, 'hi');
+	 * func();
+	 * // => 'hi fred'
+	 */
+	function bind(func, thisArg) {
+	  return arguments.length > 2
+	    ? createWrapper(func, 17, slice(arguments, 2), null, thisArg)
+	    : createWrapper(func, 1, null, null, thisArg);
+	}
+
+	module.exports = bind;
+
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * This method returns the first argument provided to it.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @param {*} value Any value.
+	 * @returns {*} Returns `value`.
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.identity(object) === object;
+	 * // => true
+	 */
+	function identity(value) {
+	  return value;
+	}
+
+	module.exports = identity;
+
+
+/***/ },
+/* 182 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var isNative = __webpack_require__(204),
+	    noop = __webpack_require__(205);
+
+	/** Used as the property descriptor for `__bindData__` */
+	var descriptor = {
+	  'configurable': false,
+	  'enumerable': false,
+	  'value': null,
+	  'writable': false
+	};
+
+	/** Used to set meta data on functions */
+	var defineProperty = (function() {
+	  // IE 8 only accepts DOM elements
+	  try {
+	    var o = {},
+	        func = isNative(func = Object.defineProperty) && func,
+	        result = func(o, o, o) && func;
+	  } catch(e) { }
+	  return result;
+	}());
+
+	/**
+	 * Sets `this` binding data on a given function.
+	 *
+	 * @private
+	 * @param {Function} func The function to set data on.
+	 * @param {Array} value The data array to set.
+	 */
+	var setBindData = !defineProperty ? noop : function(func, value) {
+	  descriptor.value = value;
+	  defineProperty(func, '__bindData__', descriptor);
+	};
+
+	module.exports = setBindData;
+
+
+/***/ },
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var isNative = __webpack_require__(206);
+
+	/** Used to detect functions containing a `this` reference */
+	var reThis = /\bthis\b/;
+
+	/**
+	 * An object used to flag environments features.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @type Object
+	 */
+	var support = {};
+
+	/**
+	 * Detect if functions can be decompiled by `Function#toString`
+	 * (all but PS3 and older Opera mobile browsers & avoided in Windows 8 apps).
+	 *
+	 * @memberOf _.support
+	 * @type boolean
+	 */
+	support.funcDecomp = !isNative(global.WinRTError) && reThis.test(function() { return this; });
+
+	/**
+	 * Detect if `Function#name` is supported (all but IE).
+	 *
+	 * @memberOf _.support
+	 * @type boolean
+	 */
+	support.funcNames = typeof Function.name == 'string';
+
+	module.exports = support;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 184 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var baseCreateCallback = __webpack_require__(164),
+	    objectTypes = __webpack_require__(187);
 
 	/**
 	 * Iterates over own and inherited enumerable properties of an object,
@@ -40125,7 +40487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 179 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -40136,7 +40498,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var arrayPool = __webpack_require__(201);
+	var arrayPool = __webpack_require__(207);
 
 	/**
 	 * Gets an array from the array pool or creates a new one if the pool is empty.
@@ -40152,7 +40514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 180 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -40185,7 +40547,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 181 */
+/* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -40211,7 +40573,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 182 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -40222,8 +40584,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var arrayPool = __webpack_require__(202),
-	    maxPoolSize = __webpack_require__(203);
+	var arrayPool = __webpack_require__(208),
+	    maxPoolSize = __webpack_require__(209);
 
 	/**
 	 * Releases the given array back to the array pool.
@@ -40242,266 +40604,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 183 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var createWrapper = __webpack_require__(204),
-	    slice = __webpack_require__(205);
-
-	/**
-	 * Creates a function that, when called, invokes `func` with the `this`
-	 * binding of `thisArg` and prepends any additional `bind` arguments to those
-	 * provided to the bound function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Functions
-	 * @param {Function} func The function to bind.
-	 * @param {*} [thisArg] The `this` binding of `func`.
-	 * @param {...*} [arg] Arguments to be partially applied.
-	 * @returns {Function} Returns the new bound function.
-	 * @example
-	 *
-	 * var func = function(greeting) {
-	 *   return greeting + ' ' + this.name;
-	 * };
-	 *
-	 * func = _.bind(func, { 'name': 'fred' }, 'hi');
-	 * func();
-	 * // => 'hi fred'
-	 */
-	function bind(func, thisArg) {
-	  return arguments.length > 2
-	    ? createWrapper(func, 17, slice(arguments, 2), null, thisArg)
-	    : createWrapper(func, 1, null, null, thisArg);
-	}
-
-	module.exports = bind;
-
-
-/***/ },
-/* 184 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/**
-	 * This method returns the first argument provided to it.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @param {*} value Any value.
-	 * @returns {*} Returns `value`.
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.identity(object) === object;
-	 * // => true
-	 */
-	function identity(value) {
-	  return value;
-	}
-
-	module.exports = identity;
-
-
-/***/ },
-/* 185 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var isNative = __webpack_require__(206),
-	    noop = __webpack_require__(207);
-
-	/** Used as the property descriptor for `__bindData__` */
-	var descriptor = {
-	  'configurable': false,
-	  'enumerable': false,
-	  'value': null,
-	  'writable': false
-	};
-
-	/** Used to set meta data on functions */
-	var defineProperty = (function() {
-	  // IE 8 only accepts DOM elements
-	  try {
-	    var o = {},
-	        func = isNative(func = Object.defineProperty) && func,
-	        result = func(o, o, o) && func;
-	  } catch(e) { }
-	  return result;
-	}());
-
-	/**
-	 * Sets `this` binding data on a given function.
-	 *
-	 * @private
-	 * @param {Function} func The function to set data on.
-	 * @param {Array} value The data array to set.
-	 */
-	var setBindData = !defineProperty ? noop : function(func, value) {
-	  descriptor.value = value;
-	  defineProperty(func, '__bindData__', descriptor);
-	};
-
-	module.exports = setBindData;
-
-
-/***/ },
-/* 186 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var isNative = __webpack_require__(208);
-
-	/** Used to detect functions containing a `this` reference */
-	var reThis = /\bthis\b/;
-
-	/**
-	 * An object used to flag environments features.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @type Object
-	 */
-	var support = {};
-
-	/**
-	 * Detect if functions can be decompiled by `Function#toString`
-	 * (all but PS3 and older Opera mobile browsers & avoided in Windows 8 apps).
-	 *
-	 * @memberOf _.support
-	 * @type boolean
-	 */
-	support.funcDecomp = !isNative(global.WinRTError) && reThis.test(function() { return this; });
-
-	/**
-	 * Detect if `Function#name` is supported (all but IE).
-	 *
-	 * @memberOf _.support
-	 * @type boolean
-	 */
-	support.funcNames = typeof Function.name == 'string';
-
-	module.exports = support;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 187 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the internal [[Class]] of values */
-	var toString = objectProto.toString;
-
-	/** Used to detect if a method is native */
-	var reNative = RegExp('^' +
-	  String(toString)
-	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
-	);
-
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
-	 */
-	function isNative(value) {
-	  return typeof value == 'function' && reNative.test(value);
-	}
-
-	module.exports = isNative;
-
-
-/***/ },
-/* 188 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(210);
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Native method shortcuts */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-
-	/**
-	 * A fallback implementation of `Object.keys` which produces an array of the
-	 * given object's own enumerable property names.
-	 *
-	 * @private
-	 * @type Function
-	 * @param {Object} object The object to inspect.
-	 * @returns {Array} Returns an array of property names.
-	 */
-	var shimKeys = function(object) {
-	  var index, iterable = object, result = [];
-	  if (!iterable) return result;
-	  if (!(objectTypes[typeof object])) return result;
-	    for (index in iterable) {
-	      if (hasOwnProperty.call(iterable, index)) {
-	        result.push(index);
-	      }
-	    }
-	  return result
-	};
-
-	module.exports = shimKeys;
-
-
-/***/ },
 /* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -40513,8 +40615,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var createWrapper = __webpack_require__(209),
-	    slice = __webpack_require__(213);
+	var createWrapper = __webpack_require__(213),
+	    slice = __webpack_require__(214);
 
 	/**
 	 * Creates a function that, when called, invokes `func` with the `this`
@@ -40560,17 +40662,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 
-	/** Used to determine if values are of the language type Object */
-	var objectTypes = {
-	  'boolean': false,
-	  'function': true,
-	  'object': true,
-	  'number': false,
-	  'string': false,
-	  'undefined': false
-	};
+	/**
+	 * This method returns the first argument provided to it.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @param {*} value Any value.
+	 * @returns {*} Returns `value`.
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.identity(object) === object;
+	 * // => true
+	 */
+	function identity(value) {
+	  return value;
+	}
 
-	module.exports = objectTypes;
+	module.exports = identity;
 
 
 /***/ },
@@ -40585,8 +40695,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(211),
-	    noop = __webpack_require__(212);
+	var isNative = __webpack_require__(210),
+	    noop = __webpack_require__(211);
 
 	/** Used as the property descriptor for `__bindData__` */
 	var descriptor = {
@@ -40634,7 +40744,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(214);
+	var isNative = __webpack_require__(212);
 
 	/** Used to detect functions containing a `this` reference */
 	var reThis = /\bthis\b/;
@@ -40682,40 +40792,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 
-	/**
-	 * This method returns the first argument provided to it.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @param {*} value Any value.
-	 * @returns {*} Returns `value`.
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.identity(object) === object;
-	 * // => true
-	 */
-	function identity(value) {
-	  return value;
-	}
-
-	module.exports = identity;
-
-
-/***/ },
-/* 194 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
 	/** Used for native method references */
 	var objectProto = Object.prototype;
 
@@ -40744,7 +40820,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 195 */
+/* 194 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -40789,7 +40865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 196 */
+/* 195 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -40833,6 +40909,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 196 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used to determine if values are of the language type Object */
+	var objectTypes = {
+	  'boolean': false,
+	  'function': true,
+	  'object': true,
+	  'number': false,
+	  'string': false,
+	  'undefined': false
+	};
+
+	module.exports = objectTypes;
+
+
+/***/ },
 /* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -40844,9 +40946,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(216),
-	    isObject = __webpack_require__(199),
-	    noop = __webpack_require__(215);
+	var isNative = __webpack_require__(215),
+	    isObject = __webpack_require__(198),
+	    noop = __webpack_require__(216);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
@@ -40883,6 +40985,51 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 198 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var objectTypes = __webpack_require__(142);
+
+	/**
+	 * Checks if `value` is the language type of Object.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Objects
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(1);
+	 * // => false
+	 */
+	function isObject(value) {
+	  // check if the value is the ECMAScript language type of Object
+	  // http://es5.github.io/#x8
+	  // and avoid a V8 bug
+	  // http://code.google.com/p/v8/issues/detail?id=2291
+	  return !!(value && objectTypes[typeof value]);
+	}
+
+	module.exports = isObject;
+
+
+/***/ },
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -40929,51 +41076,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = baseCreate;
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 199 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var objectTypes = __webpack_require__(142);
-
-	/**
-	 * Checks if `value` is the language type of Object.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Objects
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(1);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // check if the value is the ECMAScript language type of Object
-	  // http://es5.github.io/#x8
-	  // and avoid a V8 bug
-	  // http://code.google.com/p/v8/issues/detail?id=2291
-	  return !!(value && objectTypes[typeof value]);
-	}
-
-	module.exports = isObject;
-
 
 /***/ },
 /* 200 */
@@ -41032,67 +41134,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-
-	/** Used to pool arrays and objects used internally */
-	var arrayPool = [];
-
-	module.exports = arrayPool;
-
-
-/***/ },
-/* 202 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used to pool arrays and objects used internally */
-	var arrayPool = [];
-
-	module.exports = arrayPool;
-
-
-/***/ },
-/* 203 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used as the max size of the `arrayPool` and `objectPool` */
-	var maxPoolSize = 40;
-
-	module.exports = maxPoolSize;
-
-
-/***/ },
-/* 204 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
 	var baseBind = __webpack_require__(219),
 	    baseCreateWrapper = __webpack_require__(220),
 	    isFunction = __webpack_require__(221),
-	    slice = __webpack_require__(205);
+	    slice = __webpack_require__(202);
 
 	/**
 	 * Used for `Array` method references.
@@ -41190,7 +41235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 205 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41231,6 +41276,104 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = slice;
+
+
+/***/ },
+/* 203 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used to determine if values are of the language type Object */
+	var objectTypes = {
+	  'boolean': false,
+	  'function': true,
+	  'object': true,
+	  'number': false,
+	  'string': false,
+	  'undefined': false
+	};
+
+	module.exports = objectTypes;
+
+
+/***/ },
+/* 204 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Used to resolve the internal [[Class]] of values */
+	var toString = objectProto.toString;
+
+	/** Used to detect if a method is native */
+	var reNative = RegExp('^' +
+	  String(toString)
+	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
+	);
+
+	/**
+	 * Checks if `value` is a native function.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
+	 */
+	function isNative(value) {
+	  return typeof value == 'function' && reNative.test(value);
+	}
+
+	module.exports = isNative;
+
+
+/***/ },
+/* 205 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * A no-operation function.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.noop(object) === undefined;
+	 * // => true
+	 */
+	function noop() {
+	  // no operation performed
+	}
+
+	module.exports = noop;
 
 
 /***/ },
@@ -41286,27 +41429,52 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 
-	/**
-	 * A no-operation function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.noop(object) === undefined;
-	 * // => true
-	 */
-	function noop() {
-	  // no operation performed
-	}
+	/** Used to pool arrays and objects used internally */
+	var arrayPool = [];
 
-	module.exports = noop;
+	module.exports = arrayPool;
 
 
 /***/ },
 /* 208 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used to pool arrays and objects used internally */
+	var arrayPool = [];
+
+	module.exports = arrayPool;
+
+
+/***/ },
+/* 209 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used as the max size of the `arrayPool` and `objectPool` */
+	var maxPoolSize = 40;
+
+	module.exports = maxPoolSize;
+
+
+/***/ },
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41346,7 +41514,79 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 209 */
+/* 211 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/**
+	 * A no-operation function.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.noop(object) === undefined;
+	 * // => true
+	 */
+	function noop() {
+	  // no operation performed
+	}
+
+	module.exports = noop;
+
+
+/***/ },
+/* 212 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
+	/** Used for native method references */
+	var objectProto = Object.prototype;
+
+	/** Used to resolve the internal [[Class]] of values */
+	var toString = objectProto.toString;
+
+	/** Used to detect if a method is native */
+	var reNative = RegExp('^' +
+	  String(toString)
+	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
+	);
+
+	/**
+	 * Checks if `value` is a native function.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
+	 */
+	function isNative(value) {
+	  return typeof value == 'function' && reNative.test(value);
+	}
+
+	module.exports = isNative;
+
+
+/***/ },
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41360,7 +41600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var baseBind = __webpack_require__(222),
 	    baseCreateWrapper = __webpack_require__(223),
 	    isFunction = __webpack_require__(224),
-	    slice = __webpack_require__(213);
+	    slice = __webpack_require__(214);
 
 	/**
 	 * Used for `Array` method references.
@@ -41458,105 +41698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 210 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used to determine if values are of the language type Object */
-	var objectTypes = {
-	  'boolean': false,
-	  'function': true,
-	  'object': true,
-	  'number': false,
-	  'string': false,
-	  'undefined': false
-	};
-
-	module.exports = objectTypes;
-
-
-/***/ },
-/* 211 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the internal [[Class]] of values */
-	var toString = objectProto.toString;
-
-	/** Used to detect if a method is native */
-	var reNative = RegExp('^' +
-	  String(toString)
-	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
-	);
-
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
-	 */
-	function isNative(value) {
-	  return typeof value == 'function' && reNative.test(value);
-	}
-
-	module.exports = isNative;
-
-
-/***/ },
-/* 212 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/**
-	 * A no-operation function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.noop(object) === undefined;
-	 * // => true
-	 */
-	function noop() {
-	  // no operation performed
-	}
-
-	module.exports = noop;
-
-
-/***/ },
-/* 213 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41600,7 +41742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 214 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41640,7 +41782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 215 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41669,46 +41811,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = noop;
-
-
-/***/ },
-/* 216 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/** Used for native method references */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the internal [[Class]] of values */
-	var toString = objectProto.toString;
-
-	/** Used to detect if a method is native */
-	var reNative = RegExp('^' +
-	  String(toString)
-	    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	    .replace(/toString| for [^\]]+/g, '.*?') + '$'
-	);
-
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
-	 */
-	function isNative(value) {
-	  return typeof value == 'function' && reNative.test(value);
-	}
-
-	module.exports = isNative;
 
 
 /***/ },
@@ -41796,9 +41898,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 	var baseCreate = __webpack_require__(225),
-	    isObject = __webpack_require__(167),
-	    setBindData = __webpack_require__(185),
-	    slice = __webpack_require__(205);
+	    isObject = __webpack_require__(166),
+	    setBindData = __webpack_require__(182),
+	    slice = __webpack_require__(202);
 
 	/**
 	 * Used for `Array` method references.
@@ -41863,10 +41965,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreate = __webpack_require__(227),
-	    isObject = __webpack_require__(167),
-	    setBindData = __webpack_require__(185),
-	    slice = __webpack_require__(205);
+	var baseCreate = __webpack_require__(228),
+	    isObject = __webpack_require__(166),
+	    setBindData = __webpack_require__(182),
+	    slice = __webpack_require__(202);
 
 	/**
 	 * Used for `Array` method references.
@@ -41981,9 +42083,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 	var baseCreate = __webpack_require__(226),
-	    isObject = __webpack_require__(228),
+	    isObject = __webpack_require__(227),
 	    setBindData = __webpack_require__(191),
-	    slice = __webpack_require__(213);
+	    slice = __webpack_require__(214);
 
 	/**
 	 * Used for `Array` method references.
@@ -42051,7 +42153,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var baseCreate = __webpack_require__(229),
 	    isObject = __webpack_require__(230),
 	    setBindData = __webpack_require__(191),
-	    slice = __webpack_require__(213);
+	    slice = __webpack_require__(214);
 
 	/**
 	 * Used for `Array` method references.
@@ -42165,9 +42267,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(233),
-	    isObject = __webpack_require__(167),
-	    noop = __webpack_require__(235);
+	var isNative = __webpack_require__(231),
+	    isObject = __webpack_require__(166),
+	    noop = __webpack_require__(232);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
@@ -42214,9 +42316,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(231),
-	    isObject = __webpack_require__(228),
-	    noop = __webpack_require__(232);
+	var isNative = __webpack_require__(233),
+	    isObject = __webpack_require__(227),
+	    noop = __webpack_require__(234);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
@@ -42253,55 +42355,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 227 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-	var isNative = __webpack_require__(234),
-	    isObject = __webpack_require__(167),
-	    noop = __webpack_require__(236);
-
-	/* Native method shortcuts for methods with the same name as other `lodash` methods */
-	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
-
-	/**
-	 * The base implementation of `_.create` without support for assigning
-	 * properties to the created object.
-	 *
-	 * @private
-	 * @param {Object} prototype The object to inherit from.
-	 * @returns {Object} Returns the new object.
-	 */
-	function baseCreate(prototype, properties) {
-	  return isObject(prototype) ? nativeCreate(prototype) : {};
-	}
-	// fallback for browsers without `Object.create`
-	if (!nativeCreate) {
-	  baseCreate = (function() {
-	    function Object() {}
-	    return function(prototype) {
-	      if (isObject(prototype)) {
-	        Object.prototype = prototype;
-	        var result = new Object;
-	        Object.prototype = null;
-	      }
-	      return result || global.Object();
-	    };
-	  }());
-	}
-
-	module.exports = baseCreate;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -42344,6 +42397,55 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = isObject;
 
+
+/***/ },
+/* 228 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+	var isNative = __webpack_require__(235),
+	    isObject = __webpack_require__(166),
+	    noop = __webpack_require__(236);
+
+	/* Native method shortcuts for methods with the same name as other `lodash` methods */
+	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
+
+	/**
+	 * The base implementation of `_.create` without support for assigning
+	 * properties to the created object.
+	 *
+	 * @private
+	 * @param {Object} prototype The object to inherit from.
+	 * @returns {Object} Returns the new object.
+	 */
+	function baseCreate(prototype, properties) {
+	  return isObject(prototype) ? nativeCreate(prototype) : {};
+	}
+	// fallback for browsers without `Object.create`
+	if (!nativeCreate) {
+	  baseCreate = (function() {
+	    function Object() {}
+	    return function(prototype) {
+	      if (isObject(prototype)) {
+	        Object.prototype = prototype;
+	        var result = new Object;
+	        Object.prototype = null;
+	      }
+	      return result || global.Object();
+	    };
+	  }());
+	}
+
+	module.exports = baseCreate;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 229 */
@@ -42564,6 +42666,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Available under MIT license <http://lodash.com/license>
 	 */
 
+	/**
+	 * A no-operation function.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Utilities
+	 * @example
+	 *
+	 * var object = { 'name': 'fred' };
+	 * _.noop(object) === undefined;
+	 * // => true
+	 */
+	function noop() {
+	  // no operation performed
+	}
+
+	module.exports = noop;
+
+
+/***/ },
+/* 235 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
+	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <http://lodash.com/license>
+	 */
+
 	/** Used for native method references */
 	var objectProto = Object.prototype;
 
@@ -42589,38 +42723,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = isNative;
-
-
-/***/ },
-/* 235 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
-	 * Build: `lodash modularize modern exports="npm" -o ./npm/`
-	 * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <http://lodash.com/license>
-	 */
-
-	/**
-	 * A no-operation function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Utilities
-	 * @example
-	 *
-	 * var object = { 'name': 'fred' };
-	 * _.noop(object) === undefined;
-	 * // => true
-	 */
-	function noop() {
-	  // no operation performed
-	}
-
-	module.exports = noop;
 
 
 /***/ },
